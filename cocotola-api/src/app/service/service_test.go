@@ -9,3 +9,7 @@ import (
 func TestA(t *testing.T) {
 	service.A()
 }
+
+func TestB(t *testing.T) {
+	service.B()
+}
