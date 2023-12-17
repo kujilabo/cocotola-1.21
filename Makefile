@@ -57,4 +57,4 @@ test:
 	@bazel test //... --test_output=all --test_timeout=60
 
 test-s:
-    @go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1
+	@go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1

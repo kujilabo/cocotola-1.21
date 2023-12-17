@@ -1,0 +1,34 @@
+---
+on: [pull_request]
+name: Reviewdog
+jobs:
+  golang_1:
+    strategy:
+      matrix:
+        workdir:
+          - cocotola-api
+    name: golang
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
+
+      - name: staticcheck
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--config=../.github/.golangci.yml --disable-all -E staticcheck --timeout=10m"
+          tool_name: staticcheck
+          filter_mode: nofilter
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
