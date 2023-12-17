@@ -37,6 +37,9 @@ jobs:
       - name: bazel
         run: bazel run //:gazelle
 
+      - name: test
+        run: bazel test //... --test_output=all --test_timeout=60
+
       # - name: Coverage
       #   uses: codecov/codecov-action@v3
       #   with:
