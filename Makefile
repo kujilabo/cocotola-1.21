@@ -55,6 +55,15 @@ docker-run:
 
 test:
 	@bazelisk test //... --test_output=all --test_timeout=60
+	@bazelisk coverage //... --combined_report=lcov
+	$(eval OUTPUT_PATH := `bazel info output_path`)
+	cp "$(OUTPUT_PATH)/_coverage/_coverage_report.dat" ./coverage.lcov
+
+test-report:
+	@bazelisk test //... --test_output=all --test_timeout=60
+	@bazelisk coverage //... --combined_report=lcov
+	$(eval OUTPUT_PATH := `bazel info output_path`)
+	genhtml --branch-coverage --output genhtml "$(OUTPUT_PATH)/_coverage/_coverage_report.dat"
 
 test-s:
 	@go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1

@@ -27,6 +27,9 @@ go.work
 
 .vscode
 coverage.txt
+coverage.lcov
 *.db
 
 # proto/*.go
+
+genhtml
