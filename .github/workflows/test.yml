@@ -28,10 +28,14 @@ jobs:
       - uses: bazelbuild/setup-bazelisk@v2
 
       - name: Mount bazel cache
+        id: bazel_cache
         uses: actions/cache@v3
         with:
           path: "~/.cache/bazel"
           key: bazel
+
+      - name: Check cache
+        run: steps.bazel_cache.outputs.cache-hit != 'true'
 
       - name: bazel
         run: bazel info
@@ -44,3 +48,4 @@ jobs:
       #   with:
       #     token: ${{ secrets.CODECOV_TOKEN }}
       #     files: coverage.txt
+
