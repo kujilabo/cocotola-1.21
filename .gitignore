@@ -29,4 +29,4 @@ go.work
 coverage.txt
 *.db
 
-proto/*.go
+# proto/*.go
