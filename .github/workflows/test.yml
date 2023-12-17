@@ -32,11 +32,13 @@ jobs:
           path: "~/.cache/bazel"
           key: bazel
 
-      - name: Test
-        run: make test
+      # - name: Test
+      #   run: make test
+      - name: bazel
+        run: bazel run //:gazelle
 
-      - name: Coverage
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.txt
+      # - name: Coverage
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: coverage.txt

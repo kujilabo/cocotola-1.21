@@ -21,7 +21,7 @@ jobs:
           files: |
             ${{ matrix.workdir }}/**
 
-      - name: golangci-lint
+      - name: golangci-lint-default
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -33,7 +33,7 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-      - name: golangci-lint
+      - name: golangci-lint-addtion
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
