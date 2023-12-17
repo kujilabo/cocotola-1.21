@@ -9,6 +9,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service",
         "//proto",
     ],
 )
