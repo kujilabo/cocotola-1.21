@@ -37,6 +37,9 @@ jobs:
       - name: bazel
         run: bazel run //:gazelle
 
+      - name: bazel
+        run: bazel info
+
       - name: test
         run: bazel test //... --test_output=all --test_timeout=60
 
