@@ -28,11 +28,11 @@ work-init:
 
 .PHONY: gazelle
 gazelle:
-	@bazel run //:gazelle
+	@bazelisk run //:gazelle
 
 .PHONY: gazelle-update-repos
 gazelle-update-repos:
-	@bazel run //:gazelle -- update-repos -from_file ./go.work
+	@bazelisk run //:gazelle -- update-repos -from_file ./go.work
 
 .PHONY: update-mod
 update-mod:
@@ -41,7 +41,7 @@ update-mod:
 	popd
 
 run-cocotola-api:
-	@bazel run //cocotola-api/src
+	@bazelisk run //cocotola-api/src
 
 # https://github.com/bazel-contrib/rules_oci/blob/main/docs/go.md
 # https://github.com/aspect-build/bazel-examples/blob/main/oci_go_image/BUILD.bazel
@@ -54,7 +54,7 @@ docker-run:
 	docker run --rm gcr.io/cocotola/cocotola-api:latest
 
 test:
-	@bazel test //... --test_output=all --test_timeout=60
+	@bazelisk test //... --test_output=all --test_timeout=60
 
 test-s:
 	@go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1

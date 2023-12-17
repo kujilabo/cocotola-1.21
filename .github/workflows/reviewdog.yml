@@ -2,7 +2,7 @@
 on: [pull_request]
 name: Reviewdog
 jobs:
-  golang_1:
+  golang:
     strategy:
       matrix:
         workdir:
@@ -21,14 +21,68 @@ jobs:
           files: |
             ${{ matrix.workdir }}/**
 
-      - name: staticcheck
+      - name: golangci-lint-default
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
-          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
-          golangci_lint_flags: "--config=../.github/.golangci.yml --disable-all -E staticcheck --timeout=10m"
-          tool_name: staticcheck
+          golangci_lint_flags: --config=../.github/.golangci.yml --timeout=10m
+          tool_name: golangci-lint-default
           filter_mode: nofilter
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
+
+      - name: golangci-lint-addtion
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          golangci_lint_flags: >
+            --config=../.github/.golangci.yml --disable-all
+            -E bodyclose
+            -E errorlint
+            -E exhaustive
+            -E forbidigo
+            -E forcetypeassert
+            -E gocognit
+            -E gocyclo
+            -E gofmt
+            -E goimports
+            -E gomnd
+            -E gosec
+            -E noctx
+            -E unconvert
+            -E whitespace
+            --timeout=10m
+          tool_name: golangci-lint-addtion
+          filter_mode: nofilter
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
+  others:
+    name: others
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: misspell
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-misspell@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          locale: "US"
+          fail_on_error: true
+
+      - name: yamllint
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-yamllint@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          yamllint_flags: "-c .github/.yamllint.yml ."
+          fail_on_error: true
