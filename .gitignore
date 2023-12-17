@@ -17,5 +17,16 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+/bazel.iml
+# Ignore all bazel-* symlinks. There is no full list since this can change
+# based on the name of the directory bazel is cloned into.
+/bazel-*
+
 # Go workspace file
 go.work
+
+.vscode
+coverage.txt
+*.db
+
+# proto/*.go

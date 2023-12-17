@@ -1,0 +1,3 @@
+[submodule "redstart"]
+	path = redstart
+	url = https://github.com/kujilabo/redstart.git

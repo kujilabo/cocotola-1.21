@@ -1,0 +1,25 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "domain",
+    srcs = [
+        "init.go",
+        "lang.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/domain",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_kujilabo_redstart//lib/domain",
+        "@com_github_kujilabo_redstart//lib/errors",
+    ],
+)
+
+go_test(
+    name = "domain_test",
+    srcs = ["lang_test.go"],
+    embed = [":domain"],
+    deps = [
+        "@com_github_kujilabo_redstart//lib/domain",
+        "@com_github_stretchr_testify//assert",
+    ],
+)
