@@ -26,25 +26,26 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: bazelbuild/setup-bazelisk@v2
+
       - name: Mount bazel cache
+        id: bazel_cache
         uses: actions/cache@v3
         with:
           path: "~/.cache/bazel"
           key: bazel
 
-      # - name: Test
-      #   run: make test
-      - name: bazel
-        run: bazel run //:gazelle
+      - name: Check cache
+        run: ${{ steps.bazel_cache.outputs.cache-hit }}
 
       - name: bazel
         run: bazel info
 
-      - name: test
-        run: bazel test //... --test_output=all --test_timeout=60
+      - name: Test
+        run: make test
 
       # - name: Coverage
       #   uses: codecov/codecov-action@v3
       #   with:
       #     token: ${{ secrets.CODECOV_TOKEN }}
       #     files: coverage.txt
+
