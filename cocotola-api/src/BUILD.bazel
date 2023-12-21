@@ -1,6 +1,8 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push", "oci_tarball")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 
 go_library(
     name = "src_lib",
@@ -46,6 +48,30 @@ oci_push(
     name = "push",
     image = ":image",
     remote_tags = ["latest"],
+    repository = "asia.gcr.io/cocotola-001/cocotola-api",
+    # repository = "pecolynx/cocotola",
+)
+
+expand_template(
+    name = "stamped",
+    out = "_stamped.tags.txt",
+    stamp_substitutions = {"BUILD_VERSION": "{{BUILD_EMBED_LABEL}}"},
+    substitutions = {"BUILD_VERSION": "0.0.0"},
+    template = "tags_tmpl",
+)
+
+write_file(
+    name = "tags_tmpl",
+    out = "tags.txt.tmpl",
+    content = [
+        "BUILD_VERSION",
+    ],
+)
+
+oci_push(
+    name = "push1",
+    image = ":image",
+    remote_tags = ":stamped",
     repository = "asia.gcr.io/cocotola-001/cocotola-api",
     # repository = "pecolynx/cocotola",
 )
