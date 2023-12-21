@@ -46,9 +46,12 @@ run-cocotola-api:
 # https://github.com/bazel-contrib/rules_oci/blob/main/docs/go.md
 # https://github.com/aspect-build/bazel-examples/blob/main/oci_go_image/BUILD.bazel
 docker-build:
-	bazel build //cocotola-api/src:tarball
+	bazelisk build //cocotola-api/src:tarball
 	$(eval COCOTOLA_API_TARBALL := `bazel cquery --output=files //cocotola-api/src:tarball`)
 	docker load --input $(COCOTOLA_API_TARBALL)
+
+docker-push:
+	bazelisk run //cocotola-api/src:push
 
 docker-run:
 	docker run --rm gcr.io/cocotola/cocotola-api:latest
