@@ -84,11 +84,11 @@ jobs:
         run: bazelisk build //cocotola-api/src:tarball
 
       - name: Digest
-        run: cat bazel-bin/cocotola-api/src/image/index.json | jq '.manifests[0].digest' | cut -d ":" -f 2
+        run: cat bazel-bin/cocotola-api/src/image/index.json | jq '.manifests[0].digest' | cut -d ':' -f 2
 
       - name: Digest
         id: digest
-        run: echo "digest=$(cat bazel-bin/cocotola-api/src/image/index.json | jq '.manifests[0].digest' | cut -d ":" -f 2)" >> $GITHUB_OUTPUT
+        run: echo "digest=$(cat bazel-bin/cocotola-api/src/image/index.json | jq '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
 
       - name: Push
-        run: REMOTE_TAG=$ ${{ steps.digest.outputs.digest }} make docker-push
+        run: REMOTE_TAG=${{ steps.digest.outputs.digest }} make docker-push
