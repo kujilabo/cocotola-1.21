@@ -80,5 +80,15 @@ jobs:
       - name: Check outputs
         run: echo ${{ steps.vars.outputs.sha_short }}
 
+      - name: Build
+        run: bazelisk build //cocotola-api/src:tarball
+
+      - name: Digest
+        run: cat bazel-bin/cocotola-api/src/image/index.json | jq '.manifests[0].digest' | cut -d ":" -f 2
+
+      - name: Digest
+        id: digest
+        run: echo "digest=$(cat bazel-bin/cocotola-api/src/image/index.json | jq '.manifests[0].digest' | cut -d ":" -f 2)" >> $GITHUB_OUTPUT
+
       - name: Push
-        run: make docker-push ${{ steps.vars.outputs.sha_short }}
+        run: REMOTE_TAG=$ ${{ steps.digest.outputs.digest }} make docker-push
