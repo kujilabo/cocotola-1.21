@@ -51,7 +51,7 @@ docker-build:
 	docker load --input $(COCOTOLA_API_TARBALL)
 
 docker-push:
-	bazelisk run //cocotola-api/src:push
+	bazelisk run //cocotola-api/src:push -- --tag $(REMOTE_TAG)
 
 docker-run:
 	docker run --rm gcr.io/cocotola/cocotola-api:latest

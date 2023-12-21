@@ -72,5 +72,13 @@ jobs:
       # https://github.com/google-github-actions/setup-gcloud#authorization
 
       # https://docs.github.com/ja/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Check outputs
+        run: echo ${{ steps.vars.outputs.sha_short }}
+
       - name: Push
-        run: make docker-push
+        run: make docker-push ${{ steps.vars.outputs.sha_short }}
