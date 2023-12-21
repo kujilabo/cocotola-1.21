@@ -46,3 +46,6 @@ jobs:
 
       - name: Test
         run: make test
+
+      - name: Push
+        run: make docker-push

@@ -1,5 +1,5 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
-load("@rules_oci//oci:defs.bzl", "oci_image", "oci_tarball")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push", "oci_tarball")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
 go_library(
@@ -41,3 +41,19 @@ oci_tarball(
     image = ":image",
     repo_tags = ["gcr.io/cocotola:latest"],
 )
+
+oci_push(
+    name = "push",
+    image = ":image",
+    remote_tags = ["latest"],
+    repository = "asia.gcr.io/cocotola-001/cocotola-api",
+    # repository = "pecolynx/cocotola",
+)
+
+# load("@container_structure_test//:defs.bzl", "container_structure_test")
+
+# container_structure_test(
+#     name = "hello_test",
+#     configs = ["testdata/hello.yaml"],
+#     image = ":hello",
+# )
