@@ -15,3 +15,7 @@ func TestA(t *testing.T) {
 func TestB(t *testing.T) {
 	service.B()
 }
+
+func TestC(t *testing.T) {
+	service.C()
+}
