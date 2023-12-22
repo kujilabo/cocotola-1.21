@@ -16,5 +16,6 @@ func main() {
 	logger.Info("")
 	logger.Info(domain.Lang2EN.String())
 	logger.Info("Hello")
+	logger.Info("Hello")
 	service.A()
 }
