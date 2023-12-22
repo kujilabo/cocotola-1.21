@@ -7,3 +7,12 @@ GOPROXY=direct go install github.com/pecolynx/pkgforbid/cmd/pkgforbid@latest
 ```
 
 lcov
+
+
+
+.vscode/settings.json
+```
+{
+    "go.buildTags": " small medium large"
+}
+```

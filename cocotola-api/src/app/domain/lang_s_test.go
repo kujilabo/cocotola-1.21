@@ -1,4 +1,6 @@
-package domain
+//go:build small
+
+package domain_test
 
 import (
 	"errors"
@@ -7,28 +9,39 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/domain"
 	libdomain "github.com/kujilabo/redstart/lib/domain"
 )
+
+func TestA(t *testing.T) {
+	assert.False(t, true)
+	assert.False(t, true)
+}
+
+func TestB(t *testing.T) {
+	assert.False(t, true)
+	assert.False(t, true)
+}
 
 func TestNewLang2(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name          string
 		args          string
-		want          Lang2
+		want          domain.Lang2
 		wantErr       bool
 		wantErrDetail error
 	}{
 		{
 			name:    "en",
 			args:    "en",
-			want:    Lang2EN,
+			want:    domain.Lang2EN,
 			wantErr: false,
 		},
 		{
 			name:    "ja",
 			args:    "ja",
-			want:    Lang2JA,
+			want:    domain.Lang2JA,
 			wantErr: false,
 		},
 		{
@@ -42,7 +55,7 @@ func TestNewLang2(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := NewLang2(tt.args)
+			got, err := domain.NewLang2(tt.args)
 			if !tt.wantErr {
 				assert.NoError(t, err)
 			} else {
