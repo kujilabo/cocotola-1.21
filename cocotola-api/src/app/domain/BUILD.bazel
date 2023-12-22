@@ -16,9 +16,21 @@ go_library(
 
 go_test(
     name = "domain_test",
-    srcs = ["lang_test.go"],
-    embed = [":domain"],
+    srcs = ["lang_s_test.go"],
     deps = [
+        ":domain",
+        "@com_github_kujilabo_redstart//lib/domain",
+        "@com_github_stretchr_testify//assert",
+    ],
+)
+
+go_test(
+    name = "domain_s_test",
+    size = "small",
+    srcs = ["lang_s_test.go"],
+    gotags = ["small"],
+    deps = [
+        ":domain",
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_stretchr_testify//assert",
     ],

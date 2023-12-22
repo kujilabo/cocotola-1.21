@@ -28,7 +28,7 @@ work-init:
 
 .PHONY: gazelle
 gazelle:
-	@bazelisk run //:gazelle
+	@bazelisk run //:gazelle -- -build_tags=small,medium,large
 
 .PHONY: gazelle-update-repos
 gazelle-update-repos:
@@ -57,16 +57,18 @@ docker-run:
 	docker run --rm gcr.io/cocotola/cocotola-api:latest
 
 test:
-	@bazelisk test //... --test_output=all --test_timeout=60
+	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small --@io_bazel_rules_go//go/config:race
 	@bazelisk coverage //... --combined_report=lcov
 	$(eval OUTPUT_PATH := `bazel info output_path`)
 	cp "$(OUTPUT_PATH)/_coverage/_coverage_report.dat" ./coverage.lcov
 
 test-report:
-	@bazelisk test //... --test_output=all --test_timeout=60
+	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small --@io_bazel_rules_go//go/config:race 
 	@bazelisk coverage //... --combined_report=lcov
 	$(eval OUTPUT_PATH := `bazel info output_path`)
 	genhtml --branch-coverage --output genhtml "$(OUTPUT_PATH)/_coverage/_coverage_report.dat"
 
 test-s:
-	@go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1
+	@pushd ./cocotola-api/ && \
+		go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1 -race -tags=small && \
+	popd

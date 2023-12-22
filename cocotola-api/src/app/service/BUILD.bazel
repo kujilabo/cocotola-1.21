@@ -9,6 +9,14 @@ go_library(
 
 go_test(
     name = "service_test",
-    srcs = ["service_test.go"],
+    srcs = ["service_s_test.go"],
+    deps = [":service"],
+)
+
+go_test(
+    name = "service_s_test",
+    size = "small",
+    srcs = ["service_s_test.go"],
+    gotags = ["small"],
     deps = [":service"],
 )

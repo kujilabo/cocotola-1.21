@@ -1,3 +1,5 @@
+//go:build small
+
 package service_test
 
 import (
