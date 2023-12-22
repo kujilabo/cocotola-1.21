@@ -13,16 +13,6 @@ import (
 	libdomain "github.com/kujilabo/redstart/lib/domain"
 )
 
-func TestA(t *testing.T) {
-	assert.False(t, true)
-	assert.False(t, true)
-}
-
-func TestB(t *testing.T) {
-	assert.False(t, true)
-	assert.False(t, true)
-}
-
 func TestNewLang2(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
