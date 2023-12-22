@@ -69,6 +69,13 @@ jobs:
 
       - name: Test
         run: make test
+
+      - name: Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.lcov
+
       # https://github.com/google-github-actions/setup-gcloud#authorization
 
       # https://docs.github.com/ja/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform
