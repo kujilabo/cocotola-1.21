@@ -6,7 +6,7 @@ require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223144514-1499f74c326f
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223145322-0f615e7128d3
 	github.com/kujilabo/redstart v0.0.3
 	github.com/samber/slog-gin v1.7.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.46.1
