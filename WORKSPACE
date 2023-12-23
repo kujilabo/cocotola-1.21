@@ -30,8 +30,8 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 go_repository(
     name = "co_honnef_go_tools",
     importpath = "honnef.co/go/tools",
-    sum = "h1:3JgtbtFHMiCmsznwGVTUWbgGov+pVqnlf1dEJTNAXeM=",
-    version = "v0.0.1-2019.2.3",
+    sum = "h1:/hemPrYIhOhy8zYrNj+069zDB68us2sMGsfkFJO0iZs=",
+    version = "v0.0.0-20190523083050-ea95bdfd59fc",
 )
 
 go_repository(
@@ -778,6 +778,7 @@ go_repository(
 
 go_repository(
     name = "com_github_googleapis_gax_go_v2",
+    build_file_proto_mode = "disable_global",
     importpath = "github.com/googleapis/gax-go/v2",
     sum = "h1:A+gCJKdRfqXkr+BIRGtZLibNXf0m1f9E4HG56etFpas=",
     version = "v2.12.0",
@@ -2075,8 +2076,8 @@ go_repository(
 go_repository(
     name = "com_github_kujilabo_redstart",
     importpath = "github.com/kujilabo/redstart",
-    sum = "h1:CuZHFIbrRu1O71BxTuxkSLuba0F0/E+iorx8qnSpjVo=",
-    version = "v0.0.2",
+    sum = "h1:vba49mETpd8rH3DdpRXpV92+i62fubAvUn/c1T3xtIw=",
+    version = "v0.0.3",
 )
 
 go_repository(
