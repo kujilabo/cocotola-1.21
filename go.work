@@ -1,0 +1,9 @@
+go 1.21.4
+
+use (
+	./cocotola-api
+	./cocotola-auth
+	./lib
+	./proto
+	./redstart
+)
