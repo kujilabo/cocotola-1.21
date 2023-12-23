@@ -163,8 +163,6 @@ github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
-github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223144514-1499f74c326f h1:+bfNOsFZxGpBwJ4fsMrl2gk9Pe79yw0YXK+I6bSG42I=
-github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223144514-1499f74c326f/go.mod h1:+vsIUOClie9ylVsim4Ym8gBkToaDCALPFpBjLW11Xh4=
 github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223145322-0f615e7128d3 h1:gBFyhqbImVggSTCiXJEgOXj3fy9IGHzuEdt5XJlkhmc=
 github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223145322-0f615e7128d3/go.mod h1:+vsIUOClie9ylVsim4Ym8gBkToaDCALPFpBjLW11Xh4=
 github.com/kujilabo/redstart v0.0.3 h1:vba49mETpd8rH3DdpRXpV92+i62fubAvUn/c1T3xtIw=
@@ -177,7 +175,6 @@ github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWE
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/mattn/go-sqlite3 v1.14.19 h1:fhGleo2h1p8tVChob4I9HpmVFIAkKGpiukdrgQbWfGI=
 github.com/mattn/go-sqlite3 v1.14.19/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=
-github.com/matttproud/golang_protobuf_extensions v1.0.4 h1:mmDVorXM7PCGKw94cs5zkfA9PSy5pEvNWRP0ET0TIVo=
 github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 h1:jWpvCLoY8Z/e3VKvlsiIGKtc+UG6U5vzxaoagmhXfyg=
 github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0/go.mod h1:QUyp042oQthUoa9bqDv0ER0wrtXnBruoNd7aNjkbP+k=
 github.com/moby/term v0.5.0 h1:xt8Q1nalod/v7BqbG21f8mQPqH+xAaC9C3N3wfWbVP0=
