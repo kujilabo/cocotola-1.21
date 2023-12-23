@@ -57,7 +57,7 @@ docker-run:
 	docker run --rm gcr.io/cocotola/cocotola-api:latest
 
 test:
-	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small --@io_bazel_rules_go//go/config:race
+	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small
 	@bazelisk coverage //... --combined_report=lcov
 	$(eval OUTPUT_PATH := `bazel info output_path`)
 	cp "$(OUTPUT_PATH)/_coverage/_coverage_report.dat" ./coverage.lcov
