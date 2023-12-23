@@ -5,14 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/log"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 )
 
 func NewAuthMiddleware(signingKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
-		logger := rsliblog.GetLoggerFromContext(ctx, log.AppTraceLoggerContextKey)
+		logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppTraceLoggerContextKey)
 
 		authorization := c.GetHeader("Authorization")
 		if !strings.HasPrefix(authorization, "Bearer ") {

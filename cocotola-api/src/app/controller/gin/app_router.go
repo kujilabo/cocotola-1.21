@@ -12,7 +12,7 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/config"
 	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/controller/gin/middleware"
 	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/usecase/student"
-	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/log"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 )
 
@@ -56,7 +56,7 @@ func NewAppRouter(
 	corsConfig cors.Config, appConfig *config.AppConfig,
 	// authConfig *config.AuthConfig,
 	debugConfig *config.DebugConfig) (*gin.Engine, error) {
-	logger := rsliblog.GetLoggerFromContext(ctx, log.AppControllerLoggerContextKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 
 	router := gin.New()
 	router.Use(cors.New(corsConfig))

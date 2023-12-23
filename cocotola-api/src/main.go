@@ -31,8 +31,8 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/gateway"
 	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/service"
-	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/log"
 	"github.com/kujilabo/cocotola-1.21/cocotola-api/src/sqls"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	"github.com/kujilabo/cocotola-1.21/proto"
 )
 
@@ -60,7 +60,7 @@ func main() {
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
-	ctx = log.InitLogger(ctx)
+	ctx = liblog.InitLogger(ctx)
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
 
 	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {

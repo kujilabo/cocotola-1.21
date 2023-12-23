@@ -13,7 +13,7 @@ go_library(
         "//cocotola-api/src/app/config",
         "//cocotola-api/src/app/controller/gin/middleware",
         "//cocotola-api/src/app/usecase/student",
-        "//cocotola-api/src/log",
+        "//lib/log",
         "@com_github_gin_contrib_cors//:cors",
         "@com_github_gin_gonic_gin//:gin",
         "@com_github_kujilabo_redstart//lib/domain",
