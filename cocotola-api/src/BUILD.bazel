@@ -9,27 +9,6 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-api/src",
     visibility = ["//visibility:private"],
-    deps = [
-        "//cocotola-api/src/app/config",
-        "//cocotola-api/src/app/controller/gin",
-        "//cocotola-api/src/app/domain",
-        "//cocotola-api/src/app/gateway",
-        "//cocotola-api/src/app/service",
-        "//cocotola-api/src/sqls",
-        "//lib/log",
-        "//proto",
-        "@com_github_gin_gonic_gin//:gin",
-        "@com_github_kujilabo_redstart//lib/config",
-        "@com_github_kujilabo_redstart//lib/domain",
-        "@com_github_kujilabo_redstart//lib/errors",
-        "@com_github_kujilabo_redstart//lib/gateway",
-        "@com_github_kujilabo_redstart//lib/log",
-        "@io_gorm_gorm//:gorm",
-        "@io_opentelemetry_go_otel//:otel",
-        "@io_opentelemetry_go_otel//propagation",
-        "@io_opentelemetry_go_otel_sdk//trace",
-        "@org_golang_x_sync//errgroup",
-    ],
 )
 
 go_binary(
