@@ -12,6 +12,5 @@ packageConfigs:
       - "net/http"
   "main":
     forbiddenPackages:
-      - "net/http"
 
 debug: false

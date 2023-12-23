@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "student",
+    srcs = ["student_usecase_workbook.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/usecase/student",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/service",
+        "@com_github_kujilabo_redstart//user/domain",
+    ],
+)
