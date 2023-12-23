@@ -10,9 +10,15 @@ go_library(
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/controller/gin",
     visibility = ["//visibility:public"],
     deps = [
+        "//cocotola-api/src/app/config",
+        "//cocotola-api/src/app/controller/gin/middleware",
         "//cocotola-api/src/app/usecase/student",
+        "//lib/log",
+        "@com_github_gin_contrib_cors//:cors",
         "@com_github_gin_gonic_gin//:gin",
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/log",
+        "@com_github_samber_slog_gin//:slog-gin",
+        "@io_opentelemetry_go_contrib_instrumentation_github_com_gin_gonic_gin_otelgin//:otelgin",
     ],
 )
