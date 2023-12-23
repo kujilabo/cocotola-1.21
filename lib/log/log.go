@@ -17,6 +17,7 @@ const (
 	AppGinLoggerContextKey        rslibdomain.ContextKey = "app_gin"
 	AppTraceLoggerContextKey      rslibdomain.ContextKey = "app_trace"
 	AppAuthLoggerContextKey       rslibdomain.ContextKey = "app_auth"
+	AppUsecaseLoggerContextKey    rslibdomain.ContextKey = "app_usecase"
 )
 
 var (

@@ -39,6 +39,12 @@ update-mod:
 	@pushd ./cocotola-api/ && \
 		go get -u ./... && \
 	popd
+	@pushd ./cocotola-auth/ && \
+		go get -u ./... && \
+	popd
+	@pushd ./lib/ && \
+		go get -u ./... && \
+	popd
 
 run-cocotola-api:
 	@bazelisk run //cocotola-api/src

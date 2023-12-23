@@ -7,6 +7,8 @@ jobs:
       matrix:
         workdir:
           - cocotola-api
+          - cocotola-auth
+          - lib
     name: golang
     runs-on: ubuntu-latest
     steps:

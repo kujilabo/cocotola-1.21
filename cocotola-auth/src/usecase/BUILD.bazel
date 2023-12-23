@@ -9,7 +9,13 @@ go_library(
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase",
     visibility = ["//visibility:public"],
     deps = [
+        "//cocotola-auth/src/domain",
         "//cocotola-auth/src/service",
+        "//lib/log",
+        "@com_github_golang_jwt_jwt//:jwt",
         "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/log",
+        "@com_github_kujilabo_redstart//user/domain",
+        "@com_github_kujilabo_redstart//user/service",
     ],
 )
