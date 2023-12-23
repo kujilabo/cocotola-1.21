@@ -34,7 +34,6 @@ func NewAuthentication(rf rsuserservice.RepositoryFactory, signingKey []byte) *A
 		rf:         rf,
 		signingKey: signingKey,
 	}
-
 }
 
 func (u *Authentication) Authenticate(ctx context.Context, bearerToken string) (*rsuserdomain.AppUserModel, error) {
