@@ -23,7 +23,7 @@
 /bazel-*
 
 # Go workspace file
-# go.work
+go.work
 
 .vscode
 coverage.txt
