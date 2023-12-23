@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "google_auth_client.go",
+        "init.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_kujilabo_redstart//lib/errors",
+        "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)

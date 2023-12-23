@@ -5,6 +5,7 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src",
     visibility = ["//visibility:private"],
+    deps = ["//cocotola-auth/src/usecase"],
 )
 
 go_binary(
