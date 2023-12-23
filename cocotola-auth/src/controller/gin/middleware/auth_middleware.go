@@ -5,14 +5,15 @@ package middleware
 
 // 	"github.com/gin-gonic/gin"
 
-// 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 // 	rsliblog "github.com/kujilabo/redstart/lib/log"
+
+// 	"github.com/kujilabo/cocotola-1.21/lib/log"
 // )
 
 // func NewAuthMiddleware(signingKey []byte) gin.HandlerFunc {
 // 	return func(c *gin.Context) {
 // 		ctx := c.Request.Context()
-// 		logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppTraceLoggerContextKey)
+// 		logger := rsliblog.GetLoggerFromContext(ctx, log.AppTraceLoggerContextKey)
 
 // 		authorization := c.GetHeader("Authorization")
 // 		if !strings.HasPrefix(authorization, "Bearer ") {

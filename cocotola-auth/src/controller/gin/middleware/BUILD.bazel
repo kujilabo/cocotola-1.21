@@ -8,7 +8,7 @@ go_library(
         "tracelog_middleware.go",
         "wait_middleware.go",
     ],
-    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-api/src/app/controller/gin/middleware",
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin/middleware",
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_gin_gonic_gin//:gin",

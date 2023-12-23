@@ -1,5 +1,5 @@
 package middleware
 
-import "go.opentelemetry.io/otel"
+// import "go.opentelemetry.io/otel"
 
-var tracer = otel.Tracer("github.com/pecolynx/golang-webapi-boilerplate/src/controller/middleware")
+// // var tracer = otel.Tracer("github.com/pecolynx/golang-webapi-boilerplate/src/controller/middleware")
