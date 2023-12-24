@@ -15,10 +15,18 @@
     "jsx": "react-jsx",
 
     /* Linting */
+    "allowSyntheticDefaultImports": true, // Added
+    "esModuleInterop": true, // Added
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": "./", // Added
+    "paths": { // Added
+      "@/*": ["src/*"],
+      "~/*": ["public/*"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
