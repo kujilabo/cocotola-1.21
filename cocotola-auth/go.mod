@@ -5,7 +5,7 @@ go 1.21.4
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223145322-0f615e7128d3
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223165801-a2af558a1514
 	github.com/kujilabo/redstart v0.0.3
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1
 	go.opentelemetry.io/otel v1.21.0
