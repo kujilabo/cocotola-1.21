@@ -46,21 +46,46 @@ update-mod:
 		go get -u ./... && \
 	popd
 
-run-cocotola-api:
+bazel-run-api:
 	@bazelisk run //cocotola-api/src
+
+bazel-run-auth:
+	@bazelisk run //cocotola-auth/src
 
 # https://github.com/bazel-contrib/rules_oci/blob/main/docs/go.md
 # https://github.com/aspect-build/bazel-examples/blob/main/oci_go_image/BUILD.bazel
-docker-build:
-	bazelisk build //cocotola-api/src:tarball
+bazel-docker-load-api:
 	$(eval COCOTOLA_API_TARBALL := `bazel cquery --output=files //cocotola-api/src:tarball`)
 	docker load --input $(COCOTOLA_API_TARBALL)
 
-docker-push:
+bazel-docker-load-auth:
+	$(eval COCOTOLA_AUTH_TARBALL := `bazel cquery --output=files //cocotola-auth/src:tarball`)
+	docker load --input $(COCOTOLA_AUTH_TARBALL)
+
+bazel-build-api:
+	bazelisk build //cocotola-api/src:tarball
+
+bazel-build-auth:
+	bazelisk build //cocotola-auth/src:tarball
+
+bazel-docker-push-api:
 	bazelisk run //cocotola-api/src:push -- --tag $(REMOTE_TAG)
 
-docker-run:
+bazel-docker-push-auth:
+	bazelisk run //cocotola-auth/src:push -- --tag $(REMOTE_TAG)
+
+docker-run-api:
 	docker run --rm asia.gcr.io/cocotola-001/cocotola-api:latest
+
+docker-run-auth:
+	docker run --rm asia.gcr.io/cocotola-001/cocotola-auth:latest
+
+bazel-docker-run-api: bazel-build-auth bazel-docker-load-api docker-run-api
+
+bazel-docker-run-auth: bazel-build-auth bazel-docker-load-auth docker-run-auth
+
+# all
+bazel-build: bazel-build-api bazel-build-auth
 
 test:
 	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small

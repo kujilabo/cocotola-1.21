@@ -83,22 +83,22 @@ jobs:
 
       # https://docs.github.com/ja/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-google-cloud-platform
 
-      - name: Set outputs
-        id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Check outputs
-        run: echo ${{ steps.vars.outputs.sha_short }}
-
       - name: Build
-        run: bazelisk build //cocotola-api/src:tarball
+        run: make bazel-build
 
       - name: Digest
         run: cat bazel-bin/cocotola-api/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2
 
-      - name: Digest
-        id: digest
+      - name: Digest cocotola-api
+        id: digest_api
         run: echo "digest=$(cat bazel-bin/cocotola-api/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
 
       - name: Push
-        run: REMOTE_TAG=${{ steps.digest.outputs.digest }} make docker-push
+        run: REMOTE_TAG=${{ steps.digest_api.outputs.digest }} make docker-push-api
+
+      - name: Digest cocotola-auth
+        id: digest_auth
+        run: echo "digest=$(cat bazel-bin/cocotola-auth/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
+
+      - name: Push
+        run: REMOTE_TAG=${{ steps.digest_auth.outputs.digest }} make docker-push-auth
