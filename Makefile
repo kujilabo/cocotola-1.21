@@ -60,7 +60,7 @@ docker-push:
 	bazelisk run //cocotola-api/src:push -- --tag $(REMOTE_TAG)
 
 docker-run:
-	docker run --rm gcr.io/cocotola/cocotola-api:latest
+	docker run --rm asia.gcr.io/cocotola-001/cocotola-api:latest
 
 test:
 	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small

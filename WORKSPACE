@@ -2073,11 +2073,12 @@ go_repository(
 )
 
 # bazel run //:gazelle -- update-repos github.com/kujilabo/redstart
+# GOPROXy=direct bazelisk run //:gazelle -- update-repos github.com/kujilabo/redstart
 go_repository(
     name = "com_github_kujilabo_redstart",
     importpath = "github.com/kujilabo/redstart",
-    sum = "h1:vba49mETpd8rH3DdpRXpV92+i62fubAvUn/c1T3xtIw=",
-    version = "v0.0.3",
+    sum = "h1:aXwg3HgzwAtO4lw2kB5PgqFl591HCeYTegk2GqusIe8=",
+    version = "v0.0.4",
 )
 
 go_repository(
