@@ -36,7 +36,7 @@ gazelle-update-repos:
 
 .PHONY: update-mod
 update-mod:
-	@pushd ./cocotola-api/ && \
+	@pushd ./cocotola-core/ && \
 		go get -u ./... && \
 	popd
 	@pushd ./cocotola-auth/ && \
@@ -46,46 +46,46 @@ update-mod:
 		go get -u ./... && \
 	popd
 
-bazel-run-api:
-	@bazelisk run //cocotola-api/src
+bazel-run-core:
+	@bazelisk run //cocotola-core/src
 
 bazel-run-auth:
 	@bazelisk run //cocotola-auth/src
 
 # https://github.com/bazel-contrib/rules_oci/blob/main/docs/go.md
 # https://github.com/aspect-build/bazel-examples/blob/main/oci_go_image/BUILD.bazel
-bazel-docker-load-api:
-	$(eval COCOTOLA_API_TARBALL := `bazel cquery --output=files //cocotola-api/src:tarball`)
-	docker load --input $(COCOTOLA_API_TARBALL)
+bazel-docker-load-core:
+	$(eval COCOTOLA_CORE_TARBALL := `bazel cquery --output=files //cocotola-core/src:tarball`)
+	docker load --input $(COCOTOLA_CORE_TARBALL)
 
 bazel-docker-load-auth:
 	$(eval COCOTOLA_AUTH_TARBALL := `bazel cquery --output=files //cocotola-auth/src:tarball`)
 	docker load --input $(COCOTOLA_AUTH_TARBALL)
 
-bazel-build-api:
-	bazelisk build //cocotola-api/src:tarball
+bazel-build-core:
+	bazelisk build //cocotola-core/src:tarball
 
 bazel-build-auth:
 	bazelisk build //cocotola-auth/src:tarball
 
-bazel-docker-push-api:
-	bazelisk run //cocotola-api/src:push -- --tag $(REMOTE_TAG)
+bazel-docker-push-core:
+	bazelisk run //cocotola-core/src:push -- --tag $(REMOTE_TAG)
 
 bazel-docker-push-auth:
 	bazelisk run //cocotola-auth/src:push -- --tag $(REMOTE_TAG)
 
-docker-run-api:
-	docker run --rm asia.gcr.io/cocotola-001/cocotola-api:latest
+docker-run-core:
+	docker run --rm asia.gcr.io/cocotola-001/cocotola-core:latest
 
 docker-run-auth:
 	docker run --rm asia.gcr.io/cocotola-001/cocotola-auth:latest
 
-bazel-docker-run-api: bazel-build-auth bazel-docker-load-api docker-run-api
+bazel-docker-run-core: bazel-build-auth bazel-docker-load-core docker-run-core
 
 bazel-docker-run-auth: bazel-build-auth bazel-docker-load-auth docker-run-auth
 
 # all
-bazel-build: bazel-build-api bazel-build-auth
+bazel-build: bazel-build-core bazel-build-auth
 
 test:
 	rm -f ./coverage.lcov
@@ -110,6 +110,6 @@ test-report:
 	genhtml --branch-coverage --output genhtml "$(OUTPUT_PATH)/_coverage/_coverage_report.dat"
 
 test-s:
-	@pushd ./cocotola-api/ && \
+	@pushd ./cocotola-core/ && \
 		go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1 -race -tags=small && \
 	popd

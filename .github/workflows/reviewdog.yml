@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         workdir:
-          - cocotola-api
+          - cocotola-core
           - cocotola-auth
           - lib
     name: golang

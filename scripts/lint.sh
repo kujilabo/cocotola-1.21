@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd cocotola-api
+pushd cocotola-core
 golangci-lint run --config ../.github/.golangci.yml && \
 golangci-lint run --disable-all --config ../.github/.golangci.yml \
 -E bodyclose \
