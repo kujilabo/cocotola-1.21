@@ -5,11 +5,16 @@ go_library(
     srcs = [
         "google_auth_client.go",
         "init.go",
+        "repository_factory.go",
+        "transaction_manager.go",
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway",
     visibility = ["//visibility:public"],
     deps = [
+        "//cocotola-core/src/app/service",
+        "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/errors",
+        "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
         "@io_opentelemetry_go_otel//:otel",
     ],
