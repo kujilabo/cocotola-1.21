@@ -51,6 +51,9 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
+      
+      - name: Setup go.work
+        run: go work init cocotola-api cocotola-auth lib proto
 
       - uses: bazelbuild/setup-bazelisk@v2
 
