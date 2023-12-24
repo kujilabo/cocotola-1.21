@@ -160,6 +160,8 @@ github.com/kujilabo/cocotola-1.21/proto v0.0.0-20231223145322-0f615e7128d3 h1:oJ
 github.com/kujilabo/cocotola-1.21/proto v0.0.0-20231223145322-0f615e7128d3/go.mod h1:G4LFB52E7+u4ZGEs302ZZvWFgFe/xdFPGgHywziWFa4=
 github.com/kujilabo/redstart v0.0.3 h1:vba49mETpd8rH3DdpRXpV92+i62fubAvUn/c1T3xtIw=
 github.com/kujilabo/redstart v0.0.3/go.mod h1:szFH/T+DtuMNzVrcmuN2y0hiHMneCpgx0YAaWB/8UhQ=
+github.com/kujilabo/redstart v0.0.4 h1:aXwg3HgzwAtO4lw2kB5PgqFl591HCeYTegk2GqusIe8=
+github.com/kujilabo/redstart v0.0.4/go.mod h1:2aOeTbYcjcqV+RDCps6C41JJ/LoUHl3KNhrzsM8xcHU=
 github.com/leodido/go-urn v1.2.4 h1:XlAE/cm/ms7TE/VMVoduSpNBoyc2dOxHs5MZSwAN63Q=
 github.com/leodido/go-urn v1.2.4/go.mod h1:7ZrI8mTSeBSHl/UaRyKQW1qZeMgak41ANeCNaVckg+4=
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=

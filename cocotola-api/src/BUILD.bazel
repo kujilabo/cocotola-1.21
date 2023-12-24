@@ -3,6 +3,7 @@ load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push", "oci_tarball")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_oci//oci:pull.bzl", "oci_pull")
 
 go_library(
     name = "src_lib",
@@ -36,6 +37,7 @@ go_binary(
     name = "src",
     embed = [":src_lib"],
     visibility = ["//visibility:public"],
+    pure = "on",
 )
 
 # Put app go_binary into a tar layer.
@@ -57,7 +59,7 @@ oci_tarball(
     name = "tarball",
     # Use the image built for the exec platform rather than the target platform
     image = ":image",
-    repo_tags = ["gcr.io/cocotola:latest"],
+    repo_tags = ["asia.gcr.io/cocotola-001/cocotola-api:latest"],
 )
 
 oci_push(
