@@ -88,6 +88,7 @@ bazel-docker-run-auth: bazel-build-auth bazel-docker-load-auth docker-run-auth
 bazel-build: bazel-build-api bazel-build-auth
 
 test:
+	rm -f ./coverage.lcov
 	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small
 	@bazelisk coverage //... --combined_report=lcov
 	$(eval OUTPUT_PATH := `bazel info output_path`)
