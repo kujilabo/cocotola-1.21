@@ -53,7 +53,7 @@ jobs:
           go-version: ${{ matrix.go-version }}
       
       - name: Setup go.work
-        run: go work init cocotola-api cocotola-auth lib proto
+        run: go work init cocotola-core cocotola-auth lib proto
 
       - uses: bazelbuild/setup-bazelisk@v2
 
@@ -87,18 +87,18 @@ jobs:
         run: make bazel-build
 
       - name: Digest
-        run: cat bazel-bin/cocotola-api/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2
+        run: cat bazel-bin/cocotola-core/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2
 
-      - name: Digest cocotola-api
-        id: digest_api
-        run: echo "digest=$(cat bazel-bin/cocotola-api/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
+      - name: Digest cocotola-core
+        id: digest_core
+        run: echo "digest=$(cat bazel-bin/cocotola-core/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
 
       - name: Push
-        run: REMOTE_TAG=${{ steps.digest_api.outputs.digest }} make docker-push-api
+        run: REMOTE_TAG=${{ steps.digest_core.outputs.digest }} make bazel-docker-push-core
 
       - name: Digest cocotola-auth
         id: digest_auth
         run: echo "digest=$(cat bazel-bin/cocotola-auth/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
 
       - name: Push
-        run: REMOTE_TAG=${{ steps.digest_auth.outputs.digest }} make docker-push-auth
+        run: REMOTE_TAG=${{ steps.digest_auth.outputs.digest }} make bazel-docker-push-auth
