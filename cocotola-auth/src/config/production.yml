@@ -58,5 +58,5 @@ swagger:
   host: localhost:8080
   schema: http
 debug:
-  ginMode: false
+  gin: false
   wait: false

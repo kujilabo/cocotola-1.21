@@ -12,7 +12,6 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/config"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/controller/gin/middleware"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
-	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/usecase/student"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 )
@@ -30,22 +29,6 @@ func NewInitTestRouterFunc() InitRouterGroupFunc {
 		test.GET("/ping", func(c *gin.Context) {
 			c.String(http.StatusOK, "pong")
 		})
-		return nil
-	}
-}
-func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbookInterface) InitRouterGroupFunc {
-	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
-		workbook := parentRouterGroup.Group("private/workbook")
-		privateWorkbookHandler := NewPrivateWorkbookHandler(studentUsecaseWorkbook)
-		for _, m := range middleware {
-			workbook.Use(m)
-		}
-		workbook.GET("test", privateWorkbookHandler.Test)
-		// workbook.POST(":workbookID", privateWorkbookHandler.FindWorkbooks)
-		// workbook.GET(":workbookID", privateWorkbookHandler.FindWorkbookByID)
-		// workbook.PUT(":workbookID", privateWorkbookHandler.UpdateWorkbook)
-		// workbook.DELETE(":workbookID", privateWorkbookHandler.RemoveWorkbook)
-		// workbook.POST("", privateWorkbookHandler.AddWorkbook)
 		return nil
 	}
 }

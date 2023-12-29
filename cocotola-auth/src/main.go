@@ -129,7 +129,7 @@ func run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
-	if !cfg.Debug.GinMode {
+	if !cfg.Debug.Gin {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -190,7 +190,8 @@ func appServer(ctx context.Context, cfg *config.Config, transactionManager servi
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitTestRouterFunc(),
-		controller.NewInitAuthRouterFunc(authenticationUsecase, googleUserUsecase),
+		controller.NewInitAuthRouterFunc(authenticationUsecase),
+		controller.NewInitGoogleRouterFunc(googleUserUsecase),
 	}
 	router, err := controller.NewAppRouter(ctx,
 		publicRouterGroupFunc,

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -8,29 +9,27 @@ import (
 	"github.com/gin-gonic/gin"
 
 	rsliblog "github.com/kujilabo/redstart/lib/log"
+	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
 	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
 )
 
-type AuthHandler interface {
-	RefreshToken(c *gin.Context)
-	GetUserInfo(c *gin.Context)
+type AuthenticationInterface interface {
+	GetUserInfo(ctx context.Context, bearerToken string) (*rsuserdomain.AppUserModel, error)
 }
 
-type authHandler struct {
-	authentication *usecase.Authentication
+type AuthHandler struct {
+	authentication AuthenticationInterface
 }
 
-func NewAuthHandler(authentication *usecase.Authentication) AuthHandler {
-	return &authHandler{
+func NewAuthHandler(authentication AuthenticationInterface) *AuthHandler {
+	return &AuthHandler{
 		authentication: authentication,
 	}
 }
 
-func (h *authHandler) GetUserInfo(c *gin.Context) {
+func (h *AuthHandler) GetUserInfo(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 	logger.InfoContext(ctx, "GetUserInfo")
@@ -38,6 +37,7 @@ func (h *authHandler) GetUserInfo(c *gin.Context) {
 	authorization := c.GetHeader("Authorization")
 	if !strings.HasPrefix(authorization, "Bearer ") {
 		logger.WarnContext(ctx, "invalid header. Bearer not found")
+		c.Status(http.StatusUnauthorized)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (h *authHandler) GetUserInfo(c *gin.Context) {
 	// TODO: check if the token is registered
 }
 
-func (h *authHandler) RefreshToken(c *gin.Context) {
+func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 	logger.InfoContext(ctx, "Authorize")
@@ -76,4 +76,18 @@ func (h *authHandler) RefreshToken(c *gin.Context) {
 	// c.JSON(http.StatusOK, AuthResponse{
 	// 	AccessToken: token,
 	// })
+}
+
+func NewInitAuthRouterFunc(authentication AuthenticationInterface) InitRouterGroupFunc {
+	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+		auth := parentRouterGroup.Group("auth")
+		for _, m := range middleware {
+			auth.Use(m)
+		}
+
+		authHandler := NewAuthHandler(authentication)
+		auth.POST("refresh_token", authHandler.RefreshToken)
+		auth.GET("userinfo", authHandler.GetUserInfo)
+		return nil
+	}
 }

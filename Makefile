@@ -21,6 +21,12 @@ gen-proto:
 	rm -f ./proto/helloworld.pb.go
 	cp ./bazel-out/k8-fastbuild/bin/proto/proto_go_proto_/github.com/kujilabo/cocotola-1.21/proto/helloworld.pb.go ./proto/
 
+.PHONY: gen-code
+gen-code:
+	@pushd ./cocotola-auth/ && \
+		mockery	&& \
+	popd
+
 .PHONY: work-init
 work-init:
 	@go work init

@@ -1,24 +1,35 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
+
 	rsliblog "github.com/kujilabo/redstart/lib/log"
+
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 )
+
+type GoogleUserUsecaseInterface interface {
+	RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error)
+
+	RetrieveUserInfo(ctx context.Context, GoogleAuthResponse *domain.AuthTokenSet) (*domain.UserInfo, error)
+
+	RegisterAppUser(ctx context.Context, googleUserInfo *domain.UserInfo, googleAuthResponse *domain.AuthTokenSet, organizationName string) (*domain.AuthTokenSet, error)
+}
 
 type GoogleUserHandler interface {
 	Authorize(c *gin.Context)
 }
 
 type googleUserHandler struct {
-	googleUserUsecase usecase.GoogleUserUsecaseInterface
+	googleUserUsecase GoogleUserUsecaseInterface
 }
 
-func NewGoogleAuthHandler(googleUserUsecase usecase.GoogleUserUsecaseInterface) GoogleUserHandler {
+func NewGoogleAuthHandler(googleUserUsecase GoogleUserUsecaseInterface) GoogleUserHandler {
 	return &googleUserHandler{
 		googleUserUsecase: googleUserUsecase,
 	}
@@ -64,4 +75,16 @@ func (h *googleUserHandler) Authorize(c *gin.Context) {
 		AccessToken:  authResult.AccessToken,
 		RefreshToken: authResult.RefreshToken,
 	})
+}
+
+func NewInitGoogleRouterFunc(googleUserUsecase GoogleUserUsecaseInterface) InitRouterGroupFunc {
+	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+		auth := parentRouterGroup.Group("google")
+		for _, m := range middleware {
+			auth.Use(m)
+		}
+		googleAuthHandler := NewGoogleAuthHandler(googleUserUsecase)
+		auth.POST("authorize", googleAuthHandler.Authorize)
+		return nil
+	}
 }
