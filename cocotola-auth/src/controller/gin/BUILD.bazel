@@ -14,8 +14,8 @@ go_library(
     deps = [
         "//cocotola-auth/src/config",
         "//cocotola-auth/src/controller/gin/middleware",
-        "//cocotola-auth/src/service",
         "//cocotola-auth/src/usecase",
+        "//lib/api",
         "//lib/log",
         "@com_github_gin_contrib_cors//:cors",
         "@com_github_gin_gonic_gin//:gin",

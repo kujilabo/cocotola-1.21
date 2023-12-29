@@ -3,7 +3,7 @@ import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
-import { backendUrl, extractErrorMessage } from '@/lib/base';
+import { backendAuthUrl, extractErrorMessage } from '@/lib/base';
 
 // RefreshToken
 type RefreshTokenParameter = {
@@ -38,7 +38,7 @@ export const refreshAccessToken = createAsyncThunk<
     });
   }
   return await axios
-    .post(`${backendUrl}/v1/auth/refresh_token`, arg)
+    .post(`${backendAuthUrl}/v1/auth/refresh_token`, arg)
     .then((resp) => {
       // onsole.log('refreshAccessToken1 a');
       const response = resp.data as RefreshTokenResponse;
@@ -72,9 +72,9 @@ export const googleAuthorize = createAsyncThunk(
   'auth/google',
   async (arg: GoogleAuthorizeArg, thunkAPI) => {
     console.log('googleauthorize');
-    console.log(`${backendUrl}/v1/auth/google/authorize`);
+    console.log(`${backendAuthUrl}/v1/auth/google/authorize`);
     return await axios
-      .post(`${backendUrl}/v1/auth/google/authorize`, arg.param)
+      .post(`${backendAuthUrl}/v1/auth/google/authorize`, arg.param)
       .then((resp) => {
         console.log('callback then');
         return resp.data as GoogleAuthorizeResponse;
@@ -109,7 +109,7 @@ export const guestAuthorize = createAsyncThunk(
   'auth/guest',
   async (arg: GuestAuthorizeArg, thunkAPI) => {
     return await axios
-      .post(`${backendUrl}/v1/auth/google/authorize`, arg.param)
+      .post(`${backendAuthUrl}/v1/auth/google/authorize`, arg.param)
       .then((resp) => {
         // onsole.log('callback then');
         return resp.data as GuestAuthorizeResponse;
@@ -153,6 +153,7 @@ export const authSlice = createSlice({
     },
     setAccessToken: (state, action: PayloadAction<{ accessToken: string }>) => {
       state.accessToken = action.payload.accessToken;
+      console.log('setAccessToken', state.accessToken);
       localStorage.setItem('accessToken', state.accessToken);
     },
     setRefreshToken: (state, action: PayloadAction<{ refreshToken: string }>) => {
@@ -217,7 +218,7 @@ export const authSlice = createSlice({
         state.loading = true;
       })
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
-        // onsole.log('refreshAccessToken1', action);
+        console.log('refreshAccessToken1', action);
         authSlice.caseReducers.setAccessToken(state, action);
         state.loading = false;
         state.failed = false;

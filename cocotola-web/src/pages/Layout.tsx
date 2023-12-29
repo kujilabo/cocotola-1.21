@@ -14,8 +14,7 @@ export const Layout: React.VFC = () => {
           <Link to="page1">show page1</Link>
         </li>
         <li>
-          <Link to="page2">show page2</Link>
-          <span> ( 認証済みのユーザーなら可 )</span>
+          <Link to="test">Test</Link>
         </li>
         <li>
           <Link to="app/login">Login</Link>

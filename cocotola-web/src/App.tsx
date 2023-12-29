@@ -16,6 +16,7 @@ import { Providers } from '@/components/Providers';
 import { RouteAuthGuard } from '@/components/RouteAuthGuard';
 import { Callback } from '@/features/auth/components/Callback';
 import { Login } from '@/features/auth/components/Login';
+import {Test } from '@/features/private_workbook/components/Test';
 import { Home } from '@/pages/Home';
 import { Layout } from '@/pages/Layout';
 // import { Login } from '@/pages/Login';
@@ -49,6 +50,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route path="/app/login" element={<Login />} />
             <Route path="/app/callback" element={<Callback />} />
+            <Route path="/test" element={<Test />} />
           </Route>
         </Routes>
       </BrowserRouter>

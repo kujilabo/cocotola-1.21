@@ -1,8 +1,8 @@
 ---
 app:
   name: golang-structure
-  httpPort: 8080
-  metricsPort: 8081
+  httpPort: 8010
+  metricsPort: 8011
   ownerPassword: password
 db:
 #   driverName: sqlite3

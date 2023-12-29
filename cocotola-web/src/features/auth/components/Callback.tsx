@@ -20,6 +20,7 @@ export const Callback = (): ReactElement => {
   console.log('decode acc', accessToken);
   let isAccessTokenExpired = true;
   if (accessToken && accessToken != null && accessToken !== '') {
+    console.log('jwt_decode');
     const decoded = jwt_decode<JwtPayload>(accessToken) || null;
     if (decoded.exp) {
       isAccessTokenExpired = decoded.exp < new Date().getTime() / 1000;

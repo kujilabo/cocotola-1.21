@@ -1,31 +1,37 @@
 package handler
 
 import (
+	"context"
+	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/usecase/student"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
-)
+	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
-// type PrivateWorkbookHandler interface {
-// 	FindWorkbooks(c *gin.Context)
-// 	// FindWorkbookByID(c *gin.Context)
-// 	// AddWorkbook(c *gin.Context)
-// 	// UpdateWorkbook(c *gin.Context)
-// 	// RemoveWorkbook(c *gin.Context)
-// }
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/controller/gin/helper"
+	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/usecase/student"
+)
 
 type PrivateWorkbookHandler struct {
 	// repository             gateway.Repository
-	studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbook
+	studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbookInterface
 }
 
-func NewPrivateWorkbookHandler(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbook) *PrivateWorkbookHandler {
+func NewPrivateWorkbookHandler(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbookInterface) *PrivateWorkbookHandler {
 	return &PrivateWorkbookHandler{
 		studentUsecaseWorkbook: studentUsecaseWorkbook,
 	}
+}
+
+func (h *PrivateWorkbookHandler) Test(c *gin.Context) {
+	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID) error {
+		logger.InfoContext(ctx, "TEST")
+		c.Status(http.StatusOK)
+		return nil
+	}, h.errorHandle)
 }
 
 // FindWorkbooks godoc
@@ -59,4 +65,14 @@ func (h *PrivateWorkbookHandler) FindWorkbooks(c *gin.Context) {
 	// 	c.JSON(http.StatusOK, response)
 	// 	return nil
 	// }, h.errorHandle)
+}
+
+func (h *PrivateWorkbookHandler) errorHandle(ctx context.Context, logger *slog.Logger, c *gin.Context, err error) bool {
+	// if errors.Is(err, service.ErrAudioNotFound) {
+	// 	logger.Warnf("PrivateWorkbookHandler err: %+v", err)
+	// 	c.JSON(http.StatusNotFound, gin.H{"message": "Audio not found"})
+	// 	return true
+	// }
+	logger.ErrorContext(ctx, fmt.Sprintf("error:%v", err))
+	return false
 }

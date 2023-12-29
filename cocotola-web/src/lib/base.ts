@@ -1,4 +1,4 @@
-export const backendUrl = String(import.meta.env.VITE_APP_BACKEND);
+export const backendCoreUrl = String(import.meta.env.VITE_APP_CORE_BACKEND);export const backendAuthUrl = String(import.meta.env.VITE_APP_AUTH_BACKEND);
 export const clientId = String(import.meta.env.VITE_APP_CLIENT_ID);
 export const frontendUrl = String(import.meta.env.VITE_APP_FRONTEND);
 

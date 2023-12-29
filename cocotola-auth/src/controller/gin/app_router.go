@@ -15,7 +15,6 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin/middleware"
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
 )
 
@@ -36,7 +35,7 @@ func NewInitTestRouterFunc() InitRouterGroupFunc {
 	}
 }
 
-func NewInitAuthRouterFunc(googleUserUsecase usecase.GoogleUserUsecaseInterface, authTokenManager service.AuthTokenManager) InitRouterGroupFunc {
+func NewInitAuthRouterFunc(authentication *usecase.Authentication, googleUserUsecase usecase.GoogleUserUsecaseInterface) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 		auth := parentRouterGroup.Group("auth")
 		for _, m := range middleware {
@@ -44,11 +43,12 @@ func NewInitAuthRouterFunc(googleUserUsecase usecase.GoogleUserUsecaseInterface,
 		}
 		// googleUserUsecase := authU.NewGoogleUserUsecase(db, googleAuthClient, authTokenManager, registerAppUserCallback)
 		// guestUserUsecase := authU.NewGuestUserUsecase(authTokenManager)
-		authHandler := NewAuthHandler(authTokenManager)
+		authHandler := NewAuthHandler(authentication)
 		googleAuthHandler := NewGoogleAuthHandler(googleUserUsecase)
 		// guestAuthHandler := authH.NewGuestAuthHandler(guestUserUsecase)
 		auth.POST("google/authorize", googleAuthHandler.Authorize)
 		auth.POST("refresh_token", authHandler.RefreshToken)
+		auth.GET("userinfo", authHandler.GetUserInfo)
 		return nil
 	}
 }

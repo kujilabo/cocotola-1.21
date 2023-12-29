@@ -8,6 +8,9 @@ import (
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 )
 
+type StudentUsecaseWorkbookInterface interface {
+}
+
 type StudentUsecaseWorkbook struct {
 	transactionManager service.TransactionManager
 }

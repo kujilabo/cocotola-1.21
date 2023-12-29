@@ -16,6 +16,7 @@ go_library(
         "//cocotola-core/src/app/domain",
         "//cocotola-core/src/app/gateway",
         "//cocotola-core/src/app/service",
+        "//cocotola-core/src/app/usecase/student",
         "//cocotola-core/src/sqls",
         "//lib/log",
         "//proto",

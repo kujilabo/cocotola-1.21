@@ -7,6 +7,14 @@ import (
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 )
 
+type AppUserInfo struct {
+	LoginID          string
+	AppUserID        int
+	Username         string
+	OrganizationID   int
+	OrganizationName string
+}
+
 type AppUserInterface interface {
 	AppUserID() *rsuserdomain.AppUserID
 	OrganizationID() *rsuserdomain.OrganizationID
@@ -21,6 +29,8 @@ type OrganizationInterface interface {
 }
 
 type AuthTokenManager interface {
+	GetUserInfo(ctx context.Context, tokenString string) (*AppUserInfo, error)
+
 	CreateTokenSet(ctx context.Context, appUser AppUserInterface, organization OrganizationInterface) (*domain.AuthTokenSet, error)
 	// RefreshToken(ctx context.Context, tokenString string) (string, error)
 }

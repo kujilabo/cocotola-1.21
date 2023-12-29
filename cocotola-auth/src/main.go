@@ -177,10 +177,11 @@ func appServer(ctx context.Context, cfg *config.Config, transactionManager servi
 	signingMethod := jwt.SigningMethodHS256
 	authTokenManager := gateway.NewAuthTokenManager(signingKey, signingMethod, time.Duration(cfg.Auth.AccessTokenTTLMin)*time.Minute, time.Duration(cfg.Auth.RefreshTokenTTLHour)*time.Hour)
 
+	authenticationUsecase := usecase.NewAuthentication(transactionManager, authTokenManager)
 	googleUserUsecase := usecase.NewGoogleUserUsecase(transactionManager, authTokenManager, googleAuthClient)
 
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
-		// 	controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
+		// controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
 		// 	controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
 		// 	controller.NewInitStudyRouterFunc(studentUseCaseStudy),
 		// 	controller.NewInitAudioRouterFunc(studentUsecaseAudio),
@@ -189,7 +190,7 @@ func appServer(ctx context.Context, cfg *config.Config, transactionManager servi
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitTestRouterFunc(),
-		controller.NewInitAuthRouterFunc(googleUserUsecase, authTokenManager),
+		controller.NewInitAuthRouterFunc(authenticationUsecase, googleUserUsecase),
 	}
 	router, err := controller.NewAppRouter(ctx,
 		publicRouterGroupFunc,

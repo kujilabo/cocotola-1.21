@@ -119,7 +119,22 @@ func (m *authTokenManager) createJWT(ctx context.Context, appUser service.AppUse
 	return signed, nil
 }
 
-func (m *authTokenManager) RefreshToken(ctx context.Context, tokenString string) (string, error) {
+func (m *authTokenManager) GetUserInfo(ctx context.Context, tokenString string) (*service.AppUserInfo, error) {
+	currentClaims, err := m.parseToken(ctx, tokenString)
+	if err != nil {
+		return nil, fmt.Errorf("jwt.ParseWithClaims. err: %w", domain.ErrUnauthenticated)
+	}
+
+	return &service.AppUserInfo{
+		LoginID:          currentClaims.LoginID,
+		AppUserID:        currentClaims.AppUserID,
+		Username:         currentClaims.Username,
+		OrganizationID:   currentClaims.OrganizationID,
+		OrganizationName: currentClaims.OrganizationName,
+	}, nil
+}
+
+func (m *authTokenManager) parseToken(ctx context.Context, tokenString string) (*AppUserClaims, error) {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		return m.signingKey, nil
@@ -128,12 +143,20 @@ func (m *authTokenManager) RefreshToken(ctx context.Context, tokenString string)
 	currentToken, err := jwt.ParseWithClaims(tokenString, &AppUserClaims{}, keyFunc)
 	if err != nil {
 		logger.InfoContext(ctx, fmt.Sprintf("%v", err))
-		return "", fmt.Errorf("jwt.ParseWithClaims. err: %w", domain.ErrUnauthenticated)
+		return nil, fmt.Errorf("jwt.ParseWithClaims. err: %w", domain.ErrUnauthenticated)
 	}
 
 	currentClaims, ok := currentToken.Claims.(*AppUserClaims)
 	if !ok || !currentToken.Valid {
-		return "", fmt.Errorf("invalid token. err: %w", domain.ErrUnauthenticated)
+		return nil, fmt.Errorf("invalid token. err: %w", domain.ErrUnauthenticated)
+	}
+	return currentClaims, nil
+}
+
+func (m *authTokenManager) RefreshToken(ctx context.Context, tokenString string) (string, error) {
+	currentClaims, err := m.parseToken(ctx, tokenString)
+	if err != nil {
+		return "", err
 	}
 
 	if currentClaims.TokenType != "refresh" {
@@ -144,6 +167,7 @@ func (m *authTokenManager) RefreshToken(ctx context.Context, tokenString string)
 		loginID:  currentClaims.LoginID,
 		username: currentClaims.Username,
 	}
+
 	organizationID, err := rsuserdomain.NewOrganizationID(currentClaims.OrganizationID)
 	if err != nil {
 		return "", err

@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "helper",
+    srcs = ["auth_helper.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/controller/gin/helper",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//lib/log",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_kujilabo_redstart//lib/log",
+        "@com_github_kujilabo_redstart//user/domain",
+    ],
+)
