@@ -1,0 +1,37 @@
+---
+version: '3'
+services:
+  # dev-core-mysql:
+  #   image: mysql:8.0.27
+  #   container_name: dev-core-mysql
+  #   command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: mysql
+  #     MYSQL_PORT: 3306
+  #     MYSQL_DATABASE: development
+  #     MYSQL_USER: user
+  #     MYSQL_PASSWORD: password
+  #   ports:
+  #     - 3306:3306
+  #   volumes:
+  #     - "./mysql-data:/var/lib/mysql"
+  dev-auth-mysql:
+    image: mysql:8.0.27
+    container_name: dev-auth-mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: development
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      TZ: "Etc/GMT"
+    ports:
+      - 3316:3306
+  dev-jaeger:
+    image: jaegertracing/all-in-one:1.51.0
+    container_name: dev-jaeger
+    ports:
+      - 4318:4318
+      - 14268:14268
+      - 16686:16686

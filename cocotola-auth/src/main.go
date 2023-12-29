@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -25,13 +26,14 @@ import (
 	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 	rssqls "github.com/kujilabo/redstart/sqls"
+	rsusergateway "github.com/kujilabo/redstart/user/gateway"
+	rsuserservice "github.com/kujilabo/redstart/user/service"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
 	controller "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway"
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/domain"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	"github.com/kujilabo/cocotola-1.21/proto"
 )
@@ -66,20 +68,20 @@ func main() {
 	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
 		return gateway.NewRepositoryFactory(ctx, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
+	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, cfg.DB.DriverName, db, time.UTC)
+	if err != nil {
+		panic(err)
+	}
 
 	appTransactionManager := initTransactionManager(db, rff)
 
 	logger.Info(fmt.Sprintf("%+v", proto.HelloRequest{}))
 
-	logger.Info("")
-	logger.Info(domain.Lang2EN.String())
-	logger.Info("Hello")
-	logger.Info("Hello")
-	service.A()
+	initApp1(ctx, appTransactionManager, "cocotola", cfg.App.OwnerPassword)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, appTransactionManager)
+	result := run(ctx, cfg, appTransactionManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
@@ -123,7 +125,7 @@ func initTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) serv
 	return appTransactionManager
 }
 
-func run(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager) int {
+func run(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -132,7 +134,7 @@ func run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 	}
 
 	eg.Go(func() error {
-		return appServer(ctx, cfg) // nolint:wrapcheck
+		return appServer(ctx, cfg, transactionManager, rsrf) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		return rslibgateway.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck
@@ -151,7 +153,7 @@ func run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 	return 0
 }
 
-func appServer(ctx context.Context, cfg *config.Config) error {
+func appServer(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
 	// // cors
 	corsConfig := rslibconfig.InitCORS(cfg.CORS)
@@ -169,6 +171,13 @@ func appServer(ctx context.Context, cfg *config.Config) error {
 	// if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
 	// 	return liberrors.Errorf(". err: %w", err)
 	// }
+	googleAuthClient := gateway.NewGoogleAuthClient(cfg.Auth.GoogleClientID, cfg.Auth.GoogleClientSecret, cfg.Auth.GoogleCallbackURL, time.Duration(cfg.Auth.APITimeoutSec)*time.Second)
+
+	signingKey := []byte(cfg.Auth.SigningKey)
+	signingMethod := jwt.SigningMethodHS256
+	authTokenManager := gateway.NewAuthTokenManager(signingKey, signingMethod, time.Duration(cfg.Auth.AccessTokenTTLMin)*time.Minute, time.Duration(cfg.Auth.RefreshTokenTTLHour)*time.Hour)
+
+	googleUserUsecase := usecase.NewGoogleUserUsecase(transactionManager, authTokenManager, googleAuthClient)
 
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
 		// 	controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
@@ -180,6 +189,7 @@ func appServer(ctx context.Context, cfg *config.Config) error {
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitTestRouterFunc(),
+		controller.NewInitAuthRouterFunc(googleUserUsecase, authTokenManager),
 	}
 	router, err := controller.NewAppRouter(ctx,
 		publicRouterGroupFunc,
@@ -230,4 +240,55 @@ func appServer(ctx context.Context, cfg *config.Config) error {
 	case err := <-errCh:
 		return rsliberrors.Errorf(". err: %w", err)
 	}
+}
+
+func initApp1(ctx context.Context, transactionManager service.TransactionManager, organizationName string, password string) {
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.CoreMainLoggerContextKey)
+	addOrganizationFunc := func(ctx context.Context, systemAdmin *rsuserservice.SystemAdmin) error {
+		organization, err := systemAdmin.FindOrganizationByName(ctx, organizationName)
+		if err == nil {
+			logger.InfoContext(ctx, fmt.Sprintf("organization: %d", organization.OrganizationID().Int()))
+			return nil
+		} else if !errors.Is(err, rsuserservice.ErrOrganizationNotFound) {
+			return rsliberrors.Errorf("failed to AddOrganization. err: %w", err)
+		}
+
+		firstOwnerAddParam, err := rsuserservice.NewAppUserAddParameter("cocotola-owner", "Owner(cocotola)", password, "", "", "", "")
+		if err != nil {
+			return rsliberrors.Errorf("NewFirstOwnerAddParameter. err: %w", err)
+		}
+
+		organizationAddParameter, err := rsuserservice.NewOrganizationAddParameter(organizationName, firstOwnerAddParam)
+		if err != nil {
+			return rsliberrors.Errorf("NewOrganizationAddParameter. err: %w", err)
+		}
+
+		organizationID, err := systemAdmin.AddOrganization(ctx, organizationAddParameter)
+		if err != nil {
+			return rsliberrors.Errorf("AddOrganization. err: %w", err)
+		}
+
+		logger.InfoContext(ctx, fmt.Sprintf("organizationID: %d", organizationID.Int()))
+		return nil
+	}
+
+	if err := systemAdminAction(ctx, transactionManager, addOrganizationFunc); err != nil {
+		panic(err)
+	}
+}
+
+func systemAdminAction(ctx context.Context, transactionManager service.TransactionManager, fn func(context.Context, *rsuserservice.SystemAdmin) error) error {
+	return transactionManager.Do(ctx, func(rf service.RepositoryFactory) error {
+		rsrf, err := rf.NewRedstartRepositoryFactory(ctx)
+		if err != nil {
+			return rsliberrors.Errorf(". err: %w", err)
+		}
+
+		systemAdmin, err := rsuserservice.NewSystemAdmin(ctx, rsrf)
+		if err != nil {
+			return rsliberrors.Errorf(". err: %w", err)
+		}
+
+		return fn(ctx, systemAdmin)
+	})
 }

@@ -2,7 +2,7 @@ module github.com/kujilabo/cocotola-1.21/lib
 
 go 1.21.4
 
-require github.com/kujilabo/redstart v0.0.3
+require github.com/kujilabo/redstart v0.0.5
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect

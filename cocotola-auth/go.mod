@@ -6,10 +6,9 @@ require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20231224031304-eaca32d036fa
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231223165801-a2af558a1514
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20231224031304-eaca32d036fa
-	github.com/kujilabo/redstart v0.0.4
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231224142347-b79b78eda97e
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20231224142347-b79b78eda97e
+	github.com/kujilabo/redstart v0.0.5
 	github.com/samber/slog-gin v1.7.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.46.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1
@@ -67,7 +66,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/orandin/slog-gorm v1.0.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
-	github.com/prometheus/client_golang v1.17.0 // indirect
+	github.com/prometheus/client_golang v1.18.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
@@ -83,6 +82,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/arch v0.6.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/oauth2 v0.15.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect

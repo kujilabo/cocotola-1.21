@@ -8,8 +8,10 @@ import (
 
 	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+	rsusergateway "github.com/kujilabo/redstart/user/gateway"
+	rsuserservice "github.com/kujilabo/redstart/user/service"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 )
 
 type RepositoryFactory struct {
@@ -28,6 +30,10 @@ func NewRepositoryFactory(ctx context.Context, driverName string, db *gorm.DB, l
 		db:         db,
 		location:   location,
 	}, nil
+}
+
+func (f *RepositoryFactory) NewRedstartRepositoryFactory(ctx context.Context) (rsuserservice.RepositoryFactory, error) {
+	return rsusergateway.NewRepositoryFactory(ctx, f.driverName, f.db, f.location)
 }
 
 type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)

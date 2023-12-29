@@ -37,9 +37,11 @@ gazelle-update-repos:
 .PHONY: update-mod
 update-mod:
 	@pushd ./cocotola-core/ && \
+		GOPROXY=direct go get -u  github.com/kujilabo/redstart && \
 		go get -u ./... && \
 	popd
 	@pushd ./cocotola-auth/ && \
+		GOPROXY=direct go get -u  github.com/kujilabo/redstart && \
 		go get -u ./... && \
 	popd
 	@pushd ./lib/ && \
@@ -113,3 +115,19 @@ test-s:
 	@pushd ./cocotola-core/ && \
 		go test -coverprofile="coverage.txt" -covermode=atomic ./... -count=1 -race -tags=small && \
 	popd
+
+.PHONY: dev-docker-up
+dev-docker-up:
+	@docker compose -f docker/development/docker-compose.yml up -d
+
+.PHONY: dev-docker-down
+dev-docker-down:
+	@docker compose -f docker/development/docker-compose.yml down
+
+.PHONY: test-docker-up
+test-docker-up:
+	@docker compose -f docker-compose-test.yml up -d
+
+.PHONY: test-docker-down
+test-docker-down:
+	@docker compose -f docker-compose-test.yml down

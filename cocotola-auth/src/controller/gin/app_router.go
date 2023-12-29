@@ -36,7 +36,7 @@ func NewInitTestRouterFunc() InitRouterGroupFunc {
 	}
 }
 
-func NewInitAuthRouterFunc(googleUserUsecase usecase.GoogleUserUsecase, authTokenManager service.AuthTokenManager) InitRouterGroupFunc {
+func NewInitAuthRouterFunc(googleUserUsecase usecase.GoogleUserUsecaseInterface, authTokenManager service.AuthTokenManager) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 		auth := parentRouterGroup.Group("auth")
 		for _, m := range middleware {

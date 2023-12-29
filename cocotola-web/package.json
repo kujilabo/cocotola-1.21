@@ -13,8 +13,19 @@
     "format": "prettier --config .prettierrc --write 'src/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@reduxjs/toolkit": "^2.0.1",
+    "axios": "^1.6.2",
+    "framer-motion": "^10.16.16",
+    "jwt-decode": "^3.1.2",
+    "query-string": "^8.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.0.4",
+    "react-router-dom": "^6.21.1",
+    "redux": "^5.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
