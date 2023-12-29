@@ -11,6 +11,7 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/config"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/controller/gin/middleware"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
 	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/usecase/student"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
@@ -32,13 +33,14 @@ func NewInitTestRouterFunc() InitRouterGroupFunc {
 		return nil
 	}
 }
-func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbook) InitRouterGroupFunc {
+func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbookInterface) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
-		// workbook := parentRouterGroup.Group("private/workbook")
-		// privateWorkbookHandler := NewPrivateWorkbookHandler(studentUsecaseWorkbook)
-		// for _, m := range middleware {
-		// 	workbook.Use(m)
-		// }
+		workbook := parentRouterGroup.Group("private/workbook")
+		privateWorkbookHandler := NewPrivateWorkbookHandler(studentUsecaseWorkbook)
+		for _, m := range middleware {
+			workbook.Use(m)
+		}
+		workbook.GET("test", privateWorkbookHandler.Test)
 		// workbook.POST(":workbookID", privateWorkbookHandler.FindWorkbooks)
 		// workbook.GET(":workbookID", privateWorkbookHandler.FindWorkbookByID)
 		// workbook.PUT(":workbookID", privateWorkbookHandler.UpdateWorkbook)
@@ -49,9 +51,10 @@ func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentusecase.StudentUsec
 }
 
 func NewAppRouter(
-	ctx context.Context,
+	ctx context.Context, cocotolaAuthClient service.CocotolaAuthClient,
 	initPublicRouterFunc []InitRouterGroupFunc,
-	// initPrivateRouterFunc []InitRouterGroupFunc, initPluginRouterFunc []InitRouterGroupFunc,
+	initPrivateRouterFunc []InitRouterGroupFunc,
+	// initPluginRouterFunc []InitRouterGroupFunc,
 	//authTokenManager service.AuthTokenManager,
 	corsConfig cors.Config, appConfig *config.AppConfig,
 	// authConfig *config.AuthConfig,
@@ -66,6 +69,7 @@ func NewAppRouter(
 	// 	// router.Use(ginlog.Middleware(ginlog.DefaultConfig))
 	// }
 	router.Use(sloggin.New(logger))
+	authMiddleware := middleware.NewAuthMiddleware(cocotolaAuthClient)
 
 	if debugConfig.Wait {
 		router.Use(middleware.NewWaitMiddleware())
@@ -78,6 +82,11 @@ func NewAppRouter(
 
 		for _, fn := range initPublicRouterFunc {
 			if err := fn(v1); err != nil {
+				return nil, err
+			}
+		}
+		for _, fn := range initPrivateRouterFunc {
+			if err := fn(v1, authMiddleware); err != nil {
 				return nil, err
 			}
 		}

@@ -3,12 +3,14 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "service",
     srcs = [
+        "cocotola_auth_client.go",
         "repository_factory.go",
         "service.go",
         "transaction_manager.go",
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service",
     visibility = ["//visibility:public"],
+    deps = ["//lib/api"],
 )
 
 go_test(

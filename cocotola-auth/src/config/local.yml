@@ -1,8 +1,9 @@
 ---
 app:
   name: golang-structure
-  httpPort: 8080
-  metricsPort: 8081
+  httpPort: 8010
+  metricsPort: 8011
+  ownerPassword: password
 db:
 #   driverName: sqlite3
 #   sqlite3:
@@ -12,16 +13,16 @@ db:
     username: user
     password: password
     host: 127.0.0.1
-    port: 3306
+    port: 3316
     database: development
-# auth:
-#   signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
-#   accessTokenTtlMin: 5
-#   refreshTokenTtlHour: 720
-#   googleCallbackUrl: http://localhost:5173/app/callback
-#   googleClientId: 830416463276-3ts1rsinahi0hdnsfc10m6mabpttrd5i.apps.googleusercontent.com
-#   googleClientSecret: $GOOGLE_CLIENT_SECRET
-#   apiTimeoutSec: 5
+auth:
+  signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
+  accessTokenTtlMin: 5
+  refreshTokenTtlHour: 720
+  googleCallbackUrl: http://localhost:5173/app/callback
+  googleClientId: 751610212628-f49u7fr0nivli19pr95eu3ckvn1rcdnn.apps.googleusercontent.com
+  googleClientSecret: $GOOGLE_CLIENT_SECRET
+  apiTimeoutSec: 5
 trace:
   # exporter: jaeger
   exporter: otlp
@@ -44,4 +45,4 @@ swagger:
   schema: http
 debug:
   ginMode: true
-  # wait: true
+  wait: true

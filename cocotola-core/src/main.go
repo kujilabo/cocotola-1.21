@@ -31,12 +31,14 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/gateway"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
+	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/usecase/student"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/sqls"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	"github.com/kujilabo/cocotola-1.21/proto"
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
+const authClientTimeout = time.Duration(5) * time.Second
 
 func getValue(values ...string) string {
 	for _, v := range values {
@@ -132,7 +134,7 @@ func run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 	}
 
 	eg.Go(func() error {
-		return appServer(ctx, cfg) // nolint:wrapcheck
+		return appServer(ctx, cfg, transactionManager) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		return rslibgateway.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck
@@ -151,7 +153,7 @@ func run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 	return 0
 }
 
-func appServer(ctx context.Context, cfg *config.Config) error {
+func appServer(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager) error {
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
 	// // cors
 	corsConfig := rslibconfig.InitCORS(cfg.CORS)
@@ -169,21 +171,24 @@ func appServer(ctx context.Context, cfg *config.Config) error {
 	// if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
 	// 	return liberrors.Errorf(". err: %w", err)
 	// }
-
-	// privateRouterGroupFunc := []controller.InitRouterGroupFunc{
-	// 	controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
-	// 	controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
-	// 	controller.NewInitStudyRouterFunc(studentUseCaseStudy),
-	// 	controller.NewInitAudioRouterFunc(studentUsecaseAudio),
-	// 	controller.NewInitStatRouterFunc(studentUsecaseStat),
-	// }
+	studentUsecaseWorkbook := studentusecase.NewStudentUsecaseWorkbook(transactionManager)
+	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
+		// controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
+		// controller.NewInitStudyRouterFunc(studentUseCaseStudy),
+		// controller.NewInitAudioRouterFunc(studentUsecaseAudio),
+		// controller.NewInitStatRouterFunc(studentUsecaseStat),
+	}
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitTestRouterFunc(),
 	}
+	cocotolaAuthClient := gateway.NewCocotolaAuthClient(authClientTimeout)
 	router, err := controller.NewAppRouter(ctx,
+		cocotolaAuthClient,
 		publicRouterGroupFunc,
-		//privateRouterGroupFunc, pluginRouterGroupFunc, authTokenManager,
+		privateRouterGroupFunc,
+		// pluginRouterGroupFunc, authTokenManager,
 		corsConfig, cfg.App,
 		//cfg.Auth,
 		cfg.Debug)

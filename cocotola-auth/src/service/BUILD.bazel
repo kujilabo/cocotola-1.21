@@ -9,4 +9,9 @@ go_library(
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service",
     visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-auth/src/domain",
+        "@com_github_kujilabo_redstart//user/domain",
+        "@com_github_kujilabo_redstart//user/service",
+    ],
 )

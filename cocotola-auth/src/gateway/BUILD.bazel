@@ -1,8 +1,9 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "gateway",
     srcs = [
+        "auth_token_manager.go",
         "google_auth_client.go",
         "init.go",
         "repository_factory.go",
@@ -11,11 +12,46 @@ go_library(
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway",
     visibility = ["//visibility:public"],
     deps = [
-        "//cocotola-core/src/app/service",
+        "//cocotola-auth/src/domain",
+        "//cocotola-auth/src/service",
+        "//lib/log",
+        "@com_github_golang_jwt_jwt//:jwt",
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/log",
+        "@com_github_kujilabo_redstart//user/domain",
+        "@com_github_kujilabo_redstart//user/gateway",
+        "@com_github_kujilabo_redstart//user/service",
         "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
         "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = ["auth_token_manager_s_test.go"],
+    deps = [
+        ":gateway",
+        "//cocotola-auth/src/service",
+        "@com_github_golang_jwt_jwt//:jwt",
+        "@com_github_kujilabo_redstart//user/domain",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+    ],
+)
+
+go_test(
+    name = "gateway_s_test",
+    size = "small",
+    srcs = ["auth_token_manager_s_test.go"],
+    embed = [":gateway"],
+    gotags = ["small"],
+    deps = [
+        "//cocotola-auth/src/domain",
+        "//cocotola-auth/src/service",
+        "@com_github_golang_jwt_jwt//:jwt",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
     ],
 )

@@ -18,6 +18,13 @@ const (
 	AppTraceLoggerContextKey      rslibdomain.ContextKey = "app_trace"
 	AppAuthLoggerContextKey       rslibdomain.ContextKey = "app_auth"
 	AppUsecaseLoggerContextKey    rslibdomain.ContextKey = "app_usecase"
+	CoreMainLoggerContextKey      rslibdomain.ContextKey = "core_main"
+
+	AuthGatewayLoggerContextKey    rslibdomain.ContextKey = "auth_gateway"
+	AuthControllerLoggerContextKey rslibdomain.ContextKey = "auth_controller"
+	AuthUsecaseLoggerContextKey    rslibdomain.ContextKey = "auth_usecase"
+	AuthDomainLoggerContextKey     rslibdomain.ContextKey = "auth_domain"
+	AuthServiceLoggerContextKey    rslibdomain.ContextKey = "auth_service"
 )
 
 var (

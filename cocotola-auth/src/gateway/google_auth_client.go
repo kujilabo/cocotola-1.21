@@ -11,6 +11,7 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 )
 
@@ -45,7 +46,7 @@ func NewGoogleAuthClient(clientID, clientSecret, redirectURI string, timeout tim
 	}
 }
 
-func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string) (*GoogleAuthResponse, error) {
+func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error) {
 	ctx, span := tracer.Start(ctx, "googleAuthClient.RetrieveAccessToken")
 	defer span.End()
 
@@ -91,10 +92,13 @@ func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string)
 	}
 	// logger.Infof("RetrieveAccessToken:%s", googleAuthResponse.AccessToken)
 
-	return &googleAuthResponse, nil
+	return &domain.AuthTokenSet{
+		AccessToken:  googleAuthResponse.AccessToken,
+		RefreshToken: googleAuthResponse.RefreshToken,
+	}, nil
 }
 
-func (c *GoogleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthResponse *GoogleAuthResponse) (*GoogleUserInfo, error) {
+func (c *GoogleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthResponse *domain.AuthTokenSet) (*domain.UserInfo, error) {
 	ctx, span := tracer.Start(ctx, "googleAuthClient.RetrieveUserInfo")
 	defer span.End()
 
@@ -124,5 +128,8 @@ func (c *GoogleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthRespo
 		return nil, rsliberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
-	return &googleUserInfo, nil
+	return &domain.UserInfo{
+		Email: googleUserInfo.Email,
+		Name:  googleUserInfo.Name,
+	}, nil
 }

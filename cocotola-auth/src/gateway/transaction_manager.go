@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 )
 
 type transactionManager struct {
