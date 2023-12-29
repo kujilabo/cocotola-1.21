@@ -51,5 +51,7 @@ go_test(
         "//cocotola-auth/src/domain",
         "//cocotola-auth/src/service",
         "@com_github_golang_jwt_jwt//:jwt",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
     ],
 )

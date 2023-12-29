@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type organization struct {
