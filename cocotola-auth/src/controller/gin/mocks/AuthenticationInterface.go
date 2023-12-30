@@ -78,6 +78,59 @@ func (_c *AuthenticationInterface_GetUserInfo_Call) RunAndReturn(run func(contex
 	return _c
 }
 
+// RefreshToken provides a mock function with given fields: ctx, refreshToken
+func (_m *AuthenticationInterface) RefreshToken(ctx context.Context, refreshToken string) (string, error) {
+	ret := _m.Called(ctx, refreshToken)
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+		return rf(ctx, refreshToken)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = rf(ctx, refreshToken)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, refreshToken)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// AuthenticationInterface_RefreshToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RefreshToken'
+type AuthenticationInterface_RefreshToken_Call struct {
+	*mock.Call
+}
+
+// RefreshToken is a helper method to define mock.On call
+//   - ctx context.Context
+//   - refreshToken string
+func (_e *AuthenticationInterface_Expecter) RefreshToken(ctx interface{}, refreshToken interface{}) *AuthenticationInterface_RefreshToken_Call {
+	return &AuthenticationInterface_RefreshToken_Call{Call: _e.mock.On("RefreshToken", ctx, refreshToken)}
+}
+
+func (_c *AuthenticationInterface_RefreshToken_Call) Run(run func(ctx context.Context, refreshToken string)) *AuthenticationInterface_RefreshToken_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *AuthenticationInterface_RefreshToken_Call) Return(_a0 string, _a1 error) *AuthenticationInterface_RefreshToken_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *AuthenticationInterface_RefreshToken_Call) RunAndReturn(run func(context.Context, string) (string, error)) *AuthenticationInterface_RefreshToken_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewAuthenticationInterface creates a new instance of AuthenticationInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewAuthenticationInterface(t interface {

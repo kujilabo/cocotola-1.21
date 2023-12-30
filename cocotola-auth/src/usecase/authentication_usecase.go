@@ -76,6 +76,14 @@ func (u *Authentication) GetUserInfo(ctx context.Context, bearerToken string) (*
 
 	return targetAppUserModel, nil
 }
+func (u *Authentication) RefreshToken(ctx context.Context, refreshToken string) (string, error) {
+	accessToken, err := u.authTokenManager.RefreshToken(ctx, refreshToken)
+	if err != nil {
+		return "", err
+	}
+
+	return accessToken, nil
+}
 
 // func (u *Authentication) Authenticate(ctx context.Context, bearerToken string) (*rsuserdomain.AppUserModel, error) {
 // 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppUsecaseLoggerContextKey)

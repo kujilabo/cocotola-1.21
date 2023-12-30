@@ -32,5 +32,5 @@ type AuthTokenManager interface {
 	GetUserInfo(ctx context.Context, tokenString string) (*AppUserInfo, error)
 
 	CreateTokenSet(ctx context.Context, appUser AppUserInterface, organization OrganizationInterface) (*domain.AuthTokenSet, error)
-	// RefreshToken(ctx context.Context, tokenString string) (string, error)
+	RefreshToken(ctx context.Context, accessToken string) (string, error)
 }
