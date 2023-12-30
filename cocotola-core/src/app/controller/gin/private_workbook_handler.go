@@ -76,3 +76,20 @@ func (h *PrivateWorkbookHandler) errorHandle(ctx context.Context, logger *slog.L
 	logger.ErrorContext(ctx, fmt.Sprintf("error:%v", err))
 	return false
 }
+
+func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbookInterface) InitRouterGroupFunc {
+	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+		workbook := parentRouterGroup.Group("private/workbook")
+		privateWorkbookHandler := NewPrivateWorkbookHandler(studentUsecaseWorkbook)
+		for _, m := range middleware {
+			workbook.Use(m)
+		}
+		workbook.GET("test", privateWorkbookHandler.Test)
+		// workbook.POST(":workbookID", privateWorkbookHandler.FindWorkbooks)
+		// workbook.GET(":workbookID", privateWorkbookHandler.FindWorkbookByID)
+		// workbook.PUT(":workbookID", privateWorkbookHandler.UpdateWorkbook)
+		// workbook.DELETE(":workbookID", privateWorkbookHandler.RemoveWorkbook)
+		// workbook.POST("", privateWorkbookHandler.AddWorkbook)
+		return nil
+	}
+}

@@ -36,8 +36,8 @@ type ShutdownConfig struct {
 }
 
 type DebugConfig struct {
-	GinMode bool `yaml:"ginMode"`
-	Wait    bool `yaml:"wait"`
+	Gin  bool `yaml:"gin"`
+	Wait bool `yaml:"wait"`
 }
 
 type Config struct {

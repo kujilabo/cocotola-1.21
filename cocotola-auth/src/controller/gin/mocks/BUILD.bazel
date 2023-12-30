@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mocks",
+    srcs = ["AuthenticationInterface.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin/mocks",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_kujilabo_redstart//user/domain",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

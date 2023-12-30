@@ -6,8 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/trace"
 
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
+
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 func NewTraceLogMiddleware(appName string) gin.HandlerFunc {

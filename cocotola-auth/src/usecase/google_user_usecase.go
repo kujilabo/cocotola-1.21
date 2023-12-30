@@ -66,14 +66,6 @@ type GoogleUserInfo struct {
 	Name  string `json:"name"`
 }
 
-type GoogleUserUsecaseInterface interface {
-	RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error)
-
-	RetrieveUserInfo(ctx context.Context, GoogleAuthResponse *domain.AuthTokenSet) (*domain.UserInfo, error)
-
-	RegisterAppUser(ctx context.Context, googleUserInfo *domain.UserInfo, googleAuthResponse *domain.AuthTokenSet, organizationName string) (*domain.AuthTokenSet, error)
-}
-
 type GoogleUserUsecase struct {
 	transactionManager service.TransactionManager
 	authTokenManager   service.AuthTokenManager

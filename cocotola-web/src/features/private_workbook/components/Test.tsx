@@ -1,15 +1,12 @@
-import { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 
 import { Button, ButtonGroup } from '@chakra-ui/react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { testABC ,
-    selectTestStatus,
-    } from '@/features/private_workbook/api/test';
+import { testABC, selectTestStatus } from '@/features/private_workbook/api/test';
 import { clientId, frontendUrl } from '@/lib/base';
 import { emptyFunction } from '@/lib/util';
-import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 
 console.log(clientId, 'clientId');
 export const Test = (): ReactElement => {
@@ -18,20 +15,17 @@ export const Test = (): ReactElement => {
 
   const status = useAppSelector(selectTestStatus);
 
-
   useEffect(() => {
     if (status === 'idle') {
-      dispatch(testABC({
-          param:{
-              workbookId:1,
-          }
-      }));
-  }
+      dispatch(
+        testABC({
+          param: {
+            workbookId: 1,
+          },
+        })
+      );
+    }
   }, [status, dispatch]);
 
-  return (
-    <div>
-        Test
-    </div>
-  );
+  return <div>Test</div>;
 };

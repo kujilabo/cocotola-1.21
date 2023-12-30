@@ -1,13 +1,10 @@
 ---
 app:
-  name: golang-structure
+  name: cocotola-auth
   httpPort: 8010
   metricsPort: 8011
   ownerPassword: password
 db:
-#   driverName: sqlite3
-#   sqlite3:
-#     file: app.db
   driverName: mysql
   mysql:
     username: user
@@ -24,7 +21,6 @@ auth:
   googleClientSecret: $GOOGLE_CLIENT_SECRET
   apiTimeoutSec: 5
 trace:
-  # exporter: jaeger
   exporter: otlp
   otlp:
     endpoint: localhost:4318
@@ -41,8 +37,8 @@ log:
     cocotola-core: debug
 swagger:
   enabled: true
-  host: localhost:8080
+  host: localhost:8010
   schema: http
 debug:
-  ginMode: true
+  gin: true
   wait: true

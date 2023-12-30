@@ -21,6 +21,12 @@ gen-proto:
 	rm -f ./proto/helloworld.pb.go
 	cp ./bazel-out/k8-fastbuild/bin/proto/proto_go_proto_/github.com/kujilabo/cocotola-1.21/proto/helloworld.pb.go ./proto/
 
+.PHONY: gen-code
+gen-code:
+	@pushd ./cocotola-auth/ && \
+		mockery	&& \
+	popd
+
 .PHONY: work-init
 work-init:
 	@go work init
@@ -33,6 +39,18 @@ gazelle:
 .PHONY: gazelle-update-repos
 gazelle-update-repos:
 	@bazelisk run //:gazelle -- update-repos -from_file ./go.work
+
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@pushd ./cocotola-core/ && \
+		go mod tidy && \
+	popd
+	@pushd ./cocotola-auth/ && \
+		go mod tidy && \
+	popd
+	@pushd ./lib/ && \
+		go mod tidy && \
+	popd
 
 .PHONY: update-mod
 update-mod:
