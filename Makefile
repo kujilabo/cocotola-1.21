@@ -40,6 +40,18 @@ gazelle:
 gazelle-update-repos:
 	@bazelisk run //:gazelle -- update-repos -from_file ./go.work
 
+.PHONY: go-mod-tidy
+go-mod-tidy:
+	@pushd ./cocotola-core/ && \
+		go mod tidy && \
+	popd
+	@pushd ./cocotola-auth/ && \
+		go mod tidy && \
+	popd
+	@pushd ./lib/ && \
+		go mod tidy && \
+	popd
+
 .PHONY: update-mod
 update-mod:
 	@pushd ./cocotola-core/ && \

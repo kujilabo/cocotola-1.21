@@ -3,8 +3,8 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth/api/auth';
-import { backendCoreUrl, extractErrorMessage } from '@/lib/base';
 import { WorkbookModel } from '@/features/private_workbook/models/model';
+import { backendCoreUrl, extractErrorMessage } from '@/lib/base';
 import { jsonRequestConfig } from '@/lib/util';
 
 const baseUrl = `${backendCoreUrl}/v1/private/workbook`;
@@ -25,21 +25,17 @@ type TestResult = {
   response: TestResponse;
 };
 
-export const testABC = createAsyncThunk<
-  TestResult,
-  TestArg,
-  BaseThunkApiConfig
->('private/workbook/test', async (arg: TestArg, thunkAPI) => {
-  const url = `${baseUrl}/test`;
-  const { refreshToken } = thunkAPI.getState().auth;
-  return await thunkAPI
-    .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then(() => {
+export const testABC = createAsyncThunk<TestResult, TestArg, BaseThunkApiConfig>(
+  'private/workbook/test',
+  async (arg: TestArg, thunkAPI) => {
+    const url = `${baseUrl}/test`;
+    const { refreshToken } = thunkAPI.getState().auth;
+    return await thunkAPI.dispatch(refreshAccessToken({ refreshToken: refreshToken })).then(() => {
       // onsole.log('accessToken1');
       const { accessToken } = thunkAPI.getState().auth;
       // onsole.log('accessToken', accessToken);
       return axios
-        .get(url,jsonRequestConfig(accessToken))
+        .get(url, jsonRequestConfig(accessToken))
         .then((resp) => {
           // onsole.log('the1', resp);
           const response = resp.data as TestResponse;
@@ -55,7 +51,8 @@ export const testABC = createAsyncThunk<
           return thunkAPI.rejectWithValue(errorMessage);
         });
     });
-});
+  }
+);
 
 export interface TestState {
   loading: boolean;
@@ -94,21 +91,16 @@ export const workbookTestSlice = createSlice({
   },
 });
 
-export const selectTestStatus = (state: RootState): string =>
-  state.workbookTest.status;
+export const selectTestStatus = (state: RootState): string => state.workbookTest.status;
 
-export const selectWorkbookFindLoading = (state: RootState): boolean =>
-  state.workbookFind.loading;
+export const selectWorkbookFindLoading = (state: RootState): boolean => state.workbookFind.loading;
 
-export const selectWorkbookFindFailed = (state: RootState): boolean =>
-  state.workbookFind.failed;
+export const selectWorkbookFindFailed = (state: RootState): boolean => state.workbookFind.failed;
 
-export const selectWorkbooksLoadedMap = (
-  state: RootState
-): { [key: string]: boolean } => state.workbookFind.workbooksLoadedMap;
+export const selectWorkbooksLoadedMap = (state: RootState): { [key: string]: boolean } =>
+  state.workbookFind.workbooksLoadedMap;
 
-export const selectWorkbooksMap = (
-  state: RootState
-): { [key: string]: WorkbookModel[] } => state.workbookFind.workbooksMap;
+export const selectWorkbooksMap = (state: RootState): { [key: string]: WorkbookModel[] } =>
+  state.workbookFind.workbooksMap;
 
 export default workbookTestSlice.reducer;

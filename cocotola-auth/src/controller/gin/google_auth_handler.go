@@ -13,6 +13,11 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 )
 
+type GoogleAuthParameter struct {
+	OrganizationName string `json:"organizationName"`
+	Code             string `json:"code"`
+}
+
 type GoogleUserUsecaseInterface interface {
 	RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error)
 

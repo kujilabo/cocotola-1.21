@@ -1,6 +1,6 @@
 ---
 app:
-  name: golang-structure
+  name: cocotola-auth
   httpPort: 8010
   metricsPort: 8011
   ownerPassword: password
@@ -37,7 +37,7 @@ log:
     cocotola-core: debug
 swagger:
   enabled: true
-  host: localhost:8080
+  host: localhost:8010
   schema: http
 debug:
   gin: true

@@ -30,7 +30,7 @@ export const Callback = (): ReactElement => {
   const authLoading = useAppSelector(selectAuthLoading);
   const authFailed = useAppSelector(selectAuthFailed);
   const location = window.location.search;
-  console.log('Callback', authLoading,authFailed, isAccessTokenExpired);
+  console.log('Callback', authLoading, authFailed, isAccessTokenExpired);
   if (authFailed) {
     return <div>Failed</div>;
   } else if (authLoading === false && isAccessTokenExpired) {

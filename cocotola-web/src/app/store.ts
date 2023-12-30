@@ -2,8 +2,8 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 
 import authReducer from '@/features/auth/api/auth';
-import workbookFindReducer from '@/features/private_workbook/api/workbook_find';
 import workbookTestReducer from '@/features/private_workbook/api/test';
+import workbookFindReducer from '@/features/private_workbook/api/workbook_find';
 export const rootReducer = combineReducers({
   // ...reducers,
   auth: authReducer,
