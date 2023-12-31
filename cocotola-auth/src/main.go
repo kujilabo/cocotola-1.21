@@ -48,6 +48,7 @@ func getValue(values ...string) string {
 	}
 	return ""
 }
+
 func main() {
 	var _ = new(usecase.Authentication)
 	ctx := context.Background()

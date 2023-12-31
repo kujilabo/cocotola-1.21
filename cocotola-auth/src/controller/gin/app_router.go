@@ -17,8 +17,6 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin/middleware"
 )
 
-// type NewIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType appD.ProblemTypeName, reader io.Reader) (appS.ProblemAddParameterIterator, error)
-
 type InitRouterGroupFunc func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error
 
 func NewInitTestRouterFunc() InitRouterGroupFunc {

@@ -60,6 +60,7 @@ func init() {
 }
 
 func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.AuthenticationInterface) *gin.Engine {
+	t.Helper()
 	fn := handler.NewInitAuthRouterFunc(authentication)
 
 	initPublicRouterFunc := []handler.InitRouterGroupFunc{fn}
@@ -70,15 +71,23 @@ func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.Au
 
 	return router
 }
-func parseJSON(t *testing.T, b *bytes.Buffer) interface{} {
+
+func readBytes(t *testing.T, b *bytes.Buffer) []byte {
+	t.Helper()
 	respBytes, err := io.ReadAll(b)
 	require.NoError(t, err)
-	obj, err := oj.Parse(respBytes)
+	return respBytes
+}
+
+func parseJSON(t *testing.T, bytes []byte) interface{} {
+	t.Helper()
+	obj, err := oj.Parse(bytes)
 	require.NoError(t, err)
 	return obj
 }
 
 func parseExpr(t *testing.T, v string) jp.Expr {
+	t.Helper()
 	expr, err := jp.ParseString(v)
 	require.NoError(t, err)
 	return expr
@@ -86,9 +95,7 @@ func parseExpr(t *testing.T, v string) jp.Expr {
 
 func TestAuthHandler_GetUserInfo(t *testing.T) {
 	ctx := context.Background()
-	type conditions struct {
-	}
-	type inputs struct {
+	type args struct {
 		authorizationHeader string
 	}
 	type outputs struct {
@@ -98,14 +105,10 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		loginID        string
 		username       string
 	}
-	type results struct {
-	}
 	tests := []struct {
-		name       string
-		conditions conditions
-		inputs     inputs
-		outputs    outputs
-		results    results
+		name    string
+		args    args
+		outputs outputs
 	}{
 		{
 			name: "authorization header is not specified",
@@ -115,7 +118,7 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		},
 		{
 			name: "authorization header is invalid",
-			inputs: inputs{
+			args: args{
 				authorizationHeader: "Bearer INVALID_TOKEN",
 			},
 			outputs: outputs{
@@ -124,7 +127,7 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		},
 		{
 			name: "authorization header is valid",
-			inputs: inputs{
+			args: args{
 				authorizationHeader: "Bearer VALID_TOKEN",
 			},
 			outputs: outputs{
@@ -160,16 +163,19 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 			// when
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/v1/auth/userinfo", nil)
 			require.NoError(t, err)
-			req.Header.Set("Authorization", tt.inputs.authorizationHeader)
+			req.Header.Set("Authorization", tt.args.authorizationHeader)
 			r.ServeHTTP(w, req)
-			jsonObj := parseJSON(t, w.Body)
+			respBytes := readBytes(t, w.Body)
 
 			// - check the status code
 			assert.Equal(t, tt.outputs.statusCode, w.Code)
 
 			if w.Code != http.StatusOK {
+				assert.Len(t, respBytes, 0)
 				return
 			}
+
+			jsonObj := parseJSON(t, respBytes)
 
 			// - check the appUserId
 			appUserIDExpr := parseExpr(t, "$.appUserId")
@@ -190,6 +196,82 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 			usernameExpr := parseExpr(t, "$.username")
 			username := usernameExpr.Get(jsonObj)
 			assert.Equal(t, tt.outputs.username, username[0])
+		})
+	}
+}
+
+func TestAuthHandler_RefreshToken(t *testing.T) {
+	ctx := context.Background()
+	type args struct {
+		requestBody string
+	}
+	type outputs struct {
+		statusCode  int
+		accessToken string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		outputs outputs
+	}{
+		{
+			name: "requetyBody is empty",
+			outputs: outputs{
+				statusCode: http.StatusBadRequest,
+			},
+		},
+		{
+			name: "requetyBody is invalid",
+			args: args{
+				requestBody: `{"refreshToken": "INVALID_TOKEN"}`,
+			},
+			outputs: outputs{
+				statusCode: http.StatusUnauthorized,
+			},
+		},
+		{
+			name: "requetyBody is valid",
+			args: args{
+				requestBody: `{"refreshToken": "VALID_TOKEN"}`,
+			},
+			outputs: outputs{
+				statusCode:  http.StatusOK,
+				accessToken: "ACCESS_TOKEN",
+			},
+		},
+	}
+	// given
+	authentication := new(handlermock.AuthenticationInterface)
+	authentication.On("RefreshToken", anythingOfContext, "VALID_TOKEN").Return("ACCESS_TOKEN", nil)
+	authentication.On("RefreshToken", anythingOfContext, "INVALID_TOKEN").Return("", errors.New("INVALID"))
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// given
+			r := initAuthRouter(t, ctx, authentication)
+			w := httptest.NewRecorder()
+
+			// when
+			req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/auth/refresh_token", bytes.NewBuffer([]byte(tt.args.requestBody)))
+			require.NoError(t, err)
+			r.ServeHTTP(w, req)
+
+			respBytes := readBytes(t, w.Body)
+
+			// - check the status code
+			assert.Equal(t, tt.outputs.statusCode, w.Code)
+
+			if w.Code != http.StatusOK {
+				assert.Len(t, respBytes, 0)
+				return
+			}
+
+			jsonObj := parseJSON(t, respBytes)
+
+			// - check the organizationId
+			accessTokenExpr := parseExpr(t, "$.accessToken")
+			accessToken := accessTokenExpr.Get(jsonObj)
+			assert.Equal(t, tt.outputs.accessToken, accessToken[0])
 		})
 	}
 }

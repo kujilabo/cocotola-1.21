@@ -14,3 +14,9 @@ linters-settings:
   forbidigo:
     forbid:
       - ^fmt\.Print.*$
+
+run:
+  build-tags:
+    - small
+    - medium
+    - large

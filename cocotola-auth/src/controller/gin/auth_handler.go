@@ -17,6 +17,7 @@ import (
 
 type AuthenticationInterface interface {
 	GetUserInfo(ctx context.Context, bearerToken string) (*rsuserdomain.AppUserModel, error)
+	RefreshToken(ctx context.Context, refreshToken string) (string, error)
 }
 
 type AuthHandler struct {
@@ -62,20 +63,20 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 	logger.InfoContext(ctx, "Authorize")
 	refreshTokenParameter := RefreshTokenParameter{}
-	if err := c.BindJSON(&refreshTokenParameter); err != nil {
+	if err := c.ShouldBindJSON(&refreshTokenParameter); err != nil {
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	// token, err := h.authTokenManager.RefreshToken(ctx, refreshTokenParameter.RefreshToken)
-	// if err != nil {
-	// 	c.Status(http.StatusBadRequest)
-	// 	return
-	// }
+	accessToken, err := h.authentication.RefreshToken(ctx, refreshTokenParameter.RefreshToken)
+	if err != nil {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
 
-	// logger.Info("Authorize OK")
-	// c.JSON(http.StatusOK, AuthResponse{
-	// 	AccessToken: token,
-	// })
+	c.JSON(http.StatusOK, AuthResponse{
+		AccessToken: accessToken,
+	})
 }
 
 func NewInitAuthRouterFunc(authentication AuthenticationInterface) InitRouterGroupFunc {

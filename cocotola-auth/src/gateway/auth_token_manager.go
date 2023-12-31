@@ -7,13 +7,14 @@ import (
 
 	"github.com/golang-jwt/jwt"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
+
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
+
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 )
 
 type AppUserClaims struct {
@@ -59,29 +60,29 @@ func (m *appUser) LoginID() string {
 	return m.loginID
 }
 
-type authTokenManager struct {
-	signingKey     []byte
-	signingMethod  jwt.SigningMethod
-	tokenTimeout   time.Duration
-	refreshTimeout time.Duration
+type AuthTokenManager struct {
+	SigningKey     []byte
+	SigningMethod  jwt.SigningMethod
+	TokenTimeout   time.Duration
+	RefreshTimeout time.Duration
 }
 
-func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tokenTimeout, refreshTimeout time.Duration) service.AuthTokenManager {
-	return &authTokenManager{
-		signingKey:     signingKey,
-		signingMethod:  signingMethod,
-		tokenTimeout:   tokenTimeout,
-		refreshTimeout: refreshTimeout,
+func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tokenTimeout, refreshTimeout time.Duration) *AuthTokenManager {
+	return &AuthTokenManager{
+		SigningKey:     signingKey,
+		SigningMethod:  signingMethod,
+		TokenTimeout:   tokenTimeout,
+		RefreshTimeout: refreshTimeout,
 	}
 }
 
-func (m *authTokenManager) CreateTokenSet(ctx context.Context, appUser service.AppUserInterface, organization service.OrganizationInterface) (*domain.AuthTokenSet, error) {
-	accessToken, err := m.createJWT(ctx, appUser, organization, m.tokenTimeout, "access")
+func (m *AuthTokenManager) CreateTokenSet(ctx context.Context, appUser service.AppUserInterface, organization service.OrganizationInterface) (*domain.AuthTokenSet, error) {
+	accessToken, err := m.createJWT(ctx, appUser, organization, m.TokenTimeout, "access")
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := m.createJWT(ctx, appUser, organization, m.refreshTimeout, "refresh")
+	refreshToken, err := m.createJWT(ctx, appUser, organization, m.RefreshTimeout, "refresh")
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +93,11 @@ func (m *authTokenManager) CreateTokenSet(ctx context.Context, appUser service.A
 	}, nil
 }
 
-func (m *authTokenManager) createJWT(ctx context.Context, appUser service.AppUserInterface, organization service.OrganizationInterface, duration time.Duration, tokenType string) (string, error) {
+func (m *AuthTokenManager) createJWT(ctx context.Context, appUser service.AppUserInterface, organization service.OrganizationInterface, duration time.Duration, tokenType string) (string, error) {
+	if len(m.SigningKey) == 0 {
+		return "", rsliberrors.Errorf("m.SigningKey is not set")
+	}
+
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
 	now := time.Now()
 	claims := AppUserClaims{
@@ -110,8 +115,8 @@ func (m *authTokenManager) createJWT(ctx context.Context, appUser service.AppUse
 
 	logger.DebugContext(ctx, fmt.Sprintf("claims: %+v", claims))
 
-	token := jwt.NewWithClaims(m.signingMethod, claims)
-	signed, err := token.SignedString(m.signingKey)
+	token := jwt.NewWithClaims(m.SigningMethod, claims)
+	signed, err := token.SignedString(m.SigningKey)
 	if err != nil {
 		return "", rsliberrors.Errorf(". err: %w", err)
 	}
@@ -119,10 +124,10 @@ func (m *authTokenManager) createJWT(ctx context.Context, appUser service.AppUse
 	return signed, nil
 }
 
-func (m *authTokenManager) GetUserInfo(ctx context.Context, tokenString string) (*service.AppUserInfo, error) {
+func (m *AuthTokenManager) GetUserInfo(ctx context.Context, tokenString string) (*service.AppUserInfo, error) {
 	currentClaims, err := m.parseToken(ctx, tokenString)
 	if err != nil {
-		return nil, fmt.Errorf("jwt.ParseWithClaims. err: %w", domain.ErrUnauthenticated)
+		return nil, fmt.Errorf("parseToken(%s). err: %w", err.Error(), domain.ErrUnauthenticated)
 	}
 
 	return &service.AppUserInfo{
@@ -134,29 +139,38 @@ func (m *authTokenManager) GetUserInfo(ctx context.Context, tokenString string) 
 	}, nil
 }
 
-func (m *authTokenManager) parseToken(ctx context.Context, tokenString string) (*AppUserClaims, error) {
+func (m *AuthTokenManager) parseToken(ctx context.Context, tokenString string) (*AppUserClaims, error) {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
-		return m.signingKey, nil
+		return m.SigningKey, nil
 	}
 
 	currentToken, err := jwt.ParseWithClaims(tokenString, &AppUserClaims{}, keyFunc)
 	if err != nil {
 		logger.InfoContext(ctx, fmt.Sprintf("%v", err))
-		return nil, fmt.Errorf("jwt.ParseWithClaims. err: %w", domain.ErrUnauthenticated)
+		// return nil, fmt.Errorf("jwt.ParseWithClaims. err: %w", domain.ErrUnauthenticated)
+		return nil, err
+	}
+	if !currentToken.Valid {
+		return nil, fmt.Errorf("invalid token")
 	}
 
 	currentClaims, ok := currentToken.Claims.(*AppUserClaims)
-	if !ok || !currentToken.Valid {
-		return nil, fmt.Errorf("invalid token. err: %w", domain.ErrUnauthenticated)
+	if !ok {
+		return nil, fmt.Errorf("invalid claims")
 	}
+
+	if err := currentClaims.Valid(); err != nil {
+		return nil, err
+	}
+
 	return currentClaims, nil
 }
 
-func (m *authTokenManager) RefreshToken(ctx context.Context, tokenString string) (string, error) {
+func (m *AuthTokenManager) RefreshToken(ctx context.Context, tokenString string) (string, error) {
 	currentClaims, err := m.parseToken(ctx, tokenString)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("parseToken(%s). err: %w", err.Error(), domain.ErrUnauthenticated)
 	}
 
 	if currentClaims.TokenType != "refresh" {
@@ -178,7 +192,7 @@ func (m *authTokenManager) RefreshToken(ctx context.Context, tokenString string)
 		name:           currentClaims.OrganizationName,
 	}
 
-	accessToken, err := m.createJWT(ctx, appUser, organization, m.tokenTimeout, "access")
+	accessToken, err := m.createJWT(ctx, appUser, organization, m.TokenTimeout, "access")
 	if err != nil {
 		return "", rsliberrors.Errorf("m.createJWT. err: %w", err)
 	}
