@@ -15,11 +15,14 @@ import (
 func NewAuthMiddleware(cocotolaAuthClient service.CocotolaAuthClient) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
+		ctx, span := tracer.Start(ctx, "authMiddleware")
+		defer span.End()
+
 		logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppTraceLoggerContextKey)
 
 		authorization := c.GetHeader("Authorization")
 		if !strings.HasPrefix(authorization, "Bearer ") {
-			logger.WarnContext(ctx, "invalid header. Bearer not found")
+			logger.InfoContext(ctx, "invalid header. Bearer not found")
 			return
 		}
 

@@ -15,16 +15,16 @@ import (
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
-type AuthenticationInterface interface {
+type AuthenticationUsecaseInterface interface {
 	GetUserInfo(ctx context.Context, bearerToken string) (*rsuserdomain.AppUserModel, error)
 	RefreshToken(ctx context.Context, refreshToken string) (string, error)
 }
 
 type AuthHandler struct {
-	authentication AuthenticationInterface
+	authentication AuthenticationUsecaseInterface
 }
 
-func NewAuthHandler(authentication AuthenticationInterface) *AuthHandler {
+func NewAuthHandler(authentication AuthenticationUsecaseInterface) *AuthHandler {
 	return &AuthHandler{
 		authentication: authentication,
 	}
@@ -79,7 +79,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	})
 }
 
-func NewInitAuthRouterFunc(authentication AuthenticationInterface) InitRouterGroupFunc {
+func NewInitAuthRouterFunc(authentication AuthenticationUsecaseInterface) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 		auth := parentRouterGroup.Group("auth")
 		for _, m := range middleware {

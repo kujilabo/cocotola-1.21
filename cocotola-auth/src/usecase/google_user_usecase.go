@@ -80,31 +80,23 @@ func NewGoogleUserUsecase(transactionManager service.TransactionManager, authTok
 	}
 }
 
-func (u *GoogleUserUsecase) RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error) {
+func (u *GoogleUserUsecase) Authorize(ctx context.Context, code, organizationName string) (*domain.AuthTokenSet, error) {
 	resp, err := u.googleAuthClient.RetrieveAccessToken(ctx, code)
 	if err != nil {
 		return nil, rsliberrors.Errorf(". err: %w", err)
 	}
 
-	return resp, nil
-}
-
-func (u *GoogleUserUsecase) RetrieveUserInfo(ctx context.Context, googleAuthResponse *domain.AuthTokenSet) (*domain.UserInfo, error) {
-	info, err := u.googleAuthClient.RetrieveUserInfo(ctx, googleAuthResponse)
+	info, err := u.googleAuthClient.RetrieveUserInfo(ctx, resp)
 	if err != nil {
 		return nil, rsliberrors.Errorf(". err: %w", err)
 	}
 
-	return info, nil
-}
-
-func (u *GoogleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo *domain.UserInfo, googleAuthResponse *domain.AuthTokenSet, organizationName string) (*domain.AuthTokenSet, error) {
 	var tokenSet *domain.AuthTokenSet
 
 	var targetOorganization *organization
 	var targetAppUser *appUser
 	if err := u.transactionManager.Do(ctx, func(rf service.RepositoryFactory) error {
-		tmpOrganization, tmpAppUser, err := u.registerAppUser(ctx, rf, organizationName, googleUserInfo.Email, googleUserInfo.Name, googleUserInfo.Email, googleAuthResponse.AccessToken, googleAuthResponse.RefreshToken)
+		tmpOrganization, tmpAppUser, err := u.registerAppUser(ctx, rf, organizationName, info.Email, info.Name, info.Email, resp.AccessToken, resp.RefreshToken)
 		if err != nil && !errors.Is(err, rsuserservice.ErrAppUserAlreadyExists) {
 			return rsliberrors.Errorf("s.registerAppUser. err: %w", err)
 		}
@@ -125,9 +117,6 @@ func (u *GoogleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 		return nil, rsliberrors.Errorf("RegisterAppUser. err: %w", err)
 	}
 
-	// if err := s.registerAppUserCallback(ctx, organizationName, appUser); err != nil {
-	// 	return nil, rsliberrors.Errorf("registerStudentCallback. err: %w", err)
-	// }
 	tokenSetTmp, err := u.authTokenManager.CreateTokenSet(ctx, targetAppUser, targetOorganization)
 	if err != nil {
 		return nil, rsliberrors.Errorf("s.authTokenManager.CreateTokenSet. err: %w", err)
@@ -135,6 +124,62 @@ func (u *GoogleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 	tokenSet = tokenSetTmp
 	return tokenSet, nil
 }
+
+// func (u *GoogleUserUsecase) RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error) {
+// 	resp, err := u.googleAuthClient.RetrieveAccessToken(ctx, code)
+// 	if err != nil {
+// 		return nil, rsliberrors.Errorf(". err: %w", err)
+// 	}
+
+// 	return resp, nil
+// }
+
+// func (u *GoogleUserUsecase) RetrieveUserInfo(ctx context.Context, googleAuthResponse *domain.AuthTokenSet) (*domain.UserInfo, error) {
+// 	info, err := u.googleAuthClient.RetrieveUserInfo(ctx, googleAuthResponse)
+// 	if err != nil {
+// 		return nil, rsliberrors.Errorf(". err: %w", err)
+// 	}
+
+// 	return info, nil
+// }
+
+// func (u *GoogleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo *domain.UserInfo, googleAuthResponse *domain.AuthTokenSet, organizationName string) (*domain.AuthTokenSet, error) {
+// 	var tokenSet *domain.AuthTokenSet
+
+// 	var targetOorganization *organization
+// 	var targetAppUser *appUser
+// 	if err := u.transactionManager.Do(ctx, func(rf service.RepositoryFactory) error {
+// 		tmpOrganization, tmpAppUser, err := u.registerAppUser(ctx, rf, organizationName, googleUserInfo.Email, googleUserInfo.Name, googleUserInfo.Email, googleAuthResponse.AccessToken, googleAuthResponse.RefreshToken)
+// 		if err != nil && !errors.Is(err, rsuserservice.ErrAppUserAlreadyExists) {
+// 			return rsliberrors.Errorf("s.registerAppUser. err: %w", err)
+// 		}
+
+// 		targetAppUser = &appUser{
+// 			appUserID:      tmpAppUser.AppUserID,
+// 			organizationID: tmpAppUser.OrganizationID,
+// 			loginID:        tmpAppUser.LoginID,
+// 			username:       tmpAppUser.Username,
+// 		}
+// 		targetOorganization = &organization{
+// 			organizationID: tmpOrganization.OrganizationID,
+// 			name:           tmpOrganization.Name,
+// 		}
+
+// 		return nil
+// 	}); err != nil {
+// 		return nil, rsliberrors.Errorf("RegisterAppUser. err: %w", err)
+// 	}
+
+// 	// if err := s.registerAppUserCallback(ctx, organizationName, appUser); err != nil {
+// 	// 	return nil, rsliberrors.Errorf("registerStudentCallback. err: %w", err)
+// 	// }
+// 	tokenSetTmp, err := u.authTokenManager.CreateTokenSet(ctx, targetAppUser, targetOorganization)
+// 	if err != nil {
+// 		return nil, rsliberrors.Errorf("s.authTokenManager.CreateTokenSet. err: %w", err)
+// 	}
+// 	tokenSet = tokenSetTmp
+// 	return tokenSet, nil
+// }
 
 func (u *GoogleUserUsecase) registerAppUser(ctx context.Context, rf service.RepositoryFactory, organizationName string, loginID string, username string,
 	providerID, providerAccessToken, providerRefreshToken string) (*rsuserdomain.OrganizationModel, *rsuserdomain.AppUserModel, error) {
