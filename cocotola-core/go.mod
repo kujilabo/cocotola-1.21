@@ -5,8 +5,8 @@ go 1.21.4
 require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231229153349-f6582d80d73d
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20231224142347-b79b78eda97e
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20231231042010-f4592bf71493
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20231231042010-f4592bf71493
 	github.com/kujilabo/redstart v0.0.5
 	github.com/samber/slog-gin v1.7.1
 	github.com/stretchr/testify v1.8.4
