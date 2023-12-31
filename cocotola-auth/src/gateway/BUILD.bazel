@@ -33,6 +33,7 @@ go_test(
     srcs = ["auth_token_manager_s_test.go"],
     deps = [
         ":gateway",
+        "//cocotola-auth/src/domain",
         "//cocotola-auth/src/service",
         "@com_github_golang_jwt_jwt//:jwt",
         "@com_github_kujilabo_redstart//user/domain",

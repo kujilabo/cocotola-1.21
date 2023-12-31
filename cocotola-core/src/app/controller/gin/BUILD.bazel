@@ -15,6 +15,7 @@ go_library(
         "//cocotola-core/src/app/controller/gin/middleware",
         "//cocotola-core/src/app/service",
         "//cocotola-core/src/app/usecase/student",
+        "//lib/controller/gin/middleware",
         "//lib/log",
         "@com_github_gin_contrib_cors//:cors",
         "@com_github_gin_gonic_gin//:gin",
