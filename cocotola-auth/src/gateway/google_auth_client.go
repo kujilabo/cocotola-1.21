@@ -11,16 +11,17 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 )
 
-type GoogleAuthResponse struct {
+type googleAuthResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
-type GoogleUserInfo struct {
+type googleUserInfo struct {
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
@@ -86,7 +87,7 @@ func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string)
 		return nil, errors.New(string(respBytes))
 	}
 
-	googleAuthResponse := GoogleAuthResponse{}
+	googleAuthResponse := googleAuthResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&googleAuthResponse); err != nil {
 		return nil, rsliberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
@@ -123,7 +124,7 @@ func (c *GoogleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthRespo
 	// logger.Debugf("access_token:%s", googleAuthResponse.AccessToken)
 	// logger.Debugf("status:%d", resp.StatusCode)
 
-	googleUserInfo := GoogleUserInfo{}
+	googleUserInfo := googleUserInfo{}
 	if err := json.NewDecoder(resp.Body).Decode(&googleUserInfo); err != nil {
 		return nil, rsliberrors.Errorf("json.NewDecoder. err: %w", err)
 	}

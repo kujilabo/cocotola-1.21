@@ -15,6 +15,8 @@ golangci-lint run --disable-all --config ../.github/.golangci.yml \
 -E gomnd \
 -E gosec \
 -E noctx \
+-E testpackage \
+-E thelper \
 -E unconvert \
 -E whitespace && \
 pkgforbid -config=../.github/pkgforbid.yml ./... && \
@@ -35,6 +37,8 @@ golangci-lint run --disable-all --config ../.github/.golangci.yml \
 -E gomnd \
 -E gosec \
 -E noctx \
+-E testpackage \
+-E thelper \
 -E unconvert \
 -E whitespace && \
 pkgforbid -config=../.github/pkgforbid.yml ./... && \
@@ -55,6 +59,8 @@ golangci-lint run --disable-all --config ../.github/.golangci.yml \
 -E gomnd \
 -E gosec \
 -E noctx \
+-E testpackage \
+-E thelper \
 -E unconvert \
 -E whitespace && \
 pkgforbid -config=../.github/pkgforbid.yml ./... && \

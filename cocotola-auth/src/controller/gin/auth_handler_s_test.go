@@ -60,6 +60,7 @@ func init() {
 }
 
 func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.AuthenticationInterface) *gin.Engine {
+	t.Helper()
 	fn := handler.NewInitAuthRouterFunc(authentication)
 
 	initPublicRouterFunc := []handler.InitRouterGroupFunc{fn}
@@ -72,18 +73,21 @@ func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.Au
 }
 
 func readBytes(t *testing.T, b *bytes.Buffer) []byte {
+	t.Helper()
 	respBytes, err := io.ReadAll(b)
 	require.NoError(t, err)
 	return respBytes
 }
 
 func parseJSON(t *testing.T, bytes []byte) interface{} {
+	t.Helper()
 	obj, err := oj.Parse(bytes)
 	require.NoError(t, err)
 	return obj
 }
 
 func parseExpr(t *testing.T, v string) jp.Expr {
+	t.Helper()
 	expr, err := jp.ParseString(v)
 	require.NoError(t, err)
 	return expr
@@ -91,9 +95,7 @@ func parseExpr(t *testing.T, v string) jp.Expr {
 
 func TestAuthHandler_GetUserInfo(t *testing.T) {
 	ctx := context.Background()
-	type conditions struct {
-	}
-	type inputs struct {
+	type args struct {
 		authorizationHeader string
 	}
 	type outputs struct {
@@ -103,14 +105,10 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		loginID        string
 		username       string
 	}
-	type results struct {
-	}
 	tests := []struct {
-		name       string
-		conditions conditions
-		inputs     inputs
-		outputs    outputs
-		results    results
+		name    string
+		args    args
+		outputs outputs
 	}{
 		{
 			name: "authorization header is not specified",
@@ -120,7 +118,7 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		},
 		{
 			name: "authorization header is invalid",
-			inputs: inputs{
+			args: args{
 				authorizationHeader: "Bearer INVALID_TOKEN",
 			},
 			outputs: outputs{
@@ -129,7 +127,7 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		},
 		{
 			name: "authorization header is valid",
-			inputs: inputs{
+			args: args{
 				authorizationHeader: "Bearer VALID_TOKEN",
 			},
 			outputs: outputs{
@@ -165,7 +163,7 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 			// when
 			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/v1/auth/userinfo", nil)
 			require.NoError(t, err)
-			req.Header.Set("Authorization", tt.inputs.authorizationHeader)
+			req.Header.Set("Authorization", tt.args.authorizationHeader)
 			r.ServeHTTP(w, req)
 			respBytes := readBytes(t, w.Body)
 
@@ -204,23 +202,17 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 
 func TestAuthHandler_RefreshToken(t *testing.T) {
 	ctx := context.Background()
-	type conditions struct {
-	}
-	type inputs struct {
+	type args struct {
 		requestBody string
 	}
 	type outputs struct {
 		statusCode  int
 		accessToken string
 	}
-	type results struct {
-	}
 	tests := []struct {
-		name       string
-		conditions conditions
-		inputs     inputs
-		outputs    outputs
-		results    results
+		name    string
+		args    args
+		outputs outputs
 	}{
 		{
 			name: "requetyBody is empty",
@@ -230,7 +222,7 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 		},
 		{
 			name: "requetyBody is invalid",
-			inputs: inputs{
+			args: args{
 				requestBody: `{"refreshToken": "INVALID_TOKEN"}`,
 			},
 			outputs: outputs{
@@ -239,7 +231,7 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 		},
 		{
 			name: "requetyBody is valid",
-			inputs: inputs{
+			args: args{
 				requestBody: `{"refreshToken": "VALID_TOKEN"}`,
 			},
 			outputs: outputs{
@@ -260,7 +252,7 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// when
-			req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/auth/refresh_token", bytes.NewBuffer([]byte(tt.inputs.requestBody)))
+			req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/auth/refresh_token", bytes.NewBuffer([]byte(tt.args.requestBody)))
 			require.NoError(t, err)
 			r.ServeHTTP(w, req)
 
