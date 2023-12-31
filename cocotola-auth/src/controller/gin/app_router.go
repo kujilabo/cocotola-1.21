@@ -11,10 +11,10 @@ import (
 
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
+	libmiddleware "github.com/kujilabo/cocotola-1.21/lib/controller/gin/middleware"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin/middleware"
 )
 
 type InitRouterGroupFunc func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error
@@ -49,13 +49,13 @@ func NewAppRouter(
 	router.Use(sloggin.New(logger))
 
 	if debugConfig.Wait {
-		router.Use(middleware.NewWaitMiddleware())
+		router.Use(libmiddleware.NewWaitMiddleware())
 	}
 
 	v1 := router.Group("v1")
 	{
 		v1.Use(otelgin.Middleware(appConfig.Name))
-		v1.Use(middleware.NewTraceLogMiddleware(appConfig.Name))
+		v1.Use(libmiddleware.NewTraceLogMiddleware(appConfig.Name))
 
 		for _, fn := range initPublicRouterFunc {
 			if err := fn(v1); err != nil {

@@ -9,11 +9,14 @@ import (
 	sloggin "github.com/samber/slog-gin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
+	rsliblog "github.com/kujilabo/redstart/lib/log"
+
+	libmiddleware "github.com/kujilabo/cocotola-1.21/lib/controller/gin/middleware"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
+
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/config"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/controller/gin/middleware"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-	rsliblog "github.com/kujilabo/redstart/lib/log"
 )
 
 // type NewIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType appD.ProblemTypeName, reader io.Reader) (appS.ProblemAddParameterIterator, error)
@@ -55,13 +58,13 @@ func NewAppRouter(
 	authMiddleware := middleware.NewAuthMiddleware(cocotolaAuthClient)
 
 	if debugConfig.Wait {
-		router.Use(middleware.NewWaitMiddleware())
+		router.Use(libmiddleware.NewWaitMiddleware())
 	}
 
 	v1 := router.Group("v1")
 	{
 		v1.Use(otelgin.Middleware(appConfig.Name))
-		v1.Use(middleware.NewTraceLogMiddleware(appConfig.Name))
+		v1.Use(libmiddleware.NewTraceLogMiddleware(appConfig.Name))
 
 		for _, fn := range initPublicRouterFunc {
 			if err := fn(v1); err != nil {
