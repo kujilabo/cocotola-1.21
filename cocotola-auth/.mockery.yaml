@@ -9,4 +9,5 @@ packages:
     config:
       dir: src/controller/gin/mocks
     interfaces:
-      AuthenticationInterface:
+      AuthenticationUsecaseInterface:
+      GoogleUserUsecaseInterface:

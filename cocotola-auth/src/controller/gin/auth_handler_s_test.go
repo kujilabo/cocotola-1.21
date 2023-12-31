@@ -1,18 +1,17 @@
+//go:build small
+
 package handler_test
 
 import (
 	"bytes"
 	"context"
 	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/ohler55/ojg/jp"
-	"github.com/ohler55/ojg/oj"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -53,13 +52,9 @@ func init() {
 		Gin:  false,
 		Wait: false,
 	}
-
-	// signingKey := []byte(authConfig.SigningKey)
-	// signingMethod := jwt.SigningMethodHS256
-	// authTokenManager = auth.NewAuthTokenManager(signingKey, signingMethod, time.Duration(authConfig.AccessTokenTTLMin)*time.Minute, time.Duration(authConfig.RefreshTokenTTLHour)*time.Hour)
 }
 
-func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.AuthenticationInterface) *gin.Engine {
+func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.AuthenticationUsecaseInterface) *gin.Engine {
 	t.Helper()
 	fn := handler.NewInitAuthRouterFunc(authentication)
 
@@ -72,28 +67,8 @@ func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.Au
 	return router
 }
 
-func readBytes(t *testing.T, b *bytes.Buffer) []byte {
-	t.Helper()
-	respBytes, err := io.ReadAll(b)
-	require.NoError(t, err)
-	return respBytes
-}
-
-func parseJSON(t *testing.T, bytes []byte) interface{} {
-	t.Helper()
-	obj, err := oj.Parse(bytes)
-	require.NoError(t, err)
-	return obj
-}
-
-func parseExpr(t *testing.T, v string) jp.Expr {
-	t.Helper()
-	expr, err := jp.ParseString(v)
-	require.NoError(t, err)
-	return expr
-}
-
 func TestAuthHandler_GetUserInfo(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	type args struct {
 		authorizationHeader string
@@ -140,24 +115,24 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		},
 	}
 	// given
-	appUserID, err := rsuserdomain.NewAppUserID(123)
-	require.NoError(t, err)
-	organizaionID, err := rsuserdomain.NewOrganizationID(456)
-	require.NoError(t, err)
+	appUserID := appUserID(t, 123)
+	organizaionID := organizationID(t, 456)
 	appUserInfo := &rsuserdomain.AppUserModel{
 		AppUserID:      appUserID,
 		OrganizationID: organizaionID,
 		LoginID:        "LOGIN_ID",
 		Username:       "USERNAME",
 	}
-	authentication := new(handlermock.AuthenticationInterface)
-	authentication.On("GetUserInfo", anythingOfContext, "VALID_TOKEN").Return(appUserInfo, nil)
-	authentication.On("GetUserInfo", anythingOfContext, "INVALID_TOKEN").Return(nil, errors.New("INVALID"))
+	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
+	authenticationUsecase.On("GetUserInfo", anythingOfContext, "VALID_TOKEN").Return(appUserInfo, nil)
+	authenticationUsecase.On("GetUserInfo", anythingOfContext, "INVALID_TOKEN").Return(nil, errors.New("INVALID"))
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// given
-			r := initAuthRouter(t, ctx, authentication)
+			r := initAuthRouter(t, ctx, authenticationUsecase)
 			w := httptest.NewRecorder()
 
 			// when
@@ -201,6 +176,7 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 }
 
 func TestAuthHandler_RefreshToken(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	type args struct {
 		requestBody string
@@ -241,14 +217,16 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 		},
 	}
 	// given
-	authentication := new(handlermock.AuthenticationInterface)
-	authentication.On("RefreshToken", anythingOfContext, "VALID_TOKEN").Return("ACCESS_TOKEN", nil)
-	authentication.On("RefreshToken", anythingOfContext, "INVALID_TOKEN").Return("", errors.New("INVALID"))
+	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
+	authenticationUsecase.On("RefreshToken", anythingOfContext, "VALID_TOKEN").Return("ACCESS_TOKEN", nil)
+	authenticationUsecase.On("RefreshToken", anythingOfContext, "INVALID_TOKEN").Return("", errors.New("INVALID"))
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			// given
-			r := initAuthRouter(t, ctx, authentication)
+			r := initAuthRouter(t, ctx, authenticationUsecase)
 			w := httptest.NewRecorder()
 
 			// when

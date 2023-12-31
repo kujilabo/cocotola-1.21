@@ -30,7 +30,10 @@ go_library(
 
 go_test(
     name = "gateway_test",
-    srcs = ["auth_token_manager_s_test.go"],
+    srcs = [
+        "auth_token_manager_s_test.go",
+        "helper_test.go",
+    ],
     deps = [
         ":gateway",
         "//cocotola-auth/src/domain",
@@ -45,7 +48,10 @@ go_test(
 go_test(
     name = "gateway_s_test",
     size = "small",
-    srcs = ["auth_token_manager_s_test.go"],
+    srcs = [
+        "auth_token_manager_s_test.go",
+        "helper_test.go",
+    ],
     embed = [":gateway"],
     gotags = ["small"],
     deps = [

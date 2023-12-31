@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -77,14 +77,15 @@ func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, rsliberrors.Errorf("retrieve user info. err: %w", domain.ErrUnauthenticated)
+	} else if resp.StatusCode != http.StatusOK {
 		respBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, rsliberrors.Errorf("io.ReadAll. err: %w", err)
 		}
-		// logger.Debugf("status:%d", resp.StatusCode)
-		// logger.Debugf("Resp:%s", string(respBytes))
-		return nil, errors.New(string(respBytes))
+
+		return nil, fmt.Errorf("retrieve user info. status: %d, body:%s", resp.StatusCode, string(respBytes))
 	}
 
 	googleAuthResponse := googleAuthResponse{}
@@ -123,6 +124,17 @@ func (c *GoogleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthRespo
 
 	// logger.Debugf("access_token:%s", googleAuthResponse.AccessToken)
 	// logger.Debugf("status:%d", resp.StatusCode)
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, rsliberrors.Errorf("retrieve user info. err: %w", domain.ErrUnauthenticated)
+	} else if resp.StatusCode != http.StatusOK {
+		respBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, rsliberrors.Errorf("io.ReadAll. err: %w", err)
+		}
+
+		return nil, fmt.Errorf("retrieve user info. status: %d, body:%s", resp.StatusCode, string(respBytes))
+	}
 
 	googleUserInfo := googleUserInfo{}
 	if err := json.NewDecoder(resp.Body).Decode(&googleUserInfo); err != nil {
