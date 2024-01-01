@@ -11,3 +11,8 @@ packages:
     interfaces:
       AuthenticationUsecaseInterface:
       GoogleUserUsecaseInterface:
+  github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway:
+    config:
+      dir: src/gateway/mocks
+    interfaces:
+      HTTPClient:

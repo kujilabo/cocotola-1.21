@@ -14,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -154,6 +155,27 @@ func run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 	return 0
 }
 
+type systemOwnerByOrganizationName struct {
+}
+
+func (s systemOwnerByOrganizationName) Get(ctx context.Context, rf service.RepositoryFactory, organizationName string) (*rsuserservice.SystemOwner, error) {
+	rsrf, err := rf.NewRedstartRepositoryFactory(ctx)
+	if err != nil {
+		return nil, err
+	}
+	systemAdmin, err := rsuserservice.NewSystemAdmin(ctx, rsrf)
+	if err != nil {
+		return nil, err
+	}
+
+	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, organizationName)
+	if err != nil {
+		return nil, err
+	}
+
+	return systemOwner, nil
+}
+
 func appServer(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
 	// // cors
@@ -172,13 +194,17 @@ func appServer(ctx context.Context, cfg *config.Config, transactionManager servi
 	// if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
 	// 	return liberrors.Errorf(". err: %w", err)
 	// }
-	googleAuthClient := gateway.NewGoogleAuthClient(cfg.Auth.GoogleClientID, cfg.Auth.GoogleClientSecret, cfg.Auth.GoogleCallbackURL, time.Duration(cfg.Auth.APITimeoutSec)*time.Second)
+	httpClient := http.Client{
+		Timeout:   time.Duration(cfg.Auth.APITimeoutSec) * time.Second,
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
+	googleAuthClient := gateway.NewGoogleAuthClient(&httpClient, cfg.Auth.GoogleClientID, cfg.Auth.GoogleClientSecret, cfg.Auth.GoogleCallbackURL)
 
 	signingKey := []byte(cfg.Auth.SigningKey)
 	signingMethod := jwt.SigningMethodHS256
 	authTokenManager := gateway.NewAuthTokenManager(signingKey, signingMethod, time.Duration(cfg.Auth.AccessTokenTTLMin)*time.Minute, time.Duration(cfg.Auth.RefreshTokenTTLHour)*time.Hour)
 
-	authenticationUsecase := usecase.NewAuthentication(transactionManager, authTokenManager)
+	authenticationUsecase := usecase.NewAuthentication(transactionManager, authTokenManager, &systemOwnerByOrganizationName{})
 	googleUserUsecase := usecase.NewGoogleUserUsecase(transactionManager, authTokenManager, googleAuthClient)
 
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{

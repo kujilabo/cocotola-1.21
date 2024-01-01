@@ -12,7 +12,6 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
-	rsuserservice "github.com/kujilabo/redstart/user/service"
 	// "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 	// liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	// rsliblog "github.com/kujilabo/redstart/lib/log"
@@ -29,18 +28,22 @@ type AppUserClaims struct {
 }
 
 type Authentication struct {
-	transactionManager service.TransactionManager
-	authTokenManager   service.AuthTokenManager
+	transactionManager            service.TransactionManager
+	authTokenManager              service.AuthTokenManager
+	systemOwnerByOrganizationName SystemOwnerByOrganizationName
 }
 
-func NewAuthentication(transactionManager service.TransactionManager, authTokenManager service.AuthTokenManager) *Authentication {
+func NewAuthentication(transactionManager service.TransactionManager, authTokenManager service.AuthTokenManager, systemOwnerByOrganizationName SystemOwnerByOrganizationName) *Authentication {
 	return &Authentication{
-		transactionManager: transactionManager,
-		authTokenManager:   authTokenManager,
+		transactionManager:            transactionManager,
+		authTokenManager:              authTokenManager,
+		systemOwnerByOrganizationName: systemOwnerByOrganizationName,
 	}
 }
 
 func (u *Authentication) GetUserInfo(ctx context.Context, bearerToken string) (*rsuserdomain.AppUserModel, error) {
+	// TODO: Check whether the token is registered in the Database
+
 	appUserInfo, err := u.authTokenManager.GetUserInfo(ctx, bearerToken)
 	if err != nil {
 		return nil, err
@@ -49,16 +52,7 @@ func (u *Authentication) GetUserInfo(ctx context.Context, bearerToken string) (*
 	var targetAppUserModel *rsuserdomain.AppUserModel
 
 	if err := u.transactionManager.Do(ctx, func(rf service.RepositoryFactory) error {
-		rsrf, err := rf.NewRedstartRepositoryFactory(ctx)
-		if err != nil {
-			return err
-		}
-		systemAdmin, err := rsuserservice.NewSystemAdmin(ctx, rsrf)
-		if err != nil {
-			return err
-		}
-
-		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appUserInfo.OrganizationName)
+		systemOwner, err := u.systemOwnerByOrganizationName.Get(ctx, rf, appUserInfo.OrganizationName)
 		if err != nil {
 			return err
 		}
@@ -81,6 +75,8 @@ func (u *Authentication) RefreshToken(ctx context.Context, refreshToken string) 
 	if err != nil {
 		return "", err
 	}
+
+	// TODO: Save the token to the database
 
 	return accessToken, nil
 }
