@@ -23,7 +23,6 @@ go_library(
         "@com_github_kujilabo_redstart//user/gateway",
         "@com_github_kujilabo_redstart//user/service",
         "@io_gorm_gorm//:gorm",
-        "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
         "@io_opentelemetry_go_otel//:otel",
     ],
 )
@@ -32,15 +31,18 @@ go_test(
     name = "gateway_test",
     srcs = [
         "auth_token_manager_s_test.go",
+        "google_auth_client_s_test.go",
         "helper_test.go",
     ],
     deps = [
         ":gateway",
         "//cocotola-auth/src/domain",
+        "//cocotola-auth/src/gateway/mocks",
         "//cocotola-auth/src/service",
         "@com_github_golang_jwt_jwt//:jwt",
         "@com_github_kujilabo_redstart//user/domain",
         "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
         "@com_github_stretchr_testify//require",
     ],
 )
@@ -50,15 +52,19 @@ go_test(
     size = "small",
     srcs = [
         "auth_token_manager_s_test.go",
+        "google_auth_client_s_test.go",
         "helper_test.go",
     ],
     embed = [":gateway"],
     gotags = ["small"],
     deps = [
         "//cocotola-auth/src/domain",
+        "//cocotola-auth/src/gateway/mocks",
         "//cocotola-auth/src/service",
         "@com_github_golang_jwt_jwt//:jwt",
+        "@com_github_kujilabo_redstart//user/domain",
         "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
         "@com_github_stretchr_testify//require",
     ],
 )
