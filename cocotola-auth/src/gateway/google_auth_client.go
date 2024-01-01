@@ -37,11 +37,7 @@ type GoogleAuthClient struct {
 
 func NewGoogleAuthClient(httpClient HTTPClient, clientID, clientSecret, redirectURI string) *GoogleAuthClient {
 	return &GoogleAuthClient{
-		HTTPClient: httpClient,
-		// Client: http.Client{
-		// 	Timeout:   timeout,
-		// 	Transport: otelhttp.NewTransport(http.DefaultTransport),
-		// },
+		HTTPClient:   httpClient,
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		RedirectURI:  redirectURI,

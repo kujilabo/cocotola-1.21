@@ -26,6 +26,19 @@ const (
 	unauthenticated
 )
 
+func Test_GoogleAuthClient_NewGoogleAuthClient(t *testing.T) {
+	t.Parallel()
+	httpClient := new(gatewaymock.HTTPClient)
+	c := gateway.NewGoogleAuthClient(
+		httpClient, "CLIENT_ID", "CLIENT_SECRET", "REDIRECT_URI",
+	)
+	assert.Equal(t, "CLIENT_ID", c.ClientID)
+	assert.Equal(t, "CLIENT_SECRET", c.ClientSecret)
+	assert.Equal(t, "REDIRECT_URI", c.RedirectURI)
+	assert.Equal(t, "authorization_code", c.GrantType)
+	assert.Equal(t, httpClient, c.HTTPClient)
+}
+
 func Test_GoogleAuthClient_RetrieveAccessToken(t *testing.T) {
 	ctx := context.Background()
 	t.Parallel()
@@ -89,7 +102,7 @@ func Test_GoogleAuthClient_RetrieveAccessToken(t *testing.T) {
 			},
 		},
 		{
-			name: "unauthenticated",
+			name: "status code is 401",
 			conditions: conditions{
 				statusCode: http.StatusUnauthorized,
 			},
@@ -104,6 +117,24 @@ func Test_GoogleAuthClient_RetrieveAccessToken(t *testing.T) {
 				accessToken:   "ACCESS_TOKEN",
 				refreshToken:  "REFRESH_TOKEN",
 				wantErrorType: unauthenticated,
+			},
+		},
+		{
+			name: "status code is 400",
+			conditions: conditions{
+				statusCode: http.StatusBadRequest,
+			},
+			args: args{
+				code:         "VALID_CODE",
+				clientID:     "CLIENT_ID",
+				clientSecret: "CLIENT_SECRET",
+				redirectURI:  "REDIRECT_URI",
+				grantType:    "GRANT_TYPE",
+			},
+			outputs: outputs{
+				accessToken:   "ACCESS_TOKEN",
+				refreshToken:  "REFRESH_TOKEN",
+				wantErrorType: other,
 			},
 		},
 	}
