@@ -1,9 +1,5 @@
-import { useNavigate } from 'react-router-dom';
-
 import { clientId, frontendUrl } from '@/lib/base';
 export const Login = () => {
-  const navigate = useNavigate();
-
   const handleLogin = () => {
     let url = 'https://accounts.google.com/o/oauth2/auth';
     url += '?client_id=';
