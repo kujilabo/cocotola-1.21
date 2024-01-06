@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -69,6 +70,15 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 	// 	return
 	// }
 
+	if googleAuthParameter.Code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "code is empty"})
+		return
+	}
+	if googleAuthParameter.OrganizationName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "organizationName is empty"})
+		return
+	}
+
 	authResult, err := h.googleUserUsecase.Authorize(ctx, googleAuthParameter.Code, googleAuthParameter.OrganizationName)
 	if err != nil {
 		if errors.Is(err, domain.ErrUnauthenticated) {
@@ -76,7 +86,7 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 			return
 		}
 
-		// logger.Warnf("failed to RegisterStudent. err: %+v", err)
+		logger.ErrorContext(ctx, fmt.Sprintf("failed to RegisterStudent. err: %+v", err))
 		c.JSON(http.StatusInternalServerError, gin.H{"message": http.StatusText(http.StatusInternalServerError)})
 		return
 	}

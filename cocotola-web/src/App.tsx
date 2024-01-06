@@ -16,6 +16,8 @@ import { Providers } from '@/components/Providers';
 import { RouteAuthGuard } from '@/components/RouteAuthGuard';
 import { Callback } from '@/features/auth/components/Callback';
 import { Login } from '@/features/auth/components/Login';
+import { Callback as CallbackZustand } from '@/features/auth_zustand/components/Callback';
+import { Login as LoginZustand } from '@/features/auth_zustand/components/Login';
 import { Test } from '@/features/private_workbook/components/Test';
 import { Home } from '@/pages/Home';
 import { Layout } from '@/pages/Layout';
@@ -49,7 +51,9 @@ function App() {
 					</Route> */}
           <Route path="/" element={<Layout />}>
             <Route path="/app/login" element={<Login />} />
+            <Route path="/app/login-zustand" element={<LoginZustand />} />
             <Route path="/app/callback" element={<Callback />} />
+            <Route path="/app/callback-zustand" element={<CallbackZustand />} />
             <Route path="/test" element={<Test />} />
           </Route>
         </Routes>

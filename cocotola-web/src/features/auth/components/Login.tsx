@@ -24,6 +24,8 @@ export const Login = (): ReactElement => {
     url += 'code';
     url += '&access_type=';
     url += 'offline';
+    url += '&state=';
+    url += 'STATE';
     console.log(url);
     dispatch(redirectTo({ url: url }));
   };

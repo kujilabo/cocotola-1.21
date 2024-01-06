@@ -20,6 +20,9 @@ export const Layout: React.VFC = () => {
           <Link to="app/login">Login</Link>
         </li>
         <li>
+          <Link to="app/login-zustand">ZustandLogin</Link>
+        </li>
+        <li>
           <Link to="page3">show page3</Link>
           <span> ( Admin または Manager 権限のユーザーのみ可 )</span>
         </li>
