@@ -92,8 +92,8 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, AuthResponse{
-		AccessToken:  authResult.AccessToken,
-		RefreshToken: authResult.RefreshToken,
+		AccessToken:  &authResult.AccessToken,
+		RefreshToken: &authResult.RefreshToken,
 	})
 }
 

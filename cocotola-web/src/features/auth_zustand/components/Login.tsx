@@ -1,12 +1,16 @@
 import { clientId, frontendUrl } from '@/lib/base';
+import { useAuthStore } from '@/stores/auth';
+
 export const Login = () => {
+  const resetTokens = useAuthStore((state) => state.resetTokens);
   const handleLogin = () => {
+    resetTokens();
     let url = 'https://accounts.google.com/o/oauth2/auth';
     url += '?client_id=';
     url += clientId;
     url += '&redirect_uri=';
     url += frontendUrl;
-    url += '/app/callback-zustand';
+    url += '/app/callback';
     url += '&scope=profile email';
     url += '&response_type=';
     url += 'code';

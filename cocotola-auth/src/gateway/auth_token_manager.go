@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 
+	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
@@ -77,6 +78,9 @@ func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tok
 }
 
 func (m *AuthTokenManager) CreateTokenSet(ctx context.Context, appUser service.AppUserInterface, organization service.OrganizationInterface) (*domain.AuthTokenSet, error) {
+	if appUser == nil {
+		return nil, rsliberrors.Errorf("appUser is nil. err: %w", rslibdomain.ErrInvalidArgument)
+	}
 	accessToken, err := m.createJWT(ctx, appUser, organization, m.TokenTimeout, "access")
 	if err != nil {
 		return nil, err
@@ -177,9 +181,15 @@ func (m *AuthTokenManager) RefreshToken(ctx context.Context, tokenString string)
 		return "", fmt.Errorf("invalid token type. err: %w", domain.ErrUnauthenticated)
 	}
 
+	appUserID, err := rsuserdomain.NewAppUserID(currentClaims.AppUserID)
+	if err != nil {
+		return "", err
+	}
+
 	appUser := &appUser{
-		loginID:  currentClaims.LoginID,
-		username: currentClaims.Username,
+		appUserID: appUserID,
+		loginID:   currentClaims.LoginID,
+		username:  currentClaims.Username,
 	}
 
 	organizationID, err := rsuserdomain.NewOrganizationID(currentClaims.OrganizationID)

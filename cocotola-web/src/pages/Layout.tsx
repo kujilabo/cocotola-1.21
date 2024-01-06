@@ -2,7 +2,10 @@ import React from 'react';
 
 import { Outlet, Link } from 'react-router-dom';
 
+import { useAuthStore } from '@/stores/auth';
+
 export const Layout: React.VFC = () => {
+  const resetTokens = useAuthStore((state) => state.resetTokens);
   return (
     <>
       <h3>Layout</h3>
@@ -27,6 +30,7 @@ export const Layout: React.VFC = () => {
           <span> ( Admin または Manager 権限のユーザーのみ可 )</span>
         </li>
       </ul>
+      <button onClick={resetTokens}>Logout</button>
 
       <Outlet />
     </>

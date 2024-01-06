@@ -6,13 +6,16 @@ import { Navigate } from 'react-router';
 
 import { useAuthStore } from '@/stores/auth';
 export const Callback = (): ReactElement => {
+  const once = useRef(false);
+
   const location = window.location.search;
-  const fetchToken = useAuthStore((state) => state.fetchToken);
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const error = useAuthStore((state) => state.error);
   const parsed = queryString.parse(location);
   const code = parsed ? String(parsed.code) : '';
-  const once = useRef(false);
+
+  const authenticate = useAuthStore((state) => state.authenticate);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const error = useAuthStore((state) => state.error);
+
   console.log('Callback', accessToken);
 
   let isAccessTokenExpired = true;
@@ -25,26 +28,27 @@ export const Callback = (): ReactElement => {
   }
 
   useEffect(() => {
-    if (!accessToken) {
-      if (once.current === false) {
-        once.current = true;
-
+    if (once.current === false) {
+      once.current = true;
+      if (!accessToken) {
         const f = async () => {
-          await fetchToken(code);
+          await authenticate(code);
         };
         f().catch(console.error);
       }
     }
-  }, [accessToken, fetchToken, code]);
+  }, [accessToken, authenticate, code]);
 
   if (error) {
     return <div>{error}</div>;
   }
 
   if (!accessToken) {
-    <div>
-      <div>Loading</div>
-    </div>;
+    return (
+      <div>
+        <div>Loading</div>
+      </div>
+    );
   }
 
   if (isAccessTokenExpired) {

@@ -8,10 +8,16 @@ type GoogleAuthorizeParameter = {
   organizationName: string;
   code: string;
 };
-
 type GoogleAuthorizeResponse = {
   accessToken: string;
   refreshToken: string;
+};
+
+type RefreshTokenParameter = {
+  refreshToken: string;
+};
+type RefreshTokenResponse = {
+  accessToken: string;
 };
 
 type State = {
@@ -20,18 +26,24 @@ type State = {
   error: string | null;
 };
 type Action = {
-  fetchToken: (code: string) => Promise<void>;
+  resetTokens: () => void;
+  authenticate: (code: string) => Promise<void>;
+  reauthenticate: (refreshToken: string) => Promise<void>;
 };
 export const useAuthStore = create<State & Action>()(
   devtools(
     persist(
       (set) => ({
-        bears: 0,
-        fishies: {},
         accessToken: null,
         refreshToken: null,
         error: null,
-        fetchToken: async (code: string): Promise<void> => {
+        resetTokens: (): void => {
+          set({
+            accessToken: null,
+            refreshToken: null,
+          });
+        },
+        authenticate: async (code: string): Promise<void> => {
           set({ error: null });
           console.log('aaa');
           const param: GoogleAuthorizeParameter = {
@@ -46,6 +58,27 @@ export const useAuthStore = create<State & Action>()(
               set({
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken,
+              });
+            })
+            .catch((err: Error) => {
+              console.log('callback err');
+              const errorMessage = extractErrorMessage(err);
+              //   arg.postFailureProcess(errorMessage);
+              //   return thunkAPI.rejectWithValue(errorMessage);
+              set({ error: errorMessage });
+            });
+        },
+        reauthenticate: async (refreshToken: string): Promise<void> => {
+          const param: RefreshTokenParameter = {
+            refreshToken: refreshToken,
+          };
+          await axios
+            .post(`${backendAuthUrl}/v1/auth/refresh_token`, param)
+            .then((resp) => {
+              console.log('callback then');
+              const token = resp.data as RefreshTokenResponse;
+              set({
+                accessToken: token.accessToken,
               });
             })
             .catch((err: Error) => {
