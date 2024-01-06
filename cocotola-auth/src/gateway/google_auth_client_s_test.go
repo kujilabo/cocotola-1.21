@@ -134,7 +134,7 @@ func Test_GoogleAuthClient_RetrieveAccessToken(t *testing.T) {
 			outputs: outputs{
 				accessToken:   "ACCESS_TOKEN",
 				refreshToken:  "REFRESH_TOKEN",
-				wantErrorType: other,
+				wantErrorType: unauthenticated,
 			},
 		},
 	}
