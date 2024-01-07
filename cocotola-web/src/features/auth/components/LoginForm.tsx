@@ -1,7 +1,7 @@
 import { clientId, frontendUrl } from '@/lib/base';
 import { useAuthStore } from '@/stores/auth';
 
-export const Login = () => {
+export const LoginForm = () => {
   const resetTokens = useAuthStore((state) => state.resetTokens);
   const handleLogin = () => {
     resetTokens();

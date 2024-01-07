@@ -1,4 +1,5 @@
 import axios from 'axios';
+import jwt_decode, { JwtPayload } from 'jwt-decode';
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 
@@ -20,9 +21,20 @@ type RefreshTokenResponse = {
   accessToken: string;
 };
 
+interface AppJwtPayload extends JwtPayload {
+  loginId: string;
+  username: string;
+}
+
+type UserInfo = {
+  loginId: string;
+  username: string;
+};
+
 type State = {
   accessToken: string | null;
   refreshToken: string | null;
+  userInfo: UserInfo | null;
   error: string | null;
 };
 type Action = {
@@ -30,12 +42,29 @@ type Action = {
   authenticate: (code: string) => Promise<void>;
   reauthenticate: (refreshToken: string) => Promise<void>;
 };
+
+const decodeJwt = (accessToken: string | null): UserInfo | null => {
+  if (!accessToken) {
+    return null;
+  }
+
+  const decoded = jwt_decode<AppJwtPayload>(accessToken) || null;
+  if (!decoded) {
+    return null;
+  }
+
+  const loginId = decoded ? decoded.loginId : '';
+  const username = decoded ? decoded.username : '';
+  return { loginId: loginId, username: username };
+};
+
 export const useAuthStore = create<State & Action>()(
   devtools(
     persist(
       (set) => ({
         accessToken: null,
         refreshToken: null,
+        userInfo: null,
         error: null,
         resetTokens: (): void => {
           set({
@@ -79,6 +108,7 @@ export const useAuthStore = create<State & Action>()(
               const token = resp.data as RefreshTokenResponse;
               set({
                 accessToken: token.accessToken,
+                userInfo: decodeJwt(token.accessToken),
               });
             })
             .catch((err: Error) => {
@@ -96,6 +126,7 @@ export const useAuthStore = create<State & Action>()(
         partialize: (state) => ({
           accessToken: state.accessToken,
           refreshToken: state.refreshToken,
+          userInfo: decodeJwt(state.accessToken),
         }),
       }
     )
