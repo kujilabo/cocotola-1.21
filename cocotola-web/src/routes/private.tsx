@@ -6,6 +6,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { MainLayout } from '@/components/layout';
 import { lazyImport } from '@/utils/lazyImport';
 
+import { PrivateRoute } from '@/components/PrivateRoute';
 const { DiscussionsRoutes } = lazyImport(
   () => import('@/features/discussions'),
   'DiscussionsRoutes'
@@ -35,12 +36,13 @@ export const privateRoutes = [
   {
     path: '/app',
     element: <App />,
-    children: [
-      { path: '/app/discussions', element: <DiscussionsRoutes /> },
-      // { path: '/users', element: <Users /> },
-      // { path: '/profile', element: <Profile /> },
-      { path: '/app', element: <Dashboard /> },
-      { path: '/app/*', element: <Navigate to="." /> },
-    ],
+    // element: <PrivateRoute element={<App />} />,
+    // children: [
+    //   { path: '/app/discussions', element: <DiscussionsRoutes /> },
+    //   // { path: '/users', element: <Users /> },
+    //   // { path: '/profile', element: <Profile /> },
+    //   { path: '/app', element: <Dashboard /> },
+    //   { path: '/app/*', element: <Navigate to="." /> },
+    // ],
   },
 ];

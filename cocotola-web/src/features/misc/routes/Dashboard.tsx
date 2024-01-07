@@ -2,7 +2,8 @@ import { ContentLayout } from '@/components/layout';
 import { useAuthStore } from '@/stores/auth';
 
 export const Dashboard = () => {
-  const userInfo = useAuthStore((state) => state.userInfo);
+  const getUserInfo = useAuthStore((state) => state.getUserInfo);
+  const userInfo = getUserInfo();
   return (
     <ContentLayout title="Dashboard">
       <h1 className="text-xl mt-2">

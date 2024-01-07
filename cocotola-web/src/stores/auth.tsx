@@ -34,13 +34,13 @@ type UserInfo = {
 type State = {
   accessToken: string | null;
   refreshToken: string | null;
-  userInfo: UserInfo | null;
   error: string | null;
 };
 type Action = {
   resetTokens: () => void;
   authenticate: (code: string) => Promise<void>;
   reauthenticate: (refreshToken: string) => Promise<void>;
+  getUserInfo: () => UserInfo | null;
 };
 
 const decodeJwt = (accessToken: string | null): UserInfo | null => {
@@ -61,11 +61,14 @@ const decodeJwt = (accessToken: string | null): UserInfo | null => {
 export const useAuthStore = create<State & Action>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
         accessToken: null,
         refreshToken: null,
-        userInfo: null,
         error: null,
+        getUserInfo: (): UserInfo | null => {
+          const accessToken = get().accessToken;
+          return decodeJwt(accessToken);
+        },
         resetTokens: (): void => {
           set({
             accessToken: null,
@@ -108,7 +111,6 @@ export const useAuthStore = create<State & Action>()(
               const token = resp.data as RefreshTokenResponse;
               set({
                 accessToken: token.accessToken,
-                userInfo: decodeJwt(token.accessToken),
               });
             })
             .catch((err: Error) => {
