@@ -27,7 +27,7 @@ trace:
     insecure: true
 cors:
   allowOrigins:
-    - "*"
+    - '*'
 shutdown:
   timeSec1: 1
   timeSec2: 1

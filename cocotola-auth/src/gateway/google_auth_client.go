@@ -9,8 +9,10 @@ import (
 	"net/http"
 
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 type HTTPClient interface {
@@ -48,6 +50,7 @@ func NewGoogleAuthClient(httpClient HTTPClient, clientID, clientSecret, redirect
 func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error) {
 	ctx, span := tracer.Start(ctx, "googleAuthClient.RetrieveAccessToken")
 	defer span.End()
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
 
 	paramMap := map[string]string{
 		"client_id":     c.ClientID,
@@ -71,19 +74,28 @@ func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, rsliberrors.Errorf("failed to retrieve access token.err: %w", err)
+		return nil, rsliberrors.Errorf("retrieve access token.err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		return nil, rsliberrors.Errorf("retrieve user info. err: %w", domain.ErrUnauthenticated)
+		return nil, rsliberrors.Errorf("retrieve access token. err: %w", domain.ErrUnauthenticated)
+	} else if resp.StatusCode == http.StatusBadRequest {
+		respBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, rsliberrors.Errorf("io.ReadAll. err: %w", err)
+		}
+
+		logger.InfoContext(ctx, fmt.Sprintf("retrieve access token. status: %d, param: %s, body:%s", resp.StatusCode, string(paramBytes), string(respBytes)))
+
+		return nil, rsliberrors.Errorf("retrieve access token. err: %w", domain.ErrUnauthenticated)
 	} else if resp.StatusCode != http.StatusOK {
 		respBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, rsliberrors.Errorf("io.ReadAll. err: %w", err)
 		}
 
-		return nil, fmt.Errorf("retrieve user info. status: %d, body:%s", resp.StatusCode, string(respBytes))
+		return nil, fmt.Errorf("retrieve access token. status: %d, body:%s", resp.StatusCode, string(respBytes))
 	}
 
 	googleAuthResponse := googleAuthResponse{}

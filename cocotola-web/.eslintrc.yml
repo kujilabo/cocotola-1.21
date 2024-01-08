@@ -11,6 +11,9 @@ extends:
   - plugin:import/errors
   - plugin:import/warnings
   - plugin:react-hooks/recommended
+  - plugin:react/recommended
+  - plugin:react/jsx-runtime
+  - plugin:vitest/recommended
   - plugin:@typescript-eslint/recommended
   - plugin:@typescript-eslint/recommended-requiring-type-checking
 parser: "@typescript-eslint/parser"
@@ -79,3 +82,5 @@ settings:
   import/resolver:
     typescript: true
     node: true
+  react:
+    version: detect

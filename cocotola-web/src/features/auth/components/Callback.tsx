@@ -1,23 +1,23 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useRef } from 'react';
 
 import jwt_decode, { JwtPayload } from 'jwt-decode';
 import queryString from 'query-string';
 import { Navigate } from 'react-router';
 
-import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { AppDimmer } from '@/components/AppDimmer';
-import {
-  selectAccessToken,
-  selectAuthLoading,
-  selectAuthFailed,
-  googleAuthorize,
-} from '@/features/auth/api/auth';
-import { emptyFunction } from '@/lib/util';
-
+import { useAuthStore } from '@/stores/auth';
 export const Callback = (): ReactElement => {
-  const dispatch = useAppDispatch();
-  const accessToken = useAppSelector(selectAccessToken);
-  console.log('decode acc', accessToken);
+  const once = useRef(false);
+
+  const location = window.location.search;
+  const parsed = queryString.parse(location);
+  const code = parsed ? String(parsed.code) : '';
+
+  const authenticate = useAuthStore((state) => state.authenticate);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const error = useAuthStore((state) => state.error);
+
+  console.log('Callback', accessToken);
+
   let isAccessTokenExpired = true;
   if (accessToken && accessToken != null && accessToken !== '') {
     console.log('jwt_decode');
@@ -27,36 +27,33 @@ export const Callback = (): ReactElement => {
     }
   }
 
-  const authLoading = useAppSelector(selectAuthLoading);
-  const authFailed = useAppSelector(selectAuthFailed);
-  const location = window.location.search;
-  console.log('Callback', authLoading, authFailed, isAccessTokenExpired);
-  if (authFailed) {
-    return <div>Failed</div>;
-  } else if (authLoading === false && isAccessTokenExpired) {
-    const parsed = queryString.parse(location);
-    const code = parsed ? String(parsed.code) : '';
+  useEffect(() => {
+    if (once.current === false) {
+      once.current = true;
+      if (!accessToken) {
+        const f = async () => {
+          await authenticate(code);
+        };
+        f().catch(console.error);
+      }
+    }
+  }, [accessToken, authenticate, code]);
 
-    const f = async () => {
-      await dispatch(
-        googleAuthorize({
-          param: {
-            organizationName: 'cocotola',
-            code: code,
-          },
-          postSuccessProcess: emptyFunction,
-          postFailureProcess: (error: string) => {
-            console.log('callback error', error);
-            return;
-          },
-        })
-      );
-    };
-    f().catch(console.error);
-    return <AppDimmer />;
-  } else if (!isAccessTokenExpired) {
-    return <Navigate replace to="/" />;
-  } else {
-    return <AppDimmer />;
+  if (error) {
+    return <div>{error}</div>;
   }
+
+  if (!accessToken) {
+    return (
+      <div>
+        <div>Loading</div>
+      </div>
+    );
+  }
+
+  if (isAccessTokenExpired) {
+    return <div>Expired</div>;
+  }
+
+  return <Navigate replace to="/" />;
 };
