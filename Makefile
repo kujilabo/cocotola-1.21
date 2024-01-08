@@ -42,6 +42,9 @@ gazelle-update-repos:
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
+	@pushd ./cocotola-app/ && \
+		go mod tidy && \
+	popd
 	@pushd ./cocotola-core/ && \
 		go mod tidy && \
 	popd
@@ -55,16 +58,19 @@ go-mod-tidy:
 .PHONY: update-mod
 update-mod:
 	@pushd ./cocotola-core/ && \
-		GOPROXY=direct go get -u  github.com/kujilabo/redstart && \
+		GOPROXY=direct go get -u github.com/kujilabo/redstart && \
 		go get -u ./... && \
 	popd
 	@pushd ./cocotola-auth/ && \
-		GOPROXY=direct go get -u  github.com/kujilabo/redstart && \
+		GOPROXY=direct go get -u github.com/kujilabo/redstart && \
 		go get -u ./... && \
 	popd
 	@pushd ./lib/ && \
 		go get -u ./... && \
 	popd
+
+bazel-run-app:
+	@bazelisk run //cocotola-app/src
 
 bazel-run-core:
 	@bazelisk run //cocotola-core/src
@@ -74,6 +80,10 @@ bazel-run-auth:
 
 # https://github.com/bazel-contrib/rules_oci/blob/main/docs/go.md
 # https://github.com/aspect-build/bazel-examples/blob/main/oci_go_image/BUILD.bazel
+bazel-docker-load-app:
+	$(eval COCOTOLA_APP_TARBALL := `bazel cquery --output=files //cocotola-app/src:tarball`)
+	docker load --input $(COCOTOLA_APP_TARBALL)
+
 bazel-docker-load-core:
 	$(eval COCOTOLA_CORE_TARBALL := `bazel cquery --output=files //cocotola-core/src:tarball`)
 	docker load --input $(COCOTOLA_CORE_TARBALL)
@@ -82,11 +92,17 @@ bazel-docker-load-auth:
 	$(eval COCOTOLA_AUTH_TARBALL := `bazel cquery --output=files //cocotola-auth/src:tarball`)
 	docker load --input $(COCOTOLA_AUTH_TARBALL)
 
+bazel-build-app:
+	bazelisk build //cocotola-app/src:tarball
+
 bazel-build-core:
 	bazelisk build //cocotola-core/src:tarball
 
 bazel-build-auth:
 	bazelisk build //cocotola-auth/src:tarball
+
+bazel-docker-push-app:
+	bazelisk run //cocotola-app/src:push -- --tag $(REMOTE_TAG)
 
 bazel-docker-push-core:
 	bazelisk run //cocotola-core/src:push -- --tag $(REMOTE_TAG)
@@ -94,25 +110,30 @@ bazel-docker-push-core:
 bazel-docker-push-auth:
 	bazelisk run //cocotola-auth/src:push -- --tag $(REMOTE_TAG)
 
+docker-run-app:
+	docker run --rm asia.gcr.io/cocotola-001/cocotola-app:latest
+
 docker-run-core:
 	docker run --rm asia.gcr.io/cocotola-001/cocotola-core:latest
 
 docker-run-auth:
 	docker run --rm asia.gcr.io/cocotola-001/cocotola-auth:latest
 
-bazel-docker-run-core: bazel-build-auth bazel-docker-load-core docker-run-core
+bazel-docker-run-app: bazel-build-app bazel-docker-load-app docker-run-app
+
+bazel-docker-run-core: bazel-build-core bazel-docker-load-core docker-run-core
 
 bazel-docker-run-auth: bazel-build-auth bazel-docker-load-auth docker-run-auth
 
 # all
-bazel-build: bazel-build-core bazel-build-auth
+bazel-build: bazel-build-app bazel-build-core bazel-build-auth
 
 build-web:
-	mkdir -p ./cocotola-app/web_dist
-	rm -rf ./cocotola-app/web_dist/*
+	mkdir -p ./cocotola-app/src/web_dist
+	rm -rf ./cocotola-app/src/web_dist/*
 	@pushd ./cocotola-web/ && \
 		npm run build && \
-		cp -rf ./dist/* ../cocotola-app/web_dist/ && \
+		cp -rf ./dist/* ../cocotola-app/src/web_dist/ && \
 	popd
 
 test:
