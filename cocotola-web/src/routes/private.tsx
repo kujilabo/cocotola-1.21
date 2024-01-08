@@ -1,17 +1,17 @@
 import { Suspense } from 'react';
 
-import { Navigate, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 // import { Spinner } from '@/components/Elements';
 import { MainLayout } from '@/components/layout';
-import { lazyImport } from '@/utils/lazyImport';
+// import { lazyImport } from '@/utils/lazyImport';
 
-import { PrivateRoute } from '@/components/PrivateRoute';
-const { DiscussionsRoutes } = lazyImport(
-  () => import('@/features/discussions'),
-  'DiscussionsRoutes'
-);
-const { Dashboard } = lazyImport(() => import('@/features/misc'), 'Dashboard');
+// import { PrivateRoute } from '@/components/PrivateRoute';
+// const { DiscussionsRoutes } = lazyImport(
+//   () => import('@/features/discussions'),
+//   'DiscussionsRoutes'
+// );
+// const { Dashboard } = lazyImport(() => import('@/features/misc'), 'Dashboard');
 // const { Profile } = lazyImport(() => import('@/features/users'), 'Profile');
 // const { Users } = lazyImport(() => import('@/features/users'), 'Users');
 

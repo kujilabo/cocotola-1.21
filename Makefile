@@ -107,6 +107,14 @@ bazel-docker-run-auth: bazel-build-auth bazel-docker-load-auth docker-run-auth
 # all
 bazel-build: bazel-build-core bazel-build-auth
 
+build-web:
+	mkdir -p ./cocotola-app/web_dist
+	rm -rf ./cocotola-app/web_dist/*
+	@pushd ./cocotola-web/ && \
+		npm run build && \
+		cp -rf ./dist/* ../cocotola-app/web_dist/ && \
+	popd
+
 test:
 	rm -f ./coverage.lcov
 	@bazelisk test //... --test_output=errors --test_timeout=60 --test_size_filters=small

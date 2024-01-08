@@ -8,6 +8,7 @@ db:
 #   sqlite3:
 #     file: app.db
   driverName: mysql
+  migration: true
   mysql:
     username: user
     password: password

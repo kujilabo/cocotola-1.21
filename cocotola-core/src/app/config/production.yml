@@ -11,6 +11,7 @@ db:
   # sqlite3:
   #   file: app.db
   driverName: mysql
+  migration: false
   mysql:
     username: $MYSQL_USERNAME
     password: $MYSQL_PASSWORD
