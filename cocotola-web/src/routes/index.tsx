@@ -1,12 +1,12 @@
-import { useRoutes } from 'react-router-dom';
+// import { useRoutes } from 'react-router-dom';
 
 import { Landing } from '@/features/misc';
-import { useAuthStore } from '@/stores/auth';
+// import { useAuthStore } from '@/stores/auth';
 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ChakraProvider } from '@chakra-ui/react';
-import { privateRoutes } from './private';
-import { publicRoutes } from './public';
+import { Routes, Route } from 'react-router-dom';
+// import { ChakraProvider } from '@chakra-ui/react';
+// import { privateRoutes } from './private';
+// import { publicRoutes } from './public';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { Callback } from '@/features/auth/components/Callback';
 import { Login } from '@/features/auth/routes/Login';

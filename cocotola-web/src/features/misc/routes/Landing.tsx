@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router';
-
 import logo from '@/assets/react.svg';
 // import { Button } from '@/components/Elements';
 import { Head } from '@/components/head';

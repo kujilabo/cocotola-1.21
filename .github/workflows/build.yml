@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         go-version: [1.21.x]
+        node-version: [20]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     permissions:
@@ -47,13 +48,21 @@ jobs:
           mysql user: "user"
           mysql password: "password"
 
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build cocotola-web
+        run: make build-web
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
       
       - name: Setup go.work
-        run: go work init cocotola-core cocotola-auth lib proto
+        run: go work init cocotola-app cocotola-core cocotola-auth lib proto
 
       - uses: bazelbuild/setup-bazelisk@v2
 
@@ -86,6 +95,18 @@ jobs:
       - name: Build
         run: make bazel-build
 
+      # app
+      - name: Digest
+        run: cat bazel-bin/cocotola-app/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2
+
+      - name: Digest cocotola-app
+        id: digest_app
+        run: echo "digest=$(cat bazel-bin/cocotola-app/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
+
+      - name: Push
+        run: REMOTE_TAG=${{ steps.digest_app.outputs.digest }} make bazel-docker-push-app
+
+      # core
       - name: Digest
         run: cat bazel-bin/cocotola-core/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2
 
@@ -96,6 +117,7 @@ jobs:
       - name: Push
         run: REMOTE_TAG=${{ steps.digest_core.outputs.digest }} make bazel-docker-push-core
 
+      # auth
       - name: Digest cocotola-auth
         id: digest_auth
         run: echo "digest=$(cat bazel-bin/cocotola-auth/src/image/index.json | jq -r '.manifests[0].digest' | cut -d ':' -f 2)" >> $GITHUB_OUTPUT
