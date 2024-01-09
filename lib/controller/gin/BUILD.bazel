@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gin",
+    srcs = ["server.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/lib/controller/gin",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_kujilabo_redstart//lib/domain",
+        "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/log",
+    ],
+)
