@@ -111,7 +111,7 @@ bazel-docker-push-auth:
 	bazelisk run //cocotola-auth/src:push -- --tag $(REMOTE_TAG)
 
 docker-run-app:
-	docker run --rm asia.gcr.io/cocotola-001/cocotola-app:latest
+	docker run --rm -p 8080:8080 asia.gcr.io/cocotola-001/cocotola-app:latest
 
 docker-run-core:
 	docker run --rm asia.gcr.io/cocotola-001/cocotola-core:latest
