@@ -1,0 +1,25 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "initialize",
+    srcs = ["initialize.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/initialize",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-auth/src/config",
+        "//cocotola-auth/src/controller/gin",
+        "//cocotola-auth/src/gateway",
+        "//cocotola-auth/src/service",
+        "//cocotola-auth/src/usecase",
+        "//lib/config",
+        "//lib/log",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_golang_jwt_jwt//:jwt",
+        "@com_github_kujilabo_redstart//lib/config",
+        "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/log",
+        "@com_github_kujilabo_redstart//user/service",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
+    ],
+)

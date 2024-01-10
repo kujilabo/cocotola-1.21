@@ -80,7 +80,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 }
 
 func NewInitAuthRouterFunc(authentication AuthenticationUsecaseInterface) InitRouterGroupFunc {
-	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) error {
 		auth := parentRouterGroup.Group("auth")
 		for _, m := range middleware {
 			auth.Use(m)

@@ -16,9 +16,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
+	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
+
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
 	handler "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin"
 	handlermock "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin/mocks"
 )
@@ -28,7 +30,7 @@ var (
 	corsConfig        cors.Config
 	appConfig         *config.AppConfig
 	authConfig        *config.AuthConfig
-	debugConfig       *config.DebugConfig
+	debugConfig       *libconfig.DebugConfig
 	// authTokenManager  auth.AuthTokenManager
 )
 
@@ -48,7 +50,7 @@ func init() {
 		AccessTokenTTLMin:   1,
 		RefreshTokenTTLHour: 1,
 	}
-	debugConfig = &config.DebugConfig{
+	debugConfig = &libconfig.DebugConfig{
 		Gin:  false,
 		Wait: false,
 	}
@@ -61,7 +63,8 @@ func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.Au
 	initPublicRouterFunc := []handler.InitRouterGroupFunc{fn}
 	initPrivateRouterFunc := []handler.InitRouterGroupFunc{}
 
-	router, err := handler.NewAppRouter(ctx, initPublicRouterFunc, initPrivateRouterFunc, corsConfig, appConfig, debugConfig)
+	router := gin.New()
+	err := handler.InitRouter(ctx, router, initPublicRouterFunc, initPrivateRouterFunc, corsConfig, debugConfig, appConfig.Name)
 	require.NoError(t, err)
 
 	return router

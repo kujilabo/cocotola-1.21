@@ -12,30 +12,20 @@ import (
 	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 
+	authconfig "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
 	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 )
 
 type AppConfig struct {
-	Name          string `yaml:"name" validate:"required"`
-	HTTPPort      int    `yaml:"httpPort" validate:"required"`
-	MetricsPort   int    `yaml:"metricsPort" validate:"required"`
-	OwnerPassword string `yaml:"ownerPassword" validate:"required"`
-}
-
-type AuthConfig struct {
-	SigningKey          string `yaml:"signingKey"`
-	AccessTokenTTLMin   int    `yaml:"accessTokenTtlMin" validate:"gte=1"`
-	RefreshTokenTTLHour int    `yaml:"refreshTokenTtlHour" validate:"gte=1"`
-	GoogleCallbackURL   string `yaml:"googleCallbackUrl" validate:"required"`
-	GoogleClientID      string `yaml:"googleClientId" validate:"required"`
-	GoogleClientSecret  string `yaml:"googleClientSecret" validate:"required"`
-	APITimeoutSec       int    `yaml:"apiTimeoutSec" validate:"gte=1"`
+	Name        string `yaml:"name" validate:"required"`
+	HTTPPort    int    `yaml:"httpPort" validate:"required"`
+	MetricsPort int    `yaml:"metricsPort" validate:"required"`
 }
 
 type Config struct {
 	App      *AppConfig                 `yaml:"app" validate:"required"`
 	DB       *rslibconfig.DBConfig      `yaml:"db" validate:"required"`
-	Auth     *AuthConfig                `yaml:"auth" validate:"required"`
+	Auth     *authconfig.AuthConfig     `yaml:"auth" validate:"required"`
 	Trace    *rslibconfig.TraceConfig   `yaml:"trace" validate:"required"`
 	CORS     *rslibconfig.CORSConfig    `yaml:"cors" validate:"required"`
 	Shutdown *libconfig.ShutdownConfig  `yaml:"shutdown" validate:"required"`

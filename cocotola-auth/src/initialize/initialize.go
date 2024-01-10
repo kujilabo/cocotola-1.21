@@ -1,0 +1,140 @@
+package initialize
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"gorm.io/gorm"
+
+	rslibconfig "github.com/kujilabo/redstart/lib/config"
+	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+	rsliblog "github.com/kujilabo/redstart/lib/log"
+	rsuserservice "github.com/kujilabo/redstart/user/service"
+
+	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
+
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
+	controller "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin"
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway"
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
+	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
+)
+
+func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
+	appTransactionManager, err := gateway.NewTransactionManager(db, rff)
+	if err != nil {
+		panic(err)
+	}
+
+	return appTransactionManager
+}
+
+type systemOwnerByOrganizationName struct {
+}
+
+func (s systemOwnerByOrganizationName) Get(ctx context.Context, rf service.RepositoryFactory, organizationName string) (*rsuserservice.SystemOwner, error) {
+	rsrf, err := rf.NewRedstartRepositoryFactory(ctx)
+	if err != nil {
+		return nil, err
+	}
+	systemAdmin, err := rsuserservice.NewSystemAdmin(ctx, rsrf)
+	if err != nil {
+		return nil, err
+	}
+
+	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, organizationName)
+	if err != nil {
+		return nil, err
+	}
+
+	return systemOwner, nil
+}
+
+func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, authConfig *config.AuthConfig, debugConfig *libconfig.DebugConfig, appName string, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
+	// cors
+	gincorsConfig := rslibconfig.InitCORS(corsConfig)
+	httpClient := http.Client{
+		Timeout:   time.Duration(authConfig.APITimeoutSec) * time.Second,
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
+	googleAuthClient := gateway.NewGoogleAuthClient(&httpClient, authConfig.GoogleClientID, authConfig.GoogleClientSecret, authConfig.GoogleCallbackURL)
+
+	signingKey := []byte(authConfig.SigningKey)
+	signingMethod := jwt.SigningMethodHS256
+	authTokenManager := gateway.NewAuthTokenManager(signingKey, signingMethod, time.Duration(authConfig.AccessTokenTTLMin)*time.Minute, time.Duration(authConfig.RefreshTokenTTLHour)*time.Hour)
+
+	authenticationUsecase := usecase.NewAuthentication(transactionManager, authTokenManager, &systemOwnerByOrganizationName{})
+	googleUserUsecase := usecase.NewGoogleUserUsecase(transactionManager, authTokenManager, googleAuthClient)
+
+	privateRouterGroupFunc := []controller.InitRouterGroupFunc{}
+
+	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitTestRouterFunc(),
+		controller.NewInitAuthRouterFunc(authenticationUsecase),
+		controller.NewInitGoogleRouterFunc(googleUserUsecase),
+	}
+
+	if err := controller.InitRouter(ctx, parentRouterGroup, publicRouterGroupFunc, privateRouterGroupFunc, gincorsConfig, debugConfig, appName); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InitApp1(ctx context.Context, transactionManager service.TransactionManager, organizationName string, password string) {
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.CoreMainLoggerContextKey)
+	addOrganizationFunc := func(ctx context.Context, systemAdmin *rsuserservice.SystemAdmin) error {
+		organization, err := systemAdmin.FindOrganizationByName(ctx, organizationName)
+		if err == nil {
+			logger.InfoContext(ctx, fmt.Sprintf("organization: %d", organization.OrganizationID().Int()))
+			return nil
+		} else if !errors.Is(err, rsuserservice.ErrOrganizationNotFound) {
+			return rsliberrors.Errorf("failed to AddOrganization. err: %w", err)
+		}
+
+		firstOwnerAddParam, err := rsuserservice.NewAppUserAddParameter("cocotola-owner", "Owner(cocotola)", password, "", "", "", "")
+		if err != nil {
+			return rsliberrors.Errorf("NewFirstOwnerAddParameter. err: %w", err)
+		}
+
+		organizationAddParameter, err := rsuserservice.NewOrganizationAddParameter(organizationName, firstOwnerAddParam)
+		if err != nil {
+			return rsliberrors.Errorf("NewOrganizationAddParameter. err: %w", err)
+		}
+
+		organizationID, err := systemAdmin.AddOrganization(ctx, organizationAddParameter)
+		if err != nil {
+			return rsliberrors.Errorf("AddOrganization. err: %w", err)
+		}
+
+		logger.InfoContext(ctx, fmt.Sprintf("organizationID: %d", organizationID.Int()))
+		return nil
+	}
+
+	if err := systemAdminAction(ctx, transactionManager, addOrganizationFunc); err != nil {
+		panic(err)
+	}
+}
+
+func systemAdminAction(ctx context.Context, transactionManager service.TransactionManager, fn func(context.Context, *rsuserservice.SystemAdmin) error) error {
+	return transactionManager.Do(ctx, func(rf service.RepositoryFactory) error {
+		rsrf, err := rf.NewRedstartRepositoryFactory(ctx)
+		if err != nil {
+			return rsliberrors.Errorf(". err: %w", err)
+		}
+
+		systemAdmin, err := rsuserservice.NewSystemAdmin(ctx, rsrf)
+		if err != nil {
+			return rsliberrors.Errorf(". err: %w", err)
+		}
+
+		return fn(ctx, systemAdmin)
+	})
+}

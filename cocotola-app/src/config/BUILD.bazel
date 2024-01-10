@@ -7,9 +7,10 @@ go_library(
         "local.yml",
         "production.yml",
     ],
-    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config",
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-app/src/config",
     visibility = ["//visibility:public"],
     deps = [
+        "//cocotola-auth/src/config",
         "//lib/config",
         "@com_github_kujilabo_redstart//lib/config",
         "@com_github_kujilabo_redstart//lib/domain",
