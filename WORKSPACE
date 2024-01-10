@@ -2077,8 +2077,8 @@ go_repository(
 go_repository(
     name = "com_github_kujilabo_redstart",
     importpath = "github.com/kujilabo/redstart",
-    sum = "h1:D3fkym2X/3tK4HYp9rOxM31puaUm8vf/fbE5QXHUlp0=",
-    version = "v0.0.5",
+    sum = "h1:mN1D0oQcemAmkyaAUoqqZuhTJAqvj/Fxt2/3SH8Nooc=",
+    version = "v0.0.6",
 )
 
 go_repository(
