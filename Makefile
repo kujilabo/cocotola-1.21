@@ -39,6 +39,7 @@ gazelle:
 .PHONY: gazelle-update-repos
 gazelle-update-repos:
 	@bazelisk run //:gazelle -- update-repos -from_file ./go.work
+	GOPROXy=direct bazelisk run //:gazelle -- update-repos github.com/kujilabo/redstart
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
