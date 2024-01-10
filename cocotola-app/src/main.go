@@ -76,11 +76,11 @@ func main() {
 		panic(err)
 	}
 
-	transactionManager := authinit.InitTransactionManager(db, rff)
+	authTransactionManager := authinit.InitTransactionManager(db, rff)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, transactionManager, rsrf)
+	result := run(ctx, cfg, authTransactionManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")

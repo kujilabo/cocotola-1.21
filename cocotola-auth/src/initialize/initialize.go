@@ -2,7 +2,6 @@ package initialize
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,21 +10,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"golang.org/x/sync/errgroup"
 	"gorm.io/gorm"
 
 	rslibconfig "github.com/kujilabo/redstart/lib/config"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
-	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
-	rssqls "github.com/kujilabo/redstart/sqls"
 	rsuserservice "github.com/kujilabo/redstart/user/service"
 
 	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
-	libcontroller "github.com/kujilabo/cocotola-1.21/lib/controller/gin"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
@@ -35,36 +27,6 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
 )
 
-const readHeaderTimeout = time.Duration(30) * time.Second
-
-func Initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
-	cfg, err := config.LoadConfig(env)
-	if err != nil {
-		panic(err)
-	}
-
-	// init log
-	if err := rslibconfig.InitLog(cfg.Log); err != nil {
-		panic(err)
-	}
-
-	// init tracer
-	tp, err := rslibconfig.InitTracerProvider(ctx, cfg.App.Name, cfg.Trace)
-	if err != nil {
-		panic(err)
-	}
-	otel.SetTracerProvider(tp)
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-
-	// init db
-	db, sqlDB, err := rslibconfig.InitDB(cfg.DB, rssqls.SQL)
-	if err != nil {
-		panic(err)
-	}
-
-	return cfg, db, sqlDB, tp
-}
-
 func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
 	appTransactionManager, err := gateway.NewTransactionManager(db, rff)
 	if err != nil {
@@ -72,38 +34,6 @@ func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) serv
 	}
 
 	return appTransactionManager
-}
-
-func Run(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
-	var eg *errgroup.Group
-	eg, ctx = errgroup.WithContext(ctx)
-
-	if !cfg.Debug.Gin {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
-	eg.Go(func() error {
-		router := gin.New()
-		if err := InitAppServer(ctx, router, cfg.CORS, cfg.Auth, cfg.Debug, cfg.App.Name, transactionManager, rsrf); err != nil {
-			return err
-		}
-		return libcontroller.AppServerProcess(ctx, cfg.App.Name, router, cfg.App.HTTPPort, readHeaderTimeout, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck
-	})
-	eg.Go(func() error {
-		return rslibgateway.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck
-	})
-	eg.Go(func() error {
-		return rslibgateway.SignalWatchProcess(ctx) // nolint:wrapcheck
-	})
-	eg.Go(func() error {
-		<-ctx.Done()
-		return ctx.Err() // nolint:wrapcheck
-	})
-
-	if err := eg.Wait(); err != nil {
-		return 1
-	}
-	return 0
 }
 
 type systemOwnerByOrganizationName struct {
