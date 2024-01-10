@@ -14,13 +14,13 @@ import (
 	libmiddleware "github.com/kujilabo/cocotola-1.21/lib/controller/gin/middleware"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
+	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 )
 
-type InitRouterGroupFunc func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error
+type InitRouterGroupFunc func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) error
 
 func NewInitTestRouterFunc() InitRouterGroupFunc {
-	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) error {
 		test := parentRouterGroup.Group("test")
 		for _, m := range middleware {
 			test.Use(m)
@@ -32,42 +32,27 @@ func NewInitTestRouterFunc() InitRouterGroupFunc {
 	}
 }
 
-func NewAppRouter(
-	ctx context.Context,
-	initPublicRouterFunc []InitRouterGroupFunc,
-	initPrivateRouterFunc []InitRouterGroupFunc,
-	// initPluginRouterFunc []InitRouterGroupFunc,
-	//authTokenManager service.AuthTokenManager,
-	corsConfig cors.Config, appConfig *config.AppConfig,
-	// authConfig *config.AuthConfig,
-	debugConfig *config.DebugConfig) (*gin.Engine, error) {
+func InitRouter(ctx context.Context, parentRouterGroup gin.IRouter, initPublicRouterFunc []InitRouterGroupFunc, initPrivateRouterFunc []InitRouterGroupFunc, corsConfig cors.Config, debugConfig *libconfig.DebugConfig, appName string) error {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 
-	router := gin.New()
-	router.Use(cors.New(corsConfig))
-	// router.Use(gin.Recovery())
-	router.Use(sloggin.New(logger))
+	parentRouterGroup.Use(cors.New(corsConfig))
+	parentRouterGroup.Use(sloggin.New(logger))
 
 	if debugConfig.Wait {
-		router.Use(libmiddleware.NewWaitMiddleware())
+		parentRouterGroup.Use(libmiddleware.NewWaitMiddleware())
 	}
 
-	v1 := router.Group("v1")
+	v1 := parentRouterGroup.Group("v1")
 	{
-		v1.Use(otelgin.Middleware(appConfig.Name))
-		v1.Use(libmiddleware.NewTraceLogMiddleware(appConfig.Name))
+		v1.Use(otelgin.Middleware(appName))
+		v1.Use(libmiddleware.NewTraceLogMiddleware(appName))
 
 		for _, fn := range initPublicRouterFunc {
 			if err := fn(v1); err != nil {
-				return nil, err
+				return err
 			}
 		}
-		// for _, fn := range initPrivateRouterFunc {
-		// 	if err := fn(v1, authMiddleware); err != nil {
-		// 		return nil, err
-		// 	}
-		// }
 	}
 
-	return router, nil
+	return nil
 }

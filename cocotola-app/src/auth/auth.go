@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"context"
@@ -22,6 +22,8 @@ import (
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	"github.com/kujilabo/cocotola-1.21/proto"
 )
+
+const readHeaderTimeout = time.Duration(30) * time.Second
 
 func getValue(values ...string) string {
 	for _, v := range values {
@@ -57,15 +59,15 @@ func main() {
 		panic(err)
 	}
 
-	appTransactionManager := initialize.InitTransactionManager(db, rff)
+	transactionManager := initialize.InitTransactionManager(db, rff)
 
 	logger.Info(fmt.Sprintf("%+v", proto.HelloRequest{}))
 
-	initialize.InitApp1(ctx, appTransactionManager, "cocotola", cfg.App.OwnerPassword)
+	initialize.InitApp1(ctx, transactionManager, "cocotola", cfg.App.OwnerPassword)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := initialize.Run(ctx, cfg, appTransactionManager, rsrf)
+	result := initialize.Run(ctx, cfg, transactionManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")

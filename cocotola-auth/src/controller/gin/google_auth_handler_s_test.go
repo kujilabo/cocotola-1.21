@@ -26,7 +26,8 @@ func initGoogleRouter(t *testing.T, ctx context.Context, googleUser handler.Goog
 	initPublicRouterFunc := []handler.InitRouterGroupFunc{fn}
 	initPrivateRouterFunc := []handler.InitRouterGroupFunc{}
 
-	router, err := handler.NewAppRouter(ctx, initPublicRouterFunc, initPrivateRouterFunc, corsConfig, appConfig, debugConfig)
+	router := gin.New()
+	err := handler.InitRouter(ctx, router, initPublicRouterFunc, initPrivateRouterFunc, corsConfig, debugConfig, appConfig.Name)
 	require.NoError(t, err)
 
 	return router

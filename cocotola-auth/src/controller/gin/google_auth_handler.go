@@ -98,7 +98,7 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 }
 
 func NewInitGoogleRouterFunc(googleUser GoogleUserUsecaseInterface) InitRouterGroupFunc {
-	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) error {
 		auth := parentRouterGroup.Group("google")
 		for _, m := range middleware {
 			auth.Use(m)
