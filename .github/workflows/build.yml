@@ -53,8 +53,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Build cocotola-web
-        run: make build-web
+      # - name: Build cocotola-web
+      #   run: make build-web
 
       - name: Install Go
         uses: actions/setup-go@v3
