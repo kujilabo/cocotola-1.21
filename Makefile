@@ -39,6 +39,7 @@ gazelle:
 .PHONY: gazelle-update-repos
 gazelle-update-repos:
 	@bazelisk run //:gazelle -- update-repos -from_file ./go.work
+	GOPROXy=direct bazelisk run //:gazelle -- update-repos github.com/kujilabo/redstart
 
 .PHONY: go-mod-tidy
 go-mod-tidy:
@@ -57,6 +58,10 @@ go-mod-tidy:
 
 .PHONY: update-mod
 update-mod:
+	@pushd ./cocotola-app/ && \
+		GOPROXY=direct go get -u github.com/kujilabo/redstart && \
+		go get -u ./... && \
+	popd
 	@pushd ./cocotola-core/ && \
 		GOPROXY=direct go get -u github.com/kujilabo/redstart && \
 		go get -u ./... && \
