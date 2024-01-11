@@ -79,6 +79,9 @@ jobs:
       - name: bazel
         run: bazel info
 
+      - name: gazelle
+        run: make gazelle
+
       - name: Test
         run: make test
 

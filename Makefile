@@ -137,6 +137,7 @@ build-web:
 	mkdir -p ./cocotola-app/src/web_dist
 	rm -rf ./cocotola-app/src/web_dist/*
 	@pushd ./cocotola-web/ && \
+		npm install && \
 		npm run build && \
 		cp -rf ./dist/* ../cocotola-app/src/web_dist/ && \
 	popd
