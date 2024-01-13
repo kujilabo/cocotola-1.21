@@ -1,10 +1,9 @@
-import logo from '@/assets/react.svg';
-// import { Button } from '@/components/Elements';
-import { Head } from '@/components/head';
-import { useAuthStore } from '@/stores/auth';
-
 import { Navigate } from 'react-router';
+
+import logo from '@/assets/react.svg';
+import { Head } from '@/components/head';
 import { LoginForm } from '@/features/auth/components/LoginForm';
+import { useAuthStore } from '@/stores/auth';
 
 export const Landing = () => {
   const getUserInfo = useAuthStore((state) => state.getUserInfo);

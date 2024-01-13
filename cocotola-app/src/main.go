@@ -91,6 +91,8 @@ func main() {
 	authTransactionManager := authinit.InitTransactionManager(db, authRFF)
 	coreTransactionManager := coreinit.InitTransactionManager(db, coreRFF)
 
+	authinit.InitApp1(ctx, authTransactionManager, "cocotola", cfg.App.OwnerPassword)
+
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
 	result := run(ctx, cfg, authTransactionManager, coreTransactionManager, rsrf)

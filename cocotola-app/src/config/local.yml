@@ -3,6 +3,7 @@ app:
   name: cocotola-app
   httpPort: 8080
   metricsPort: 8081
+  ownerPassword: password
 db:
   driverName: postgres
   mysql:

@@ -41,7 +41,7 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 
 	googleAuthParameter := googleAuthParameter{}
 	if err := c.ShouldBindJSON(&googleAuthParameter); err != nil {
-		// logger.Warnf("invalid parameter. err: %v", err)
+		logger.InfoContext(ctx, fmt.Sprintf("invalid parameter. err: %v", err))
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 		return
 	}
@@ -82,6 +82,7 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 	authResult, err := h.googleUserUsecase.Authorize(ctx, googleAuthParameter.Code, googleAuthParameter.OrganizationName)
 	if err != nil {
 		if errors.Is(err, domain.ErrUnauthenticated) {
+			logger.InfoContext(ctx, fmt.Sprintf("invalid parameter. err: %v", err))
 			c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 			return
 		}
