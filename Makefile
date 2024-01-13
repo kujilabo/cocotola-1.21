@@ -143,6 +143,7 @@ build-web:
 		npm run build && \
 		cp -rf ./dist/* ../cocotola-app/src/web_dist/ && \
 	popd
+	make gazelle
 
 test:
 	rm -f ./coverage.lcov
