@@ -44,16 +44,16 @@ gazelle-update-repos:
 .PHONY: go-mod-tidy
 go-mod-tidy:
 	@pushd ./cocotola-app/ && \
-		go mod tidy && \
+		GOPROXY=direct go mod tidy && \
 	popd
 	@pushd ./cocotola-core/ && \
-		go mod tidy && \
+		GOPROXY=direct go mod tidy && \
 	popd
 	@pushd ./cocotola-auth/ && \
-		go mod tidy && \
+		GOPROXY=direct go mod tidy && \
 	popd
 	@pushd ./lib/ && \
-		go mod tidy && \
+		GOPROXY=direct go mod tidy && \
 	popd
 
 .PHONY: update-mod
@@ -117,6 +117,7 @@ bazel-docker-push-auth:
 	bazelisk run //cocotola-auth/src:push -- --tag $(REMOTE_TAG)
 
 docker-run-app:
+	make gazelle
 	docker run --rm -p 8080:8080 asia.gcr.io/cocotola-001/cocotola-app:latest
 
 docker-run-core:
@@ -187,6 +188,8 @@ test-docker-down:
 	@docker compose -f docker-compose-test.yml down
 
 fly-deploy:
+	make build-web
+	make gazelle
 	@pushd ./cocotola-app/ && \
 		flyctl deploy && \
 	popd

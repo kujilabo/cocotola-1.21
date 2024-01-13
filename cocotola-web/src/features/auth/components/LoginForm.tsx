@@ -10,7 +10,7 @@ export const LoginForm = () => {
     url += clientId;
     url += '&redirect_uri=';
     url += frontendUrl;
-    url += '/app/callback';
+    url += '/app/auth/callback';
     url += '&scope=profile email';
     url += '&response_type=';
     url += 'code';

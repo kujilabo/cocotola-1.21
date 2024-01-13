@@ -5,8 +5,8 @@ go 1.21.4
 require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240111132127-8a70afb041f1
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240111132127-8a70afb041f1
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240113052037-f52e692e4dfd
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240113052037-f52e692e4dfd
 	github.com/kujilabo/redstart v0.0.8
 	github.com/samber/slog-gin v1.9.0
 	github.com/stretchr/testify v1.8.4
@@ -26,7 +26,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.45.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.10.2 // indirect
-	github.com/casbin/casbin/v2 v2.80.0 // indirect
+	github.com/casbin/casbin/v2 v2.81.0 // indirect
 	github.com/casbin/gorm-adapter/v3 v3.20.0 // indirect
 	github.com/casbin/govaluate v1.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
@@ -38,7 +38,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/glebarez/go-sqlite v1.21.2 // indirect
+	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/glebarez/sqlite v1.10.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -118,7 +118,7 @@ require (
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/driver/sqlserver v1.5.2 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
-	modernc.org/libc v1.38.0 // indirect
+	modernc.org/libc v1.40.1 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect

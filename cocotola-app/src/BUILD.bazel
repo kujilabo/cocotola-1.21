@@ -10,10 +10,10 @@ go_library(
     srcs = ["main.go"],
     embedsrcs = [
         "web_dist/assets/index-V8A9tv5B.css",
-        "web_dist/assets/index-h6Czi1EM.js",
         "web_dist/assets/react-h3aPdYU7.svg",
         "web_dist/index.html",
         "web_dist/vite.svg",
+        "web_dist/assets/index--o-RoMwM.js",
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-app/src",
     visibility = ["//visibility:private"],

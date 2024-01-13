@@ -16,9 +16,11 @@ import * as React from 'react';
 // import logo from '@/assets/react.svg';
 // import { useAuth } from '@/lib/auth';
 // import { useAuthorization, ROLES } from '@/lib/authorization';
-import { useAuthStore } from '@/stores/auth';
-import { Box, Flex, Text, Button } from '@chakra-ui/react';
 import {
+  Box,
+  Flex,
+  Text,
+  Button,
   Menu,
   MenuButton,
   MenuList,
@@ -27,6 +29,8 @@ import {
   Spacer,
   MenuDivider,
 } from '@chakra-ui/react';
+
+import { useAuthStore } from '@/stores/auth';
 const NavBar = () => {
   const logout = useAuthStore((state) => state.resetTokens);
 
