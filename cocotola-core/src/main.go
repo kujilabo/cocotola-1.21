@@ -3,13 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"flag"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -25,20 +22,24 @@ import (
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
+	rsusergateway "github.com/kujilabo/redstart/user/gateway"
+	rsuserservice "github.com/kujilabo/redstart/user/service"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/config"
-	controller "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/controller/gin"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/domain"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/gateway"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/service"
-	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/app/usecase/student"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/sqls"
+	libcontroller "github.com/kujilabo/cocotola-1.21/lib/controller/gin"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	"github.com/kujilabo/cocotola-1.21/proto"
+
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/config"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/gateway"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/initialize"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/sqls"
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
-const authClientTimeout = time.Duration(5) * time.Second
+
+// const authClientTimeout = time.Duration(5) * time.Second
 
 func getValue(values ...string) string {
 	for _, v := range values {
@@ -58,7 +59,7 @@ func main() {
 
 	rsliberrors.UseXerrorsErrorf()
 
-	cfg, dialect, db, sqlDB, tp := initialize(ctx, appEnv)
+	cfg, dialect, db, sqlDB, tp := Initialize(ctx, appEnv)
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
@@ -68,8 +69,12 @@ func main() {
 	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
 		return gateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
+	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC)
+	if err != nil {
+		panic(err)
+	}
 
-	appTransactionManager := initTransactionManager(db, rff)
+	appTransactionManager := initialize.InitTransactionManager(db, rff)
 
 	logger.Info(fmt.Sprintf("%+v", proto.HelloRequest{}))
 
@@ -81,14 +86,14 @@ func main() {
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, appTransactionManager)
+	result := run(ctx, cfg, appTransactionManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
 	os.Exit(result)
 }
 
-func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.DialectRDBMS, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
+func Initialize(ctx context.Context, env string) (*config.Config, rslibgateway.DialectRDBMS, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
 	cfg, err := config.LoadConfig(env)
 	if err != nil {
 		panic(err)
@@ -116,25 +121,20 @@ func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func initTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
-	appTransactionManager, err := gateway.NewTransactionManager(db, rff)
-	if err != nil {
-		panic(err)
-	}
-
-	return appTransactionManager
-}
-
-func run(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager) int {
+func run(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
-	if !cfg.Debug.GinMode {
+	if !cfg.Debug.Gin {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	eg.Go(func() error {
-		return appServer(ctx, cfg, transactionManager) // nolint:wrapcheck
+		router := gin.New()
+		if err := initialize.InitAppServer(ctx, router, cfg.CORS, cfg.Debug, cfg.App.Name, transactionManager, rsrf); err != nil {
+			return err
+		}
+		return libcontroller.AppServerProcess(ctx, cfg.App.Name, router, cfg.App.HTTPPort, readHeaderTimeout, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		return rslibgateway.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck
@@ -153,85 +153,85 @@ func run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 	return 0
 }
 
-func appServer(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager) error {
-	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
-	// // cors
-	corsConfig := rslibconfig.InitCORS(cfg.CORS)
-	// logrus.Infof("cors: %+v", corsConfig)
+// func appServer(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager) error {
+// 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
+// 	// // cors
+// 	corsConfig := rslibconfig.InitCORS(cfg.CORS)
+// 	// logrus.Infof("cors: %+v", corsConfig)
 
-	// if err := corsConfig.Validate(); err != nil {
-	// 	return liberrors.Errorf("corsConfig.Validate. err: %w", err)
-	// }
+// 	// if err := corsConfig.Validate(); err != nil {
+// 	// 	return liberrors.Errorf("corsConfig.Validate. err: %w", err)
+// 	// }
 
-	// studyMonitor := service.NewStudyMonitor()
-	// studyStatUpdater := studyStatUpdater{
-	// 	systemOwnerModel: systemOwnerModel,
-	// 	appTransaction:   appTransaction,
-	// }
-	// if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
-	// 	return liberrors.Errorf(". err: %w", err)
-	// }
-	studentUsecaseWorkbook := studentusecase.NewStudentUsecaseWorkbook(transactionManager)
-	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
-		controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
-		// controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
-		// controller.NewInitStudyRouterFunc(studentUseCaseStudy),
-		// controller.NewInitAudioRouterFunc(studentUsecaseAudio),
-		// controller.NewInitStatRouterFunc(studentUsecaseStat),
-	}
+// 	// studyMonitor := service.NewStudyMonitor()
+// 	// studyStatUpdater := studyStatUpdater{
+// 	// 	systemOwnerModel: systemOwnerModel,
+// 	// 	appTransaction:   appTransaction,
+// 	// }
+// 	// if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
+// 	// 	return liberrors.Errorf(". err: %w", err)
+// 	// }
+// 	studentUsecaseWorkbook := studentusecase.NewStudentUsecaseWorkbook(transactionManager)
+// 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+// 		controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
+// 		// controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
+// 		// controller.NewInitStudyRouterFunc(studentUseCaseStudy),
+// 		// controller.NewInitAudioRouterFunc(studentUsecaseAudio),
+// 		// controller.NewInitStatRouterFunc(studentUsecaseStat),
+// 	}
 
-	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
-		controller.NewInitTestRouterFunc(),
-	}
-	cocotolaAuthClient := gateway.NewCocotolaAuthClient(authClientTimeout)
-	router, err := controller.NewAppRouter(ctx,
-		cocotolaAuthClient,
-		publicRouterGroupFunc,
-		privateRouterGroupFunc,
-		// pluginRouterGroupFunc, authTokenManager,
-		corsConfig, cfg.App,
-		//cfg.Auth,
-		cfg.Debug)
-	if err != nil {
-		panic(err)
-	}
+// 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
+// 		controller.NewInitTestRouterFunc(),
+// 	}
+// 	cocotolaAuthClient := gateway.NewCocotolaAuthClient(authClientTimeout)
+// 	router, err := controller.NewAppRouter(ctx,
+// 		cocotolaAuthClient,
+// 		publicRouterGroupFunc,
+// 		privateRouterGroupFunc,
+// 		// pluginRouterGroupFunc, authTokenManager,
+// 		corsConfig, cfg.App,
+// 		//cfg.Auth,
+// 		cfg.Debug)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	// if cfg.Swagger.Enabled {
-	// 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// 	docs.SwaggerInfo.Title = cfg.App.Name
-	// 	docs.SwaggerInfo.Version = "1.0"
-	// 	docs.SwaggerInfo.Host = cfg.Swagger.Host
-	// 	docs.SwaggerInfo.Schemes = []string{cfg.Swagger.Schema}
-	// }
+// 	// if cfg.Swagger.Enabled {
+// 	// 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+// 	// 	docs.SwaggerInfo.Title = cfg.App.Name
+// 	// 	docs.SwaggerInfo.Version = "1.0"
+// 	// 	docs.SwaggerInfo.Host = cfg.Swagger.Host
+// 	// 	docs.SwaggerInfo.Schemes = []string{cfg.Swagger.Schema}
+// 	// }
 
-	httpServer := http.Server{
-		Addr:              ":" + strconv.Itoa(cfg.App.HTTPPort),
-		Handler:           router,
-		ReadHeaderTimeout: readHeaderTimeout,
-	}
+// 	httpServer := http.Server{
+// 		Addr:              ":" + strconv.Itoa(cfg.App.HTTPPort),
+// 		Handler:           router,
+// 		ReadHeaderTimeout: readHeaderTimeout,
+// 	}
 
-	logger.InfoContext(ctx, fmt.Sprintf("http server listening at %v", httpServer.Addr))
+// 	logger.InfoContext(ctx, fmt.Sprintf("http server listening at %v", httpServer.Addr))
 
-	errCh := make(chan error)
-	go func() {
-		defer close(errCh)
-		if err := httpServer.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			logger.InfoContext(ctx, fmt.Sprintf("failed to ListenAndServe. err: %v", err))
-			errCh <- err
-		}
-	}()
+// 	errCh := make(chan error)
+// 	go func() {
+// 		defer close(errCh)
+// 		if err := httpServer.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+// 			logger.InfoContext(ctx, fmt.Sprintf("failed to ListenAndServe. err: %v", err))
+// 			errCh <- err
+// 		}
+// 	}()
 
-	select {
-	case <-ctx.Done():
-		gracefulShutdownTime1 := time.Duration(cfg.Shutdown.TimeSec1) * time.Second
-		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), gracefulShutdownTime1)
-		defer shutdownCancel()
-		if err := httpServer.Shutdown(shutdownCtx); err != nil {
-			logger.InfoContext(ctx, fmt.Sprintf("Server forced to shutdown. err: %v", err))
-			return rsliberrors.Errorf(". err: %w", err)
-		}
-		return nil
-	case err := <-errCh:
-		return rsliberrors.Errorf(". err: %w", err)
-	}
-}
+// 	select {
+// 	case <-ctx.Done():
+// 		gracefulShutdownTime1 := time.Duration(cfg.Shutdown.TimeSec1) * time.Second
+// 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), gracefulShutdownTime1)
+// 		defer shutdownCancel()
+// 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
+// 			logger.InfoContext(ctx, fmt.Sprintf("Server forced to shutdown. err: %v", err))
+// 			return rsliberrors.Errorf(". err: %w", err)
+// 		}
+// 		return nil
+// 	case err := <-errCh:
+// 		return rsliberrors.Errorf(". err: %w", err)
+// 	}
+// }

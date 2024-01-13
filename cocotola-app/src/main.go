@@ -36,6 +36,10 @@ import (
 	authinit "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/initialize"
 	authservice "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 
+	coregateway "github.com/kujilabo/cocotola-1.21/cocotola-core/src/gateway"
+	coreinit "github.com/kujilabo/cocotola-1.21/cocotola-core/src/initialize"
+	coreservice "github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
+
 	"github.com/kujilabo/cocotola-1.21/cocotola-app/src/config"
 )
 
@@ -73,19 +77,23 @@ func main() {
 	ctx = liblog.InitLogger(ctx)
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
 
-	rff := func(ctx context.Context, db *gorm.DB) (authservice.RepositoryFactory, error) {
+	authRFF := func(ctx context.Context, db *gorm.DB) (authservice.RepositoryFactory, error) {
 		return authgateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
+	}
+	coreRFF := func(ctx context.Context, db *gorm.DB) (coreservice.RepositoryFactory, error) {
+		return coregateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
 	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC)
 	if err != nil {
 		panic(err)
 	}
 
-	authTransactionManager := authinit.InitTransactionManager(db, rff)
+	authTransactionManager := authinit.InitTransactionManager(db, authRFF)
+	coreTransactionManager := coreinit.InitTransactionManager(db, coreRFF)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, authTransactionManager, rsrf)
+	result := run(ctx, cfg, authTransactionManager, coreTransactionManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
@@ -120,7 +128,7 @@ func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func run(ctx context.Context, cfg *config.Config, authTransactionManager authservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
+func run(ctx context.Context, cfg *config.Config, authTransactionManager authservice.TransactionManager, coreTransactionManager coreservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -151,6 +159,10 @@ func run(ctx context.Context, cfg *config.Config, authTransactionManager authser
 
 		auth := api.Group("auth")
 		if err := authinit.InitAppServer(ctx, auth, cfg.CORS, cfg.Auth, cfg.Debug, cfg.App.Name, authTransactionManager, rsrf); err != nil {
+			return err
+		}
+		core := api.Group("core")
+		if err := coreinit.InitAppServer(ctx, core, cfg.CORS, cfg.Debug, cfg.App.Name, coreTransactionManager, rsrf); err != nil {
 			return err
 		}
 

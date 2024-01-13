@@ -26,6 +26,14 @@ services:
       TZ: 'Etc/GMT'
     ports:
       - 3316:3306
+  dev-core-postgres:
+    image: postgres:15.5-alpine3.19
+    container_name: dev-autcoreh-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
   dev-auth-postgres:
     image: postgres:15.5-alpine3.19
     container_name: dev-auth-postgres

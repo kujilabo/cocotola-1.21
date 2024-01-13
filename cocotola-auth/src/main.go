@@ -9,33 +9,31 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"golang.org/x/sync/errgroup"
 	"gorm.io/gorm"
 
-	"github.com/gin-gonic/gin"
+	rslibconfig "github.com/kujilabo/redstart/lib/config"
 	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
+	rssqls "github.com/kujilabo/redstart/sqls"
 	rsusergateway "github.com/kujilabo/redstart/user/gateway"
+	rsuserservice "github.com/kujilabo/redstart/user/service"
+
+	libcontroller "github.com/kujilabo/cocotola-1.21/lib/controller/gin"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
+	"github.com/kujilabo/cocotola-1.21/proto"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/initialize"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-	"github.com/kujilabo/cocotola-1.21/proto"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-
-	rslibconfig "github.com/kujilabo/redstart/lib/config"
-	rssqls "github.com/kujilabo/redstart/sqls"
-
-	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
-	rsuserservice "github.com/kujilabo/redstart/user/service"
-
-	libcontroller "github.com/kujilabo/cocotola-1.21/lib/controller/gin"
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
