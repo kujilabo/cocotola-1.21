@@ -14,6 +14,7 @@ go_library(
         "//lib/api",
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/gateway",
         "@io_gorm_gorm//:gorm",
     ],
 )

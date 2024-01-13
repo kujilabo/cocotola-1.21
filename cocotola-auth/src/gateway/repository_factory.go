@@ -8,6 +8,7 @@ import (
 
 	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsusergateway "github.com/kujilabo/redstart/user/gateway"
 	rsuserservice "github.com/kujilabo/redstart/user/service"
 
@@ -15,17 +16,19 @@ import (
 )
 
 type RepositoryFactory struct {
+	dialect    rslibgateway.DialectRDBMS
 	driverName string
 	db         *gorm.DB
 	location   *time.Location
 }
 
-func NewRepositoryFactory(ctx context.Context, driverName string, db *gorm.DB, location *time.Location) (*RepositoryFactory, error) {
+func NewRepositoryFactory(ctx context.Context, dialect rslibgateway.DialectRDBMS, driverName string, db *gorm.DB, location *time.Location) (*RepositoryFactory, error) {
 	if db == nil {
 		return nil, rsliberrors.Errorf("db is nil. err: %w", rslibdomain.ErrInvalidArgument)
 	}
 
 	return &RepositoryFactory{
+		dialect:    dialect,
 		driverName: driverName,
 		db:         db,
 		location:   location,
@@ -33,7 +36,7 @@ func NewRepositoryFactory(ctx context.Context, driverName string, db *gorm.DB, l
 }
 
 func (f *RepositoryFactory) NewRedstartRepositoryFactory(ctx context.Context) (rsuserservice.RepositoryFactory, error) {
-	return rsusergateway.NewRepositoryFactory(ctx, f.driverName, f.db, f.location)
+	return rsusergateway.NewRepositoryFactory(ctx, f.dialect, f.driverName, f.db, f.location)
 }
 
 type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)

@@ -18,6 +18,7 @@ go_library(
         "@com_github_golang_jwt_jwt//:jwt",
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/gateway",
         "@com_github_kujilabo_redstart//lib/log",
         "@com_github_kujilabo_redstart//user/domain",
         "@com_github_kujilabo_redstart//user/gateway",
