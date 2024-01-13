@@ -59,19 +59,24 @@ func main() {
 	flag.Parse()
 	appEnv := getValue(*env, os.Getenv("APP_ENV"), "local")
 	slog.InfoContext(ctx, fmt.Sprintf("env: %s", appEnv))
+	{
+		logger := slog.Default()
+		logger.InfoContext(ctx, fmt.Sprintf("SECRET: %s", os.Getenv("GOOGLE_CLIENT_SECRET")))
+	}
 
 	rsliberrors.UseXerrorsErrorf()
 
-	cfg, db, sqlDB, tp := initialize(ctx, appEnv)
+	cfg, dialect, db, sqlDB, tp := initialize(ctx, appEnv)
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
 	ctx = liblog.InitLogger(ctx)
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
+
 	rff := func(ctx context.Context, db *gorm.DB) (authservice.RepositoryFactory, error) {
-		return authgateway.NewRepositoryFactory(ctx, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
+		return authgateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
-	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, cfg.DB.DriverName, db, time.UTC)
+	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC)
 	if err != nil {
 		panic(err)
 	}
@@ -87,7 +92,7 @@ func main() {
 	os.Exit(result)
 }
 
-func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
+func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.DialectRDBMS, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
 	cfg, err := config.LoadConfig(env)
 	if err != nil {
 		panic(err)
@@ -107,12 +112,12 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	// init db
-	db, sqlDB, err := rslibconfig.InitDB(cfg.DB, rssqls.SQL)
+	dialect, db, sqlDB, err := rslibconfig.InitDB(cfg.DB, rssqls.SQL)
 	if err != nil {
 		panic(err)
 	}
 
-	return cfg, db, sqlDB, tp
+	return cfg, dialect, db, sqlDB, tp
 }
 
 func run(ctx context.Context, cfg *config.Config, authTransactionManager authservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {

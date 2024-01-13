@@ -184,3 +184,8 @@ test-docker-up:
 .PHONY: test-docker-down
 test-docker-down:
 	@docker compose -f docker-compose-test.yml down
+
+fly-deploy:
+	@pushd ./cocotola-app/ && \
+		flyctl deploy && \
+	popd

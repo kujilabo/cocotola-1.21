@@ -59,17 +59,20 @@ func main() {
 
 	rsliberrors.UseXerrorsErrorf()
 
-	cfg, db, sqlDB, tp := Initialize(ctx, appEnv)
+	cfg, dialect, db, sqlDB, tp := Initialize(ctx, appEnv)
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
+	if dialect == nil {
+		panic("dialect is nil")
+	}
 
 	ctx = liblog.InitLogger(ctx)
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
 
 	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(ctx, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
+		return gateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
-	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, cfg.DB.DriverName, db, time.UTC)
+	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC)
 	if err != nil {
 		panic(err)
 	}
@@ -89,7 +92,7 @@ func main() {
 	os.Exit(result)
 }
 
-func Initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
+func Initialize(ctx context.Context, env string) (*config.Config, rslibgateway.DialectRDBMS, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
 	cfg, err := config.LoadConfig(env)
 	if err != nil {
 		panic(err)
@@ -109,12 +112,12 @@ func Initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	// init db
-	db, sqlDB, err := rslibconfig.InitDB(cfg.DB, rssqls.SQL)
+	dialect, db, sqlDB, err := rslibconfig.InitDB(cfg.DB, rssqls.SQL)
 	if err != nil {
 		panic(err)
 	}
 
-	return cfg, db, sqlDB, tp
+	return cfg, dialect, db, sqlDB, tp
 }
 
 func Run(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {

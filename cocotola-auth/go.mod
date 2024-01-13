@@ -7,9 +7,9 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240109165811-07cf51fd4940
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240109165811-07cf51fd4940
-	github.com/kujilabo/redstart v0.0.6
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240111132127-8a70afb041f1
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240111132127-8a70afb041f1
+	github.com/kujilabo/redstart v0.0.8
 	github.com/ohler55/ojg v1.21.0
 	github.com/samber/slog-gin v1.9.0
 	github.com/stretchr/testify v1.8.4
@@ -72,6 +72,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
@@ -107,7 +108,7 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/api v0.155.0 // indirect
+	google.golang.org/api v0.156.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20240108191215-35c7eff3a6b1 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240108191215-35c7eff3a6b1 // indirect

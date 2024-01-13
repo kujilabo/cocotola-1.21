@@ -6,7 +6,7 @@ create table `space` (
 ,`created_by` int not null
 ,`updated_by` int not null
 ,`organization_id` int not null
-,`key` varchar(20) character set ascii not null
+,`key_name` varchar(20) character set ascii not null
 ,`name` varchar(40) not null
 ,`description` text
 ,`removed` tinyint(1) not null

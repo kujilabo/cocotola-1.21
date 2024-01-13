@@ -1760,8 +1760,8 @@ go_repository(
 go_repository(
     name = "org_golang_google_api",
     importpath = "google.golang.org/api",
-    sum = "h1:vBmGhCYs0djJttDNynWo44zosHlPvHmA0XiN2zP2DtA=",
-    version = "v0.155.0",
+    sum = "h1:yloYcGbBtVYjLKQe4enCunxvwn3s2w/XPrrhVf6MsvQ=",
+    version = "v0.156.0",
 )
 
 go_repository(
@@ -2077,8 +2077,8 @@ go_repository(
 go_repository(
     name = "com_github_kujilabo_redstart",
     importpath = "github.com/kujilabo/redstart",
-    sum = "h1:mN1D0oQcemAmkyaAUoqqZuhTJAqvj/Fxt2/3SH8Nooc=",
-    version = "v0.0.6",
+    sum = "h1:CPQqxiS2jNQ4mczbTISlj02DZEQbTpc5qKN7M+0FpFg=",
+    version = "v0.0.8",
 )
 
 go_repository(
@@ -3176,8 +3176,8 @@ go_repository(
 go_repository(
     name = "org_golang_google_genproto_googleapis_bytestream",
     importpath = "google.golang.org/genproto/googleapis/bytestream",
-    sum = "h1:Y6QQt9D/syZt/Qgnz5a1y2O3WunQeeVDfS9+Xr82iFA=",
-    version = "v0.0.0-20231212172506-995d672761c0",
+    sum = "h1:4yeEIQ/7XGddl84N75aFjr9sEFUObj1u7KXas6eEmC8=",
+    version = "v0.0.0-20240102182953-50ed04b92917",
 )
 
 go_repository(

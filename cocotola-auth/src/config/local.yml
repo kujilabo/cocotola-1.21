@@ -5,13 +5,19 @@ app:
   metricsPort: 8011
   ownerPassword: password
 db:
-  driverName: mysql
+  driverName: postgres
   mysql:
     username: user
     password: password
     host: 127.0.0.1
     port: 3316
     database: development
+  postgres:
+    username: user
+    password: password
+    host: 127.0.0.1
+    port: 5442
+    database: postgres
 auth:
   signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
   accessTokenTtlMin: 5
