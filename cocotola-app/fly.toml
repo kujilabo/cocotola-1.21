@@ -17,6 +17,7 @@ BP_GO_TARGETS = "./src"
 
 [env]
 PORT = "8080"
+APP_ENV = "production"
 
 [http_service]
 internal_port = 8080

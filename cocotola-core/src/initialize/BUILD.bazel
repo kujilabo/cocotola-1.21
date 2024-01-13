@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "initialize",
+    srcs = ["initialize.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/initialize",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-core/src/controller/gin",
+        "//cocotola-core/src/gateway",
+        "//cocotola-core/src/service",
+        "//cocotola-core/src/usecase/student",
+        "//lib/config",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_kujilabo_redstart//lib/config",
+        "@com_github_kujilabo_redstart//user/service",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

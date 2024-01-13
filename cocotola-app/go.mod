@@ -4,8 +4,8 @@ go 1.21.4
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240111132127-8a70afb041f1
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240111132127-8a70afb041f1
+	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240113052037-f52e692e4dfd
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240113052037-f52e692e4dfd
 	github.com/kujilabo/redstart v0.0.8
 	go.opentelemetry.io/otel v1.21.0
 	go.opentelemetry.io/otel/sdk v1.21.0

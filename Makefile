@@ -60,6 +60,7 @@ go-mod-tidy:
 update-mod:
 	@pushd ./cocotola-app/ && \
 		GOPROXY=direct go get -u github.com/kujilabo/redstart && \
+		GOPROXY=direct go get -u github.com/kujilabo/cocotola-1.21 && \
 		go get -u ./... && \
 	popd
 	@pushd ./cocotola-core/ && \

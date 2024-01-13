@@ -4,13 +4,13 @@ app:
   httpPort: 8080
   metricsPort: 8081
 db:
-  driverName: mysql
-  mysql:
-    username: $MYSQL_USERNAME
-    password: $MYSQL_PASSWORD
-    host: $MYSQL_HOST
-    port: $MYSQL_PORT
-    database: $MYSQL_DATABASE
+  driverName: postgres
+  postgres:
+    username: $POSTGRES_USERNAME
+    password: $POSTGRES_PASSWORD
+    host: $POSTGRES_HOST
+    port: $POSTGRES_PORT
+    database: $POSTGRES_DATABASE
 auth:
   signingKey: $SIGNING_KEY
   accessTokenTtlMin: 30
