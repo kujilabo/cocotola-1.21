@@ -17,13 +17,13 @@ import (
 const defaultPageSize = 10
 
 type WorkbookFindModel struct {
-	ID   int
-	Name string
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type WorkbookFindResult struct {
-	TotalCount int
-	Results    []*WorkbookFindModel
+	TotalCount int                  `json:"totalCount"`
+	Results    []*WorkbookFindModel `json:"results"`
 }
 
 type WorkbookUsecaseInterface interface {

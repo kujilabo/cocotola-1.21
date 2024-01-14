@@ -23,6 +23,9 @@ gen-proto:
 
 .PHONY: gen-code
 gen-code:
+	@pushd ./cocotola-core/ && \
+		mockery	&& \
+	popd
 	@pushd ./cocotola-auth/ && \
 		mockery	&& \
 	popd

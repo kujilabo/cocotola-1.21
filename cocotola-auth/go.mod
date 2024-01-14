@@ -6,8 +6,8 @@ require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240114072726-c02324609129
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240114072726-c02324609129
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240114094704-3b454cb819bf
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240114094704-3b454cb819bf
 	github.com/kujilabo/redstart v0.0.10
 	github.com/ohler55/ojg v1.21.0
 	github.com/samber/slog-gin v1.9.0
@@ -119,7 +119,7 @@ require (
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/driver/sqlserver v1.5.2 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
-	modernc.org/libc v1.40.1 // indirect
+	modernc.org/libc v1.40.2 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
