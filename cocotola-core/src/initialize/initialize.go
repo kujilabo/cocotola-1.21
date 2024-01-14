@@ -49,15 +49,16 @@ func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) serv
 // 	return systemOwner, nil
 // }
 
-func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, debugConfig *libconfig.DebugConfig, appName string, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
+func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, debugConfig *libconfig.DebugConfig, appName string, txManager service.TransactionManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
 	// cors
 	gincorsConfig := rslibconfig.InitCORS(corsConfig)
 	// httpClient := http.Client{
 	// 	Timeout:   time.Duration(authConfig.APITimeoutSec) * time.Second,
 	// 	Transport: otelhttp.NewTransport(http.DefaultTransport),
 	// }
-	studentUsecaseWorkbook := studentusecase.NewStudentUsecaseWorkbook(transactionManager)
+	studentUsecaseWorkbook := studentusecase.NewStudentUsecaseWorkbook(txManager, nonTxManager)
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitPrivateWorkbookRouterFunc(studentUsecaseWorkbook),
 		controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
 		// controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
 		// controller.NewInitStudyRouterFunc(studentUseCaseStudy),

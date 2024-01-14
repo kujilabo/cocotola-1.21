@@ -77,7 +77,7 @@ func (h *PrivateWorkbookHandler) errorHandle(ctx context.Context, logger *slog.L
 	return false
 }
 
-func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbookInterface) InitRouterGroupFunc {
+func NewInitPrivateWorkbookRouterFunc(studentUsecaseWorkbook studentusecase.StudentUsecaseWorkbookInterface) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 		workbook := parentRouterGroup.Group("private/workbook")
 		privateWorkbookHandler := NewPrivateWorkbookHandler(studentUsecaseWorkbook)
