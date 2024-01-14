@@ -8,6 +8,7 @@ require (
 	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240114094704-3b454cb819bf
 	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240114094704-3b454cb819bf
 	github.com/kujilabo/redstart v0.0.10
+	github.com/ohler55/ojg v1.21.0
 	github.com/samber/slog-gin v1.9.0
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.46.1
