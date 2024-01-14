@@ -1,0 +1,17 @@
+---
+with-expecter: true
+
+mockname: "{{.InterfaceName}}"
+outpkg: mocks
+filename: "{{.MockName}}.go"
+packages:
+  github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin:
+    config:
+      dir: src/controller/gin/mocks
+    interfaces:
+      WorkbookUsecaseInterface:
+  github.com/kujilabo/cocotola-1.21/cocotola-core/src/service:
+    config:
+      dir: src/service/mocks
+    interfaces:
+      CocotolaAuthClient:
