@@ -4,9 +4,9 @@ go 1.21.4
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240114072726-c02324609129
-	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240114072726-c02324609129
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240114072726-c02324609129
+	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240114094704-3b454cb819bf
+	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240114094704-3b454cb819bf
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240114094704-3b454cb819bf
 	github.com/kujilabo/redstart v0.0.10
 	go.opentelemetry.io/otel v1.21.0
 	go.opentelemetry.io/otel/sdk v1.21.0
@@ -116,7 +116,7 @@ require (
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/driver/sqlserver v1.5.2 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
-	modernc.org/libc v1.40.1 // indirect
+	modernc.org/libc v1.40.2 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
