@@ -39,6 +39,7 @@ import (
 	coregateway "github.com/kujilabo/cocotola-1.21/cocotola-core/src/gateway"
 	coreinit "github.com/kujilabo/cocotola-1.21/cocotola-core/src/initialize"
 	coreservice "github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
+	coresqls "github.com/kujilabo/cocotola-1.21/cocotola-core/src/sqls"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-app/src/config"
 )
@@ -89,13 +90,20 @@ func main() {
 	}
 
 	authTransactionManager := authinit.InitTransactionManager(db, authRFF)
-	coreTransactionManager := coreinit.InitTransactionManager(db, coreRFF)
+	coreTxManager, err := coregateway.NewTransactionManager(db, coreRFF)
+	if err != nil {
+		panic(err)
+	}
+	coreNonTxManager, err := coregateway.NewNoneTransactionManager(coreRFF)
+	if err != nil {
+		panic(err)
+	}
 
 	authinit.InitApp1(ctx, authTransactionManager, "cocotola", cfg.App.OwnerPassword)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, authTransactionManager, coreTransactionManager, rsrf)
+	result := run(ctx, cfg, authTransactionManager, coreTxManager, coreNonTxManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
@@ -126,11 +134,14 @@ func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	if err != nil {
 		panic(err)
 	}
+	if _, _, _, err := rslibconfig.InitDB(cfg.DB, coresqls.SQL); err != nil {
+		panic(err)
+	}
 
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func run(ctx context.Context, cfg *config.Config, authTransactionManager authservice.TransactionManager, coreTransactionManager coreservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
+func run(ctx context.Context, cfg *config.Config, authTransactionManager authservice.TransactionManager, coreTxManager coreservice.TransactionManager, coreNonTxManager coreservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -164,7 +175,7 @@ func run(ctx context.Context, cfg *config.Config, authTransactionManager authser
 			return err
 		}
 		core := api.Group("core")
-		if err := coreinit.InitAppServer(ctx, core, cfg.CORS, cfg.Debug, cfg.App.Name, coreTransactionManager, rsrf); err != nil {
+		if err := coreinit.InitAppServer(ctx, core, cfg.CORS, cfg.Debug, cfg.App.Name, coreTxManager, coreNonTxManager, rsrf); err != nil {
 			return err
 		}
 

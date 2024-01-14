@@ -4,24 +4,31 @@ import (
 	"context"
 	"errors"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
+
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
+
+	workbookfinddomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookfind"
 )
 
 type StudentUsecaseWorkbookInterface interface {
+	// FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookfinddomain.Parameter) (*workbookfinddomain.Result, error)
 }
 
 type StudentUsecaseWorkbook struct {
-	transactionManager service.TransactionManager
+	txManager    service.TransactionManager
+	nonTxManager service.TransactionManager
 }
 
-func NewStudentUsecaseWorkbook(transactionManager service.TransactionManager) *StudentUsecaseWorkbook {
+func NewStudentUsecaseWorkbook(txManager service.TransactionManager, nonTxManager service.TransactionManager) *StudentUsecaseWorkbook {
 	return &StudentUsecaseWorkbook{
-		transactionManager: transactionManager,
+		txManager:    txManager,
+		nonTxManager: nonTxManager,
 	}
 }
-func (u *StudentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID rsuserdomain.OrganizationID, operatorID rsuserdomain.AppUserID) error {
-	return errors.New("")
+
+func (u *StudentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookfinddomain.Parameter) (*workbookfinddomain.Result, error) {
+	return nil, errors.New("")
 	// var result domain.WorkbookSearchResult
 	// fn := func(student service.Student) error {
 	// 	condition, err := domain.NewWorkbookSearchCondition(DefaultPageNo, DefaultPageSize, []userD.SpaceID{})

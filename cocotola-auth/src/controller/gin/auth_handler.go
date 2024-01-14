@@ -21,12 +21,12 @@ type AuthenticationUsecaseInterface interface {
 }
 
 type AuthHandler struct {
-	authentication AuthenticationUsecaseInterface
+	authenticationUsecase AuthenticationUsecaseInterface
 }
 
-func NewAuthHandler(authentication AuthenticationUsecaseInterface) *AuthHandler {
+func NewAuthHandler(authenticationUsecase AuthenticationUsecaseInterface) *AuthHandler {
 	return &AuthHandler{
-		authentication: authentication,
+		authenticationUsecase: authenticationUsecase,
 	}
 }
 
@@ -37,18 +37,19 @@ func (h *AuthHandler) GetUserInfo(c *gin.Context) {
 
 	authorization := c.GetHeader("Authorization")
 	if !strings.HasPrefix(authorization, "Bearer ") {
-		logger.WarnContext(ctx, "invalid header. Bearer not found")
+		logger.InfoContext(ctx, "invalid header. Bearer not found")
 		c.Status(http.StatusUnauthorized)
 		return
 	}
 
 	bearerToken := authorization[len("Bearer "):]
-	appUserInfo, err := h.authentication.GetUserInfo(ctx, bearerToken)
+	appUserInfo, err := h.authenticationUsecase.GetUserInfo(ctx, bearerToken)
 	if err != nil {
-		logger.WarnContext(ctx, "GetUserInfo", slog.Any("err", (err)))
+		logger.InfoContext(ctx, "GetUserInfo", slog.Any("err", (err)))
 		c.Status(http.StatusUnauthorized)
 		return
 	}
+
 	c.JSON(http.StatusOK, libapi.AppUserInfoResponse{
 		AppUserID:      appUserInfo.AppUserID.Int(),
 		OrganizationID: appUserInfo.OrganizationID.Int(),
@@ -68,7 +69,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := h.authentication.RefreshToken(ctx, refreshTokenParameter.RefreshToken)
+	accessToken, err := h.authenticationUsecase.RefreshToken(ctx, refreshTokenParameter.RefreshToken)
 	if err != nil {
 		c.Status(http.StatusUnauthorized)
 		return

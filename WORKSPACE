@@ -58,8 +58,8 @@ go_repository(
 go_repository(
     name = "com_github_alecthomas_kingpin_v2",
     importpath = "github.com/alecthomas/kingpin/v2",
-    sum = "h1:H0aULhgmSzN8xQ3nX1uxtdlTHYoPLu5AhHxWrKI6ocU=",
-    version = "v2.3.2",
+    sum = "h1:f48lwail6p8zpO1bC4TxtqACaGqHYA22qkHjHpqDjYY=",
+    version = "v2.4.0",
 )
 
 go_repository(
@@ -590,8 +590,8 @@ go_repository(
 go_repository(
     name = "com_github_go_playground_validator_v10",
     importpath = "github.com/go-playground/validator/v10",
-    sum = "h1:x+plE831WK4vaKHO/jpgUGsvLKIqRRkz6M78GuJAfGE=",
-    version = "v10.16.0",
+    sum = "h1:SmVVlfAOtlZncTxRuinDPomC2DkXJ4E5T9gDA0AIH74=",
+    version = "v10.17.0",
 )
 
 go_repository(
@@ -934,8 +934,8 @@ go_repository(
 go_repository(
     name = "com_github_jackc_pgx_v5",
     importpath = "github.com/jackc/pgx/v5",
-    sum = "h1:5I9etrGkLrN+2XPCsi6XLlV5DITbSL/xBZdmAxFcXPI=",
-    version = "v5.5.1",
+    sum = "h1:iLlpgp4Cp/gC9Xuscl7lFL1PhhW+ZLtXZcrfCt4C3tA=",
+    version = "v5.5.2",
 )
 
 go_repository(
@@ -1389,8 +1389,8 @@ go_repository(
 go_repository(
     name = "com_github_prometheus_common",
     importpath = "github.com/prometheus/common",
-    sum = "h1:2BGz0eBc2hdMDLnO/8n0jeB3oPrt2D08CekT0lneoxM=",
-    version = "v0.45.0",
+    sum = "h1:doXzt5ybi1HBKpsZOL0sSkaNHJJqkyfEWZGGqqScV0Y=",
+    version = "v0.46.0",
 )
 
 go_repository(
