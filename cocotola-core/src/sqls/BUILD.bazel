@@ -3,7 +3,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "sqls",
     srcs = ["sqls.go"],
-    embedsrcs = ["mysql/2020010102_create_space.up.sql"],
+    embedsrcs = [
+        "mysql/2020010102_create_space.up.sql",
+        "postgres/2021010101_create_workbook.up.sql",
+    ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/sqls",
     visibility = ["//visibility:public"],
 )

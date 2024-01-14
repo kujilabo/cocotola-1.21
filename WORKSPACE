@@ -1816,8 +1816,8 @@ go_repository(
 go_repository(
     name = "org_golang_x_lint",
     importpath = "golang.org/x/lint",
-    sum = "h1:VLliZ0d+/avPrXXH+OakdXhpJuEoBZuwh1m2j7U6Iug=",
-    version = "v0.0.0-20210508222113-6edffad5e616",
+    sum = "h1:XQyxROzUlZH+WIQwySDgnISgOivlhjIEwaQaJEJrrN0=",
+    version = "v0.0.0-20190313153728-d0100b6bd8b3",
 )
 
 go_repository(
@@ -2077,8 +2077,8 @@ go_repository(
 go_repository(
     name = "com_github_kujilabo_redstart",
     importpath = "github.com/kujilabo/redstart",
-    sum = "h1:CPQqxiS2jNQ4mczbTISlj02DZEQbTpc5qKN7M+0FpFg=",
-    version = "v0.0.8",
+    sum = "h1:Qlkch2G1oO9ONi9T5k2u4+Amodv5XyXrgfNNLLxd54Q=",
+    version = "v0.0.10",
 )
 
 go_repository(
@@ -3262,6 +3262,13 @@ go_repository(
     importpath = "github.com/maxatome/go-testdeep",
     sum = "h1:Ql7Go8Tg0C1D/uMMX59LAoYK7LffeJQ6X2T04nTH68g=",
     version = "v1.12.0",
+)
+
+go_repository(
+    name = "com_github_kujilabo_cocotola_1_21",
+    importpath = "github.com/kujilabo/cocotola-1.21",
+    sum = "h1:atDVVWehEZrmf0iHUtOqrL+S9xjBLpLbUHKwzcx8hfk=",
+    version = "v0.0.2",
 )
 
 go_rules_dependencies()
