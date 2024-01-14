@@ -7,7 +7,7 @@ db:
 #   driverName: sqlite3
 #   sqlite3:
 #     file: app.db
-  driverName: mysql
+  driverName: postgres
   migration: true
   mysql:
     username: user
@@ -15,6 +15,12 @@ db:
     host: 127.0.0.1
     port: 3306
     database: development
+  postgres:
+    username: user
+    password: password
+    host: 127.0.0.1
+    port: 5432
+    database: postgres
 # auth:
 #   signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
 #   accessTokenTtlMin: 5

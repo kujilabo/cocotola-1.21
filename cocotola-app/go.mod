@@ -4,10 +4,10 @@ go 1.21.4
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240113163355-40109c97851f
-	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240113163355-40109c97851f
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240113163355-40109c97851f
-	github.com/kujilabo/redstart v0.0.8
+	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240114072726-c02324609129
+	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240114072726-c02324609129
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240114072726-c02324609129
+	github.com/kujilabo/redstart v0.0.10
 	go.opentelemetry.io/otel v1.21.0
 	go.opentelemetry.io/otel/sdk v1.21.0
 	golang.org/x/sync v0.6.0
@@ -65,6 +65,7 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
+	github.com/kujilabo/cocotola-1.21 v0.0.2 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

@@ -5,9 +5,9 @@ go 1.21.4
 require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240113163355-40109c97851f
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240113163355-40109c97851f
-	github.com/kujilabo/redstart v0.0.8
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240114072726-c02324609129
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240114072726-c02324609129
+	github.com/kujilabo/redstart v0.0.10
 	github.com/samber/slog-gin v1.9.0
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.46.1

@@ -26,11 +26,11 @@ import (
 	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 	rssqls "github.com/kujilabo/redstart/sqls"
+	rsusergateway "github.com/kujilabo/redstart/user/gateway"
 	rsuserservice "github.com/kujilabo/redstart/user/service"
 
 	libcontroller "github.com/kujilabo/cocotola-1.21/lib/controller/gin"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-	rsusergateway "github.com/kujilabo/redstart/user/gateway"
 
 	authgateway "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/gateway"
 	authinit "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/initialize"
@@ -130,13 +130,13 @@ func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	// init db
-	dialect, db, sqlDB, err := rslibconfig.InitDB(cfg.DB, rssqls.SQL)
+	dialect, db, sqlDB, err := rslibconfig.InitDB(cfg.DB, rssqls.SQL, coresqls.SQL)
 	if err != nil {
 		panic(err)
 	}
-	if _, _, _, err := rslibconfig.InitDB(cfg.DB, coresqls.SQL); err != nil {
-		panic(err)
-	}
+	// if _, _, _, err := rslibconfig.InitDB(cfg.DB, coresqls.SQL); err != nil {
+	// 	panic(err)
+	// }
 
 	return cfg, dialect, db, sqlDB, tp
 }
