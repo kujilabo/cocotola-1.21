@@ -21,14 +21,18 @@ db:
     host: 127.0.0.1
     port: 5432
     database: postgres
-# auth:
-#   signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
-#   accessTokenTtlMin: 5
-#   refreshTokenTtlHour: 720
-#   googleCallbackUrl: http://localhost:5173/app/callback
-#   googleClientId: 830416463276-3ts1rsinahi0hdnsfc10m6mabpttrd5i.apps.googleusercontent.com
-#   googleClientSecret: $GOOGLE_CLIENT_SECRET
-#   apiTimeoutSec: 5
+authApi:
+  endpoint: http://localhost:8080/api/auth
+  username: $AUTH_API_USERNAME
+  password: $AUTH_API_PASSWORD
+auth:
+  signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
+  accessTokenTtlMin: 5
+  refreshTokenTtlHour: 720
+  googleCallbackUrl: http://localhost:5173/app/callback
+  googleClientId: 830416463276-3ts1rsinahi0hdnsfc10m6mabpttrd5i.apps.googleusercontent.com
+  googleClientSecret: $GOOGLE_CLIENT_SECRET
+  apiTimeoutSec: 5
 trace:
   # exporter: jaeger
   exporter: otlp

@@ -18,6 +18,10 @@ db:
     host: 127.0.0.1
     port: 5432
     database: postgres
+authApi:
+  endpoint: http://localhost:8080/api/auth
+  username: $AUTH_API_USERNAME
+  password: $AUTH_API_PASSWORD
 auth:
   signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
   accessTokenTtlMin: 5

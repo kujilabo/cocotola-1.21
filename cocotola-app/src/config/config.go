@@ -13,6 +13,7 @@ import (
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 
 	authconfig "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
+	coreconfig "github.com/kujilabo/cocotola-1.21/cocotola-core/src/config"
 	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 )
 
@@ -26,6 +27,7 @@ type AppConfig struct {
 type Config struct {
 	App      *AppConfig                 `yaml:"app" validate:"required"`
 	DB       *rslibconfig.DBConfig      `yaml:"db" validate:"required"`
+	AuthAPI  *coreconfig.AuthAPIonfig   `yaml:"authApi" validate:"required"`
 	Auth     *authconfig.AuthConfig     `yaml:"auth" validate:"required"`
 	Trace    *rslibconfig.TraceConfig   `yaml:"trace" validate:"required"`
 	CORS     *rslibconfig.CORSConfig    `yaml:"cors" validate:"required"`

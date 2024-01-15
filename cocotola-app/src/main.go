@@ -175,7 +175,7 @@ func run(ctx context.Context, cfg *config.Config, authTransactionManager authser
 			return err
 		}
 		core := api.Group("core")
-		if err := coreinit.InitAppServer(ctx, core, cfg.CORS, cfg.Debug, cfg.App.Name, coreTxManager, coreNonTxManager, rsrf); err != nil {
+		if err := coreinit.InitAppServer(ctx, core, *cfg.AuthAPI, cfg.CORS, cfg.Debug, cfg.App.Name, coreTxManager, coreNonTxManager, rsrf); err != nil {
 			return err
 		}
 
