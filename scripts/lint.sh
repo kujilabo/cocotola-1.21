@@ -1,5 +1,9 @@
 #!/bin/bash
 
+pushd cocotola-web
+npm run lint
+popd
+
 pushd cocotola-core
 golangci-lint run --config ../.github/.golangci.yml && \
 golangci-lint run --disable-all --config ../.github/.golangci.yml \
@@ -19,7 +23,7 @@ golangci-lint run --disable-all --config ../.github/.golangci.yml \
 -E thelper \
 -E unconvert \
 -E whitespace && \
-pkgforbid -config=../.github/pkgforbid.yml ./... && \
+pkgforbid -config=../.github/pkgforbid.yml ./...
 popd
 
 pushd cocotola-auth
@@ -41,7 +45,7 @@ golangci-lint run --disable-all --config ../.github/.golangci.yml \
 -E thelper \
 -E unconvert \
 -E whitespace && \
-pkgforbid -config=../.github/pkgforbid.yml ./... && \
+pkgforbid -config=../.github/pkgforbid.yml ./...
 popd
 
 pushd lib
@@ -63,5 +67,5 @@ golangci-lint run --disable-all --config ../.github/.golangci.yml \
 -E thelper \
 -E unconvert \
 -E whitespace && \
-pkgforbid -config=../.github/pkgforbid.yml ./... && \
+pkgforbid -config=../.github/pkgforbid.yml ./...
 popd

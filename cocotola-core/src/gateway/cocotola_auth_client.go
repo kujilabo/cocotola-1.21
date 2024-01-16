@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"time"
 
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 
@@ -15,26 +14,28 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 )
 
-type cocotolaAuthClient struct {
-	timeout time.Duration
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
-func NewCocotolaAuthClient(timeout time.Duration) service.CocotolaAuthClient {
+type cocotolaAuthClient struct {
+	httpClient   HTTPClient
+	authEndpoint *url.URL
+	authUsername string
+	authPassword string
+}
+
+func NewCocotolaAuthClient(httpClient HTTPClient, authEndpoint *url.URL, authUsername, authPassword string) service.CocotolaAuthClient {
 	return &cocotolaAuthClient{
-		timeout: timeout,
+		httpClient:   httpClient,
+		authEndpoint: authEndpoint,
+		authUsername: authUsername,
+		authPassword: authPassword,
 	}
 }
 
 func (c *cocotolaAuthClient) RetrieveUserInfo(ctx context.Context, bearerToken string) (*libapi.AppUserInfoResponse, error) {
-	client := http.Client{
-		Timeout: c.timeout,
-	}
-
-	u, err := url.Parse("http://localhost:8010")
-	if err != nil {
-		return nil, rsliberrors.Errorf("url.Parse. err: %w", err)
-	}
-
+	u := c.authEndpoint
 	u.Path = path.Join(u.Path, "v1", "auth", "userinfo")
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
@@ -44,9 +45,9 @@ func (c *cocotolaAuthClient) RetrieveUserInfo(ctx context.Context, bearerToken s
 
 	req.Header.Set("Authorization", "Bearer "+bearerToken)
 
-	resp, err := client.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, rsliberrors.Errorf("synthesize request. err: %w", err)
+		return nil, rsliberrors.Errorf("auth request. err: %w", err)
 	}
 	defer resp.Body.Close()
 

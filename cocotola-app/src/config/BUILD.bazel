@@ -11,6 +11,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-auth/src/config",
+        "//cocotola-core/src/config",
         "//lib/config",
         "@com_github_kujilabo_redstart//lib/config",
         "@com_github_kujilabo_redstart//lib/domain",

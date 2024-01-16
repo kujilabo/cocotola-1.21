@@ -12,6 +12,10 @@ db:
     host: $POSTGRES_HOST
     port: $POSTGRES_PORT
     database: $POSTGRES_DATABASE
+authApi:
+  endpoint: http://localhost:8080/api/auth
+  username: $AUTH_API_USERNAME
+  password: $AUTH_API_PASSWORD
 auth:
   signingKey: $SIGNING_KEY
   accessTokenTtlMin: 30

@@ -23,7 +23,7 @@ type AppConfig struct {
 }
 
 type AuthConfig struct {
-	SigningKey          string `yaml:"signingKey"`
+	SigningKey          string `yaml:"signingKey" validate:"required"`
 	AccessTokenTTLMin   int    `yaml:"accessTokenTtlMin" validate:"gte=1"`
 	RefreshTokenTTLHour int    `yaml:"refreshTokenTtlHour" validate:"gte=1"`
 	GoogleCallbackURL   string `yaml:"googleCallbackUrl" validate:"required"`

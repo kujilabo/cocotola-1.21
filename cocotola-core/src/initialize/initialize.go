@@ -2,14 +2,18 @@ package initialize
 
 import (
 	"context"
+	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 	rslibconfig "github.com/kujilabo/redstart/lib/config"
 	rsuserservice "github.com/kujilabo/redstart/user/service"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"gorm.io/gorm"
 
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/config"
 	controller "github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/gateway"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
@@ -49,13 +53,13 @@ func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) serv
 // 	return systemOwner, nil
 // }
 
-func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, debugConfig *libconfig.DebugConfig, appName string, txManager service.TransactionManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
+func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, authAPIConfig config.AuthAPIonfig, corsConfig *rslibconfig.CORSConfig, debugConfig *libconfig.DebugConfig, appName string, txManager service.TransactionManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
 	// cors
 	gincorsConfig := rslibconfig.InitCORS(corsConfig)
-	// httpClient := http.Client{
-	// 	Timeout:   time.Duration(authConfig.APITimeoutSec) * time.Second,
-	// 	Transport: otelhttp.NewTransport(http.DefaultTransport),
-	// }
+	httpClient := http.Client{
+		Timeout:   authClientTimeout,
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
 	studentUsecaseWorkbook := studentusecase.NewStudentUsecaseWorkbook(txManager, nonTxManager)
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitPrivateWorkbookRouterFunc(studentUsecaseWorkbook),
@@ -65,11 +69,15 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 		// controller.NewInitAudioRouterFunc(studentUsecaseAudio),
 		// controller.NewInitStatRouterFunc(studentUsecaseStat),
 	}
+	authEndpoint, err := url.Parse(authAPIConfig.Endpoint)
+	if err != nil {
+		return err
+	}
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitTestRouterFunc(),
 	}
-	cocotolaAuthClient := gateway.NewCocotolaAuthClient(authClientTimeout)
+	cocotolaAuthClient := gateway.NewCocotolaAuthClient(&httpClient, authEndpoint, authAPIConfig.Username, authAPIConfig.Password)
 
 	if err := controller.InitRouter(ctx, parentRouterGroup, cocotolaAuthClient, publicRouterGroupFunc, privateRouterGroupFunc, gincorsConfig, debugConfig, appName); err != nil {
 		return err

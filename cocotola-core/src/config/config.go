@@ -26,9 +26,15 @@ type ShutdownConfig struct {
 	TimeSec2 int `yaml:"timeSec2" validate:"gte=1"`
 }
 
+type AuthAPIonfig struct {
+	Endpoint string `yaml:"endpoint" validate:"required"`
+	Username string `yaml:"username" validate:"required"`
+	Password string `yaml:"password" validate:"required"`
+}
 type Config struct {
 	App      *AppConfig                 `yaml:"app" validate:"required"`
 	DB       *rslibconfig.DBConfig      `yaml:"db" validate:"required"`
+	AuthAPI  *AuthAPIonfig              `yaml:"auth" validate:"required"`
 	Trace    *rslibconfig.TraceConfig   `yaml:"trace" validate:"required"`
 	CORS     *rslibconfig.CORSConfig    `yaml:"cors" validate:"required"`
 	Shutdown *ShutdownConfig            `yaml:"shutdown" validate:"required"`

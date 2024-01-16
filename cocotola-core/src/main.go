@@ -139,7 +139,7 @@ func run(ctx context.Context, cfg *config.Config, txManager service.TransactionM
 
 	eg.Go(func() error {
 		router := gin.New()
-		if err := initialize.InitAppServer(ctx, router, cfg.CORS, cfg.Debug, cfg.App.Name, txManager, nonTxManager, rsrf); err != nil {
+		if err := initialize.InitAppServer(ctx, router, *cfg.AuthAPI, cfg.CORS, cfg.Debug, cfg.App.Name, txManager, nonTxManager, rsrf); err != nil {
 			return err
 		}
 		return libcontroller.AppServerProcess(ctx, cfg.App.Name, router, cfg.App.HTTPPort, readHeaderTimeout, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck

@@ -11,7 +11,6 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 
