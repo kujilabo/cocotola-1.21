@@ -2,7 +2,6 @@ package student
 
 import (
 	"context"
-	"errors"
 
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
@@ -28,7 +27,16 @@ func NewStudentUsecaseWorkbook(txManager service.TransactionManager, nonTxManage
 }
 
 func (u *StudentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookfinddomain.Parameter) (*workbookfinddomain.Result, error) {
-	return nil, errors.New("")
+	return &workbookfinddomain.Result{
+		TotalCount: 1,
+		Results: []*workbookfinddomain.WorkbookModel{
+			{
+				ID:   123,
+				Name: "test",
+			},
+		},
+	}, nil
+
 	// var result domain.WorkbookSearchResult
 	// fn := func(student service.Student) error {
 	// 	condition, err := domain.NewWorkbookSearchCondition(DefaultPageNo, DefaultPageSize, []userD.SpaceID{})

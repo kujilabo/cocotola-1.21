@@ -34,7 +34,7 @@ type AuthAPIonfig struct {
 type Config struct {
 	App      *AppConfig                 `yaml:"app" validate:"required"`
 	DB       *rslibconfig.DBConfig      `yaml:"db" validate:"required"`
-	AuthAPI  *AuthAPIonfig              `yaml:"auth" validate:"required"`
+	AuthAPI  *AuthAPIonfig              `yaml:"authApi" validate:"required"`
 	Trace    *rslibconfig.TraceConfig   `yaml:"trace" validate:"required"`
 	CORS     *rslibconfig.CORSConfig    `yaml:"cors" validate:"required"`
 	Shutdown *ShutdownConfig            `yaml:"shutdown" validate:"required"`

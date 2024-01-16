@@ -19,7 +19,7 @@ db:
     port: $MYSQL_PORT
     database: $MYSQL_DATABASE
 authApi:
-  endpoint: http://localhost:8080/api/auth
+  endpoint: http://localhost:8080
   username: $AUTH_API_USERNAME
   password: $AUTH_API_PASSWORD
 auth:

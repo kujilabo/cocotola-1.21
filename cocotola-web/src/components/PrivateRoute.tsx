@@ -56,7 +56,7 @@ export const PrivateRoute = (props: PrivateRouteProps): ReactElement => {
   } else if (!error && isAccessTokenExpired && !isRefreshTokenExpired) {
     return <div>Refreshing...</div>;
   } else if (isRefreshTokenExpired) {
-    return <Navigate replace to={`/app/login`} />;
+    return <Navigate replace to={`/app/auth/login`} />;
   } else {
     console.log('children');
     return <>{props.element}</>;
