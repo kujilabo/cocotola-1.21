@@ -78,7 +78,7 @@ func (h *WorkbookHandler) errorHandle(ctx context.Context, logger *slog.Logger, 
 	// 	c.JSON(http.StatusNotFound, gin.H{"message": "Audio not found"})
 	// 	return true
 	// }
-	logger.ErrorContext(ctx, fmt.Sprintf("error:%v", err))
+	logger.ErrorContext(ctx, fmt.Sprintf("WorkbookHandler. error: %+v", err))
 	return false
 }
 

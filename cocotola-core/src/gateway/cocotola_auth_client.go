@@ -35,7 +35,7 @@ func NewCocotolaAuthClient(httpClient HTTPClient, authEndpoint *url.URL, authUse
 }
 
 func (c *cocotolaAuthClient) RetrieveUserInfo(ctx context.Context, bearerToken string) (*libapi.AppUserInfoResponse, error) {
-	u := c.authEndpoint
+	u := *c.authEndpoint
 	u.Path = path.Join(u.Path, "v1", "auth", "userinfo")
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)

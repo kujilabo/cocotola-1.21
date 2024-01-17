@@ -1,11 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
 
-import { Workbooks } from '@/features/workbook/components/Workbooks';
+import { WorkbookList } from '@/features/workbook/components/WorkbookList';
 
 export const WorkbookRoutes = () => {
   return (
     <Routes>
-      <Route path="" element={<Workbooks />} />
+      <Route path="" element={<WorkbookList />} />
     </Routes>
   );
 };

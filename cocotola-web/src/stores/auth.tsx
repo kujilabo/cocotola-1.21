@@ -101,6 +101,13 @@ export const useAuthStore = create<State & Action>()(
             });
         },
         reauthenticate: async (refreshToken: string): Promise<void> => {
+          const accessToken = get().accessToken;
+          if (!isTokenExpired(accessToken)) {
+            console.log('token is not expired');
+            return new Promise(function (resolve) {
+              resolve();
+            });
+          }
           const param: RefreshTokenParameter = {
             refreshToken: refreshToken,
           };
@@ -134,3 +141,14 @@ export const useAuthStore = create<State & Action>()(
     )
   )
 );
+
+export const isTokenExpired = (token: string | null): boolean => {
+  let isExpired = true;
+  if (token && token != null && token !== '') {
+    const decoded = jwt_decode<JwtPayload>(token) || null;
+    if (decoded.exp) {
+      isExpired = decoded.exp < new Date().getTime() / 1000;
+    }
+  }
+  return isExpired;
+};
