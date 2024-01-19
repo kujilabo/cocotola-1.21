@@ -14,9 +14,6 @@ import (
 	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 	libmiddleware "github.com/kujilabo/cocotola-1.21/lib/controller/gin/middleware"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/middleware"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 )
 
 // type NewIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType appD.ProblemTypeName, reader io.Reader) (appS.ProblemAddParameterIterator, error)
@@ -36,7 +33,7 @@ func NewInitTestRouterFunc() InitRouterGroupFunc {
 	}
 }
 
-func InitRouter(ctx context.Context, parentRouterGroup gin.IRouter, cocotolaAuthClient service.CocotolaAuthClient, initPublicRouterFunc []InitRouterGroupFunc, initPrivateRouterFunc []InitRouterGroupFunc, corsConfig cors.Config, debugConfig *libconfig.DebugConfig, appName string) error {
+func InitRouter(ctx context.Context, parentRouterGroup gin.IRouter, authMiddleware gin.HandlerFunc, initPublicRouterFunc []InitRouterGroupFunc, initPrivateRouterFunc []InitRouterGroupFunc, corsConfig cors.Config, debugConfig *libconfig.DebugConfig, appName string) error {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 
 	parentRouterGroup.Use(cors.New(corsConfig))
@@ -46,7 +43,6 @@ func InitRouter(ctx context.Context, parentRouterGroup gin.IRouter, cocotolaAuth
 		parentRouterGroup.Use(libmiddleware.NewWaitMiddleware())
 	}
 
-	authMiddleware := middleware.NewAuthMiddleware(cocotolaAuthClient)
 	v1 := parentRouterGroup.Group("v1")
 	{
 		v1.Use(otelgin.Middleware(appName))

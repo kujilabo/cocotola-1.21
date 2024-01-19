@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "audio_repository.go",
+        "google_tts_client.go",
+        "init.go",
+        "repository_factory.go",
+        "transaction_manager.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-synthesizer/src/domain",
+        "//cocotola-synthesizer/src/service",
+        "//lib/domain",
+        "@com_github_kujilabo_redstart//lib/domain",
+        "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/gateway",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)

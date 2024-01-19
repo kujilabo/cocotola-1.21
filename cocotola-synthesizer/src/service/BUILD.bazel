@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "service",
+    srcs = [
+        "audio_repository.go",
+        "repository_factory.go",
+        "synthesizer_client.go",
+        "transaction_manager.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-synthesizer/src/domain",
+        "//lib/domain",
+    ],
+)

@@ -26,6 +26,10 @@ type ShutdownConfig struct {
 	TimeSec2 int `yaml:"timeSec2" validate:"gte=1"`
 }
 
+type GoogleTextToSpeechConfig struct {
+	APIKey string `yaml:"apiKey" validate:"required"`
+}
+
 type AuthAPIonfig struct {
 	Endpoint string `yaml:"endpoint" validate:"required"`
 	Username string `yaml:"username" validate:"required"`

@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
-	libdomain "github.com/kujilabo/redstart/lib/domain"
+	domain "github.com/kujilabo/cocotola-1.21/lib/domain"
+	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 )
 
 func TestNewLang2(t *testing.T) {
@@ -18,7 +18,7 @@ func TestNewLang2(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          string
-		want          domain.Lang2
+		want          *domain.Lang2
 		wantErr       bool
 		wantErrDetail error
 	}{
@@ -38,7 +38,7 @@ func TestNewLang2(t *testing.T) {
 			name:          "empty string",
 			args:          "",
 			wantErr:       true,
-			wantErrDetail: libdomain.ErrInvalidArgument,
+			wantErrDetail: rslibdomain.ErrInvalidArgument,
 		},
 	}
 	for _, tt := range tests {

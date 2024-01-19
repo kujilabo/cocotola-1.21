@@ -1,11 +1,11 @@
 package domain
 
 var (
-	Lang2EN      Lang2
-	Lang2ES      Lang2
-	Lang2JA      Lang2
-	Lang2KO      Lang2
-	Lang2Unknown Lang2
+	Lang2EN      *Lang2
+	Lang2ES      *Lang2
+	Lang2JA      *Lang2
+	Lang2KO      *Lang2
+	Lang2Unknown *Lang2
 
 	// Lang3ENG     Lang3
 	// Lang3ESP     Lang3

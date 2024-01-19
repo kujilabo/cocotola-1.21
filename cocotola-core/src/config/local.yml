@@ -23,6 +23,11 @@ db:
     database: postgres
 authApi:
   endpoint: http://localhost:8010
+  authType: static
+  username: username
+  password: password
+synthesizerApi:
+  authType: static
   username: username
   password: password
 trace:

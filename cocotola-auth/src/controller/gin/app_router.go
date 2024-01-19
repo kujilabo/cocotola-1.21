@@ -11,10 +11,9 @@ import (
 
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
+	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 	libmiddleware "github.com/kujilabo/cocotola-1.21/lib/controller/gin/middleware"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-
-	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 )
 
 type InitRouterGroupFunc func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) error
