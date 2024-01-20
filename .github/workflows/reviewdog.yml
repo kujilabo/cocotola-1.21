@@ -55,6 +55,8 @@ jobs:
             -E gomnd
             -E gosec
             -E noctx
+            -E testpackage
+            -E thelper
             -E unconvert
             -E whitespace
             --timeout=10m

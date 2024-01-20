@@ -78,7 +78,6 @@ func NewAuthTokenManager(signingKey []byte, signingMethod jwt.SigningMethod, tok
 }
 
 func (m *AuthTokenManager) CreateTokenSet(ctx context.Context, appUser service.AppUserInterface, organization service.OrganizationInterface) (*domain.AuthTokenSet, error) {
-
 	if appUser == nil {
 		return nil, rsliberrors.Errorf("appUser is nil. err: %w", rslibdomain.ErrInvalidArgument)
 	}
