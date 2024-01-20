@@ -15,7 +15,7 @@ var (
 
 	// Lang5ENUS    Lang5
 	// Lang5ESES    Lang5
-	// Lang5JAJP    Lang5
+	Lang5JAJP *Lang5
 	// Lang5KOKR    Lang5
 	// Lang5Unknown Lang5
 )
@@ -73,10 +73,10 @@ func init() {
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// Lang5JAJP, err = NewLang5("ja-JP")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	Lang5JAJP, err = NewLang5("ja-JP")
+	if err != nil {
+		panic(err)
+	}
 	// Lang5KOKR, err = NewLang5("ko-KR")
 	// if err != nil {
 	// 	panic(err)

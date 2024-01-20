@@ -23,7 +23,7 @@ type googleTTSClient struct {
 	apiKey     string
 }
 
-type ttsResponse struct {
+type googleTTSResponse struct {
 	AudioContent string `json:"audioContent"`
 }
 
@@ -34,8 +34,8 @@ func NewGoogleTTSClient(httpClient HTTPClient, apiKey string) service.Synthesize
 	}
 }
 
-func (g *googleTTSClient) Synthesize(ctx context.Context, lang5 libdomain.Lang5, text string) (string, error) {
-	ctx, span := tracer.Start(ctx, "synthesizerClient.Synthesize")
+func (c *googleTTSClient) Synthesize(ctx context.Context, lang5 *libdomain.Lang5, voice, text string) (string, error) {
+	ctx, span := tracer.Start(ctx, "googleTTSClient.Synthesize")
 	defer span.End()
 
 	type m map[string]interface{}
@@ -46,7 +46,7 @@ func (g *googleTTSClient) Synthesize(ctx context.Context, lang5 libdomain.Lang5,
 		},
 		"voice": m{
 			"languageCode": lang5.String(),
-			"ssmlGender":   "FEMALE",
+			"ssmlGender":   voice,
 		},
 		"audioConfig": m{
 			"audioEncoding": "MP3",
@@ -56,7 +56,7 @@ func (g *googleTTSClient) Synthesize(ctx context.Context, lang5 libdomain.Lang5,
 
 	b, err := json.Marshal(values)
 	if err != nil {
-		return "", err
+		return "", rsliberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	u, err := url.Parse("https://texttospeech.googleapis.com/v1/text:synthesize")
@@ -65,34 +65,34 @@ func (g *googleTTSClient) Synthesize(ctx context.Context, lang5 libdomain.Lang5,
 	}
 
 	q := u.Query()
-	q.Set("key", g.apiKey)
+	q.Set("key", c.apiKey)
 	u.RawQuery = q.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewReader(b))
 	if err != nil {
-		return "", err
+		return "", rsliberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := g.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
 	if resp.StatusCode != http.StatusOK {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return "", err
+		}
 		return "", rsliberrors.Errorf("%s", string(body))
 	}
 
-	response := ttsResponse{}
-	if err := json.Unmarshal(body, &response); err != nil {
-		return "", err
+	googleTTSResponse := googleTTSResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&googleTTSResponse); err != nil {
+		return "", rsliberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
-	return response.AudioContent, nil
+	return googleTTSResponse.AudioContent, nil
 }

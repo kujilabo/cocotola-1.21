@@ -7,5 +7,5 @@ import (
 )
 
 type SynthesizerClient interface {
-	Synthesize(ctx context.Context, lang5 libdomain.Lang5, text string) (string, error)
+	Synthesize(ctx context.Context, lang5 *libdomain.Lang5, voice, text string) (string, error)
 }
