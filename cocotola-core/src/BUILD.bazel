@@ -12,12 +12,12 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//cocotola-core/src/config",
-        "//cocotola-core/src/domain",
         "//cocotola-core/src/gateway",
         "//cocotola-core/src/initialize",
         "//cocotola-core/src/service",
         "//cocotola-core/src/sqls",
         "//lib/controller/gin",
+        "//lib/domain",
         "//lib/log",
         "//proto",
         "@com_github_gin_gonic_gin//:gin",

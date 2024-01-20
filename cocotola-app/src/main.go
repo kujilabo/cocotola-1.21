@@ -81,29 +81,49 @@ func main() {
 	authRFF := func(ctx context.Context, db *gorm.DB) (authservice.RepositoryFactory, error) {
 		return authgateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
+	authRF, err := authRFF(ctx, db)
+	if err != nil {
+		panic(err)
+	}
+
 	coreRFF := func(ctx context.Context, db *gorm.DB) (coreservice.RepositoryFactory, error) {
 		return coregateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
+	coreRF, err := coreRFF(ctx, db)
+	if err != nil {
+		panic(err)
+	}
+
 	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC)
 	if err != nil {
 		panic(err)
 	}
 
-	authTransactionManager := authinit.InitTransactionManager(db, authRFF)
+	authTxManager, err := authgateway.NewTransactionManager(db, authRFF)
+	if err != nil {
+		panic(err)
+	}
+
+	authNonTxManager, err := authgateway.NewNonTransactionManager(authRF)
+	if err != nil {
+		panic(err)
+	}
+
 	coreTxManager, err := coregateway.NewTransactionManager(db, coreRFF)
 	if err != nil {
 		panic(err)
 	}
-	coreNonTxManager, err := coregateway.NewNoneTransactionManager(coreRFF)
+
+	coreNonTxManager, err := coregateway.NewNonTransactionManager(coreRF)
 	if err != nil {
 		panic(err)
 	}
 
-	authinit.InitApp1(ctx, authTransactionManager, "cocotola", cfg.App.OwnerPassword)
+	authinit.InitApp1(ctx, authTxManager, authNonTxManager, "cocotola", cfg.App.OwnerPassword)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, authTransactionManager, coreTxManager, coreNonTxManager, rsrf)
+	result := run(ctx, cfg, authTxManager, authNonTxManager, coreTxManager, coreNonTxManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
@@ -141,7 +161,7 @@ func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func run(ctx context.Context, cfg *config.Config, authTransactionManager authservice.TransactionManager, coreTxManager coreservice.TransactionManager, coreNonTxManager coreservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
+func run(ctx context.Context, cfg *config.Config, authTxManager authservice.TransactionManager, authNonTxManager authservice.TransactionManager, coreTxManager coreservice.TransactionManager, coreNonTxManager coreservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -171,7 +191,7 @@ func run(ctx context.Context, cfg *config.Config, authTransactionManager authser
 		api := router.Group("api")
 
 		auth := api.Group("auth")
-		if err := authinit.InitAppServer(ctx, auth, cfg.CORS, cfg.Auth, cfg.Debug, cfg.App.Name, authTransactionManager, rsrf); err != nil {
+		if err := authinit.InitAppServer(ctx, auth, cfg.CORS, cfg.Auth, cfg.Debug, cfg.App.Name, authTxManager, authNonTxManager, rsrf); err != nil {
 			return err
 		}
 		core := api.Group("core")

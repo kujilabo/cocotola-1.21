@@ -12,9 +12,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-core/src/controller/gin/helper",
-        "//cocotola-core/src/controller/gin/middleware",
         "//cocotola-core/src/domain/workbookfind",
-        "//cocotola-core/src/service",
         "//cocotola-core/src/usecase/student",
         "//lib/config",
         "//lib/controller/gin/middleware",
@@ -38,6 +36,7 @@ go_test(
     deps = [
         ":gin",
         "//cocotola-core/src/config",
+        "//cocotola-core/src/controller/gin/middleware",
         "//cocotola-core/src/controller/gin/mocks",
         "//cocotola-core/src/domain/workbookfind",
         "//cocotola-core/src/service",
@@ -66,6 +65,7 @@ go_test(
     deps = [
         ":gin",
         "//cocotola-core/src/config",
+        "//cocotola-core/src/controller/gin/middleware",
         "//cocotola-core/src/controller/gin/mocks",
         "//cocotola-core/src/domain/workbookfind",
         "//cocotola-core/src/service",

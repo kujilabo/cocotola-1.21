@@ -60,9 +60,6 @@ func main() {
 	cfg, dialect, db, sqlDB, tp := Initialize(ctx, appEnv)
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
-	if dialect == nil {
-		panic("dialect is nil")
-	}
 
 	ctx = liblog.InitLogger(ctx)
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
@@ -70,20 +67,31 @@ func main() {
 	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
 		return gateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
+	rf, err := rff(ctx, db)
+	if err != nil {
+		panic(err)
+	}
 	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC)
 	if err != nil {
 		panic(err)
 	}
 
-	appTransactionManager := initialize.InitTransactionManager(db, rff)
+	txManager, err := gateway.NewTransactionManager(db, rff)
+	if err != nil {
+		panic(err)
+	}
+	nonTxManager, err := gateway.NewNonTransactionManager(rf)
+	if err != nil {
+		panic(err)
+	}
 
 	logger.Info(fmt.Sprintf("%+v", proto.HelloRequest{}))
 
-	initialize.InitApp1(ctx, appTransactionManager, "cocotola", cfg.App.OwnerPassword)
+	initialize.InitApp1(ctx, txManager, nonTxManager, "cocotola", cfg.App.OwnerPassword)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := Run(ctx, cfg, appTransactionManager, rsrf)
+	result := Run(ctx, cfg, txManager, nonTxManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
@@ -118,7 +126,7 @@ func Initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func Run(ctx context.Context, cfg *config.Config, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
+func Run(ctx context.Context, cfg *config.Config, txManager service.TransactionManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -128,7 +136,7 @@ func Run(ctx context.Context, cfg *config.Config, transactionManager service.Tra
 
 	eg.Go(func() error {
 		router := gin.New()
-		if err := initialize.InitAppServer(ctx, router, cfg.CORS, cfg.Auth, cfg.Debug, cfg.App.Name, transactionManager, rsrf); err != nil {
+		if err := initialize.InitAppServer(ctx, router, cfg.CORS, cfg.Auth, cfg.Debug, cfg.App.Name, txManager, nonTxManager, rsrf); err != nil {
 			return err
 		}
 		return libcontroller.AppServerProcess(ctx, cfg.App.Name, router, cfg.App.HTTPPort, readHeaderTimeout, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck

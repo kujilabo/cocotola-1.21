@@ -11,10 +11,10 @@ import (
 	rslibconfig "github.com/kujilabo/redstart/lib/config"
 	rsuserservice "github.com/kujilabo/redstart/user/service"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/config"
 	controller "github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/middleware"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/gateway"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student"
@@ -23,14 +23,14 @@ import (
 // const readHeaderTimeout = time.Duration(30) * time.Second
 const authClientTimeout = time.Duration(5) * time.Second
 
-func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
-	appTransactionManager, err := gateway.NewTransactionManager(db, rff)
-	if err != nil {
-		panic(err)
-	}
+// func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
+// 	appTransactionManager, err := gateway.NewTransactionManager(db, rff)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	return appTransactionManager
-}
+// 	return appTransactionManager
+// }
 
 // type systemOwnerByOrganizationName struct {
 // }
@@ -78,8 +78,9 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, authAPICo
 		controller.NewInitTestRouterFunc(),
 	}
 	cocotolaAuthClient := gateway.NewCocotolaAuthClient(&httpClient, authEndpoint, authAPIConfig.Username, authAPIConfig.Password)
+	authMiddleware := middleware.NewAuthMiddleware(cocotolaAuthClient)
 
-	if err := controller.InitRouter(ctx, parentRouterGroup, cocotolaAuthClient, publicRouterGroupFunc, privateRouterGroupFunc, gincorsConfig, debugConfig, appName); err != nil {
+	if err := controller.InitRouter(ctx, parentRouterGroup, authMiddleware, publicRouterGroupFunc, privateRouterGroupFunc, gincorsConfig, debugConfig, appName); err != nil {
 		return err
 	}
 

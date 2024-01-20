@@ -26,11 +26,11 @@ import (
 	rsuserservice "github.com/kujilabo/redstart/user/service"
 
 	libcontroller "github.com/kujilabo/cocotola-1.21/lib/controller/gin"
+	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	"github.com/kujilabo/cocotola-1.21/proto"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/config"
-	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/gateway"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/initialize"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
@@ -79,7 +79,7 @@ func main() {
 		panic(err)
 	}
 
-	nonTxManager, err := gateway.NewNoneTransactionManager(rff)
+	nonTxManager, err := gateway.NewNonTransactionManager(rff)
 	if err != nil {
 		panic(err)
 	}
@@ -87,7 +87,7 @@ func main() {
 	logger.Info(fmt.Sprintf("%+v", proto.HelloRequest{}))
 
 	logger.Info("")
-	logger.Info(domain.Lang2EN.String())
+	logger.Info(libdomain.Lang2EN.String())
 	logger.Info("Hello")
 	logger.Info("Hello")
 	service.A()

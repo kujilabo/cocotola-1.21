@@ -1,11 +1,11 @@
 package domain
 
 var (
-	Lang2EN      Lang2
-	Lang2ES      Lang2
-	Lang2JA      Lang2
-	Lang2KO      Lang2
-	Lang2Unknown Lang2
+	Lang2EN      *Lang2
+	Lang2ES      *Lang2
+	Lang2JA      *Lang2
+	Lang2KO      *Lang2
+	Lang2Unknown *Lang2
 
 	// Lang3ENG     Lang3
 	// Lang3ESP     Lang3
@@ -15,7 +15,7 @@ var (
 
 	// Lang5ENUS    Lang5
 	// Lang5ESES    Lang5
-	// Lang5JAJP    Lang5
+	Lang5JAJP *Lang5
 	// Lang5KOKR    Lang5
 	// Lang5Unknown Lang5
 )
@@ -73,10 +73,10 @@ func init() {
 	// if err != nil {
 	// 	panic(err)
 	// }
-	// Lang5JAJP, err = NewLang5("ja-JP")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	Lang5JAJP, err = NewLang5("ja-JP")
+	if err != nil {
+		panic(err)
+	}
 	// Lang5KOKR, err = NewLang5("ko-KR")
 	// if err != nil {
 	// 	panic(err)

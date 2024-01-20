@@ -55,6 +55,9 @@ go-mod-tidy:
 	@pushd ./cocotola-auth/ && \
 		GOPROXY=direct go mod tidy && \
 	popd
+	@pushd ./cocotola-synthesizer/ && \
+		GOPROXY=direct go mod tidy && \
+	popd
 	@pushd ./lib/ && \
 		GOPROXY=direct go mod tidy && \
 	popd
@@ -74,6 +77,10 @@ update-mod:
 		GOPROXY=direct go get -u github.com/kujilabo/redstart && \
 		go get -u ./... && \
 	popd
+	@pushd ./cocotola-synthesizer/ && \
+		GOPROXY=direct go get -u github.com/kujilabo/redstart && \
+		go get -u ./... && \
+	popd
 	@pushd ./lib/ && \
 		go get -u ./... && \
 	popd
@@ -86,6 +93,9 @@ bazel-run-core:
 
 bazel-run-auth:
 	@bazelisk run //cocotola-auth/src
+
+bazel-run-synthesizer:
+	@bazelisk run //cocotola-synthesizer/src
 
 # https://github.com/bazel-contrib/rules_oci/blob/main/docs/go.md
 # https://github.com/aspect-build/bazel-examples/blob/main/oci_go_image/BUILD.bazel

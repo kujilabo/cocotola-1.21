@@ -30,16 +30,16 @@ func (t *transactionManager) Do(ctx context.Context, fn func(rf service.Reposito
 	})
 }
 
-type noneTransactionManager struct {
+type nonTransactionManager struct {
 	rf service.RepositoryFactory
 }
 
-func NewNoneTransactionManager(rf service.RepositoryFactory) (service.TransactionManager, error) {
-	return &noneTransactionManager{
+func NewNonTransactionManager(rf service.RepositoryFactory) (service.TransactionManager, error) {
+	return &nonTransactionManager{
 		rf: rf,
 	}, nil
 }
 
-func (t *noneTransactionManager) Do(ctx context.Context, fn func(rf service.RepositoryFactory) error) error {
+func (t *nonTransactionManager) Do(ctx context.Context, fn func(rf service.RepositoryFactory) error) error {
 	return fn(t.rf)
 }

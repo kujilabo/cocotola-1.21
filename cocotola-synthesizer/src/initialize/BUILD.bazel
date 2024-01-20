@@ -1,0 +1,21 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "initialize",
+    srcs = ["initialize.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/initialize",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-synthesizer/src/config",
+        "//cocotola-synthesizer/src/controller/gin",
+        "//cocotola-synthesizer/src/gateway",
+        "//cocotola-synthesizer/src/service",
+        "//cocotola-synthesizer/src/usecase",
+        "//lib/config",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_kujilabo_redstart//lib/config",
+        "@com_github_kujilabo_redstart//user/service",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
+    ],
+)

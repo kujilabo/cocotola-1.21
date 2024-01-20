@@ -4,6 +4,7 @@ go_library(
     name = "gateway",
     srcs = [
         "cocotola_auth_client.go",
+        "init.go",
         "repository_factory.go",
         "transaction_manager.go",
     ],
@@ -16,5 +17,6 @@ go_library(
         "@com_github_kujilabo_redstart//lib/errors",
         "@com_github_kujilabo_redstart//lib/gateway",
         "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
     ],
 )

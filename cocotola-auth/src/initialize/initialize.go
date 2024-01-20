@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"gorm.io/gorm"
 
 	rslibconfig "github.com/kujilabo/redstart/lib/config"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
@@ -27,14 +26,14 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase"
 )
 
-func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
-	appTransactionManager, err := gateway.NewTransactionManager(db, rff)
-	if err != nil {
-		panic(err)
-	}
+// func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
+// 	appTransactionManager, err := gateway.NewTransactionManager(db, rff)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	return appTransactionManager
-}
+// 	return appTransactionManager
+// }
 
 type systemOwnerByOrganizationName struct {
 }
@@ -57,7 +56,7 @@ func (s systemOwnerByOrganizationName) Get(ctx context.Context, rf service.Repos
 	return systemOwner, nil
 }
 
-func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, authConfig *config.AuthConfig, debugConfig *libconfig.DebugConfig, appName string, transactionManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
+func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, authConfig *config.AuthConfig, debugConfig *libconfig.DebugConfig, appName string, txManager service.TransactionManager, txNonManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
 	// cors
 	gincorsConfig := rslibconfig.InitCORS(corsConfig)
 	httpClient := http.Client{
@@ -70,8 +69,8 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 	signingMethod := jwt.SigningMethodHS256
 	authTokenManager := gateway.NewAuthTokenManager(signingKey, signingMethod, time.Duration(authConfig.AccessTokenTTLMin)*time.Minute, time.Duration(authConfig.RefreshTokenTTLHour)*time.Hour)
 
-	authenticationUsecase := usecase.NewAuthentication(transactionManager, authTokenManager, &systemOwnerByOrganizationName{})
-	googleUserUsecase := usecase.NewGoogleUserUsecase(transactionManager, authTokenManager, googleAuthClient)
+	authenticationUsecase := usecase.NewAuthentication(txManager, authTokenManager, &systemOwnerByOrganizationName{})
+	googleUserUsecase := usecase.NewGoogleUserUsecase(txManager, authTokenManager, googleAuthClient)
 
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{}
 
@@ -88,7 +87,7 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 	return nil
 }
 
-func InitApp1(ctx context.Context, transactionManager service.TransactionManager, organizationName string, password string) {
+func InitApp1(ctx context.Context, txManager service.TransactionManager, nonTxManager service.TransactionManager, organizationName string, password string) {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.CoreMainLoggerContextKey)
 	addOrganizationFunc := func(ctx context.Context, systemAdmin *rsuserservice.SystemAdmin) error {
 		organization, err := systemAdmin.FindOrganizationByName(ctx, organizationName)
@@ -118,7 +117,7 @@ func InitApp1(ctx context.Context, transactionManager service.TransactionManager
 		return nil
 	}
 
-	if err := systemAdminAction(ctx, transactionManager, addOrganizationFunc); err != nil {
+	if err := systemAdminAction(ctx, txManager, addOrganizationFunc); err != nil {
 		panic(err)
 	}
 }

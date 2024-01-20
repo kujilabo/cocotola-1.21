@@ -20,6 +20,7 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/config"
 	handler "github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/middleware"
 	handlermock "github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/mocks"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookfind"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
@@ -55,24 +56,24 @@ func initWorkbookRouter(t *testing.T, ctx context.Context, cocotolaAuthClient se
 	t.Helper()
 	fn := handler.NewInitWorkbookRouterFunc(workbokUsecase)
 
+	authMiddleware := middleware.NewAuthMiddleware(cocotolaAuthClient)
 	initPublicRouterFunc := []handler.InitRouterGroupFunc{}
 	initPrivateRouterFunc := []handler.InitRouterGroupFunc{fn}
 
 	router := gin.New()
-	err := handler.InitRouter(ctx, router, cocotolaAuthClient, initPublicRouterFunc, initPrivateRouterFunc, corsConfig, debugConfig, appConfig.Name)
+	err := handler.InitRouter(ctx, router, authMiddleware, initPublicRouterFunc, initPrivateRouterFunc, corsConfig, debugConfig, appConfig.Name)
 	require.NoError(t, err)
 
 	return router
 }
 
-func TestWorkbookHandler_FindWorkbook(t *testing.T) {
+func TestWorkbookHandler_FindWorkbook_Returns200(t *testing.T) {
 	ctx := context.Background()
 
 	type args struct {
 		authorizationHeader string
 	}
 	type outputs struct {
-		statusCode  int
 		totalCount  int
 		resultsLen  int
 		resultID0   int
@@ -84,27 +85,11 @@ func TestWorkbookHandler_FindWorkbook(t *testing.T) {
 		outputs outputs
 	}{
 		{
-			name: "authorization header is not specified",
-			outputs: outputs{
-				statusCode: http.StatusUnauthorized,
-			},
-		},
-		{
-			name: "authorization header is invalid",
-			args: args{
-				authorizationHeader: "Bearer INVALID_TOKEN",
-			},
-			outputs: outputs{
-				statusCode: http.StatusUnauthorized,
-			},
-		},
-		{
 			name: "authorization header is valid",
 			args: args{
 				authorizationHeader: "Bearer VALID_TOKEN",
 			},
 			outputs: outputs{
-				statusCode:  http.StatusOK,
 				totalCount:  789,
 				resultsLen:  1,
 				resultID0:   135,
@@ -113,15 +98,19 @@ func TestWorkbookHandler_FindWorkbook(t *testing.T) {
 		},
 	}
 
-	appUserID := appUserID(t, 123)
-	organizaionID := organizationID(t, 456)
-	apiUserInfo := libapi.AppUserInfoResponse{
+	// given
+	cocotolaAuthClient := new(servicemock.CocotolaAuthClient)
+	cocotolaAuthClient.On("RetrieveUserInfo", anythingOfContext, "VALID_TOKEN").Return(&libapi.AppUserInfoResponse{
 		AppUserID:      123,
 		OrganizationID: 456,
 		LoginID:        "LOGIN_ID",
 		Username:       "USERNAME",
-	}
-	workbookFindResult := workbookfind.Result{
+	}, nil)
+
+	appUserID := appUserID(t, 123)
+	organizaionID := organizationID(t, 456)
+	workbookUsecase := new(handlermock.WorkbookUsecaseInterface)
+	workbookUsecase.On("FindWorkbooks", anythingOfContext, organizaionID, appUserID, mock.Anything).Return(&workbookfind.Result{
 		TotalCount: 789,
 		Results: []*workbookfind.WorkbookModel{
 			{
@@ -129,12 +118,8 @@ func TestWorkbookHandler_FindWorkbook(t *testing.T) {
 				Name: "WORKBOOK_NAME",
 			},
 		},
-	}
-	cocotolaAuthClient := new(servicemock.CocotolaAuthClient)
-	cocotolaAuthClient.On("RetrieveUserInfo", anythingOfContext, "VALID_TOKEN").Return(&apiUserInfo, nil)
-	cocotolaAuthClient.On("RetrieveUserInfo", anythingOfContext, "INVALID_TOKEN").Return(nil, errors.New("invalid token"))
-	workbookUsecase := new(handlermock.WorkbookUsecaseInterface)
-	workbookUsecase.On("FindWorkbooks", anythingOfContext, organizaionID, appUserID, mock.Anything).Return(&workbookFindResult, nil)
+	}, nil)
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
@@ -150,13 +135,7 @@ func TestWorkbookHandler_FindWorkbook(t *testing.T) {
 			r.ServeHTTP(w, req)
 			respBytes := readBytes(t, w.Body)
 
-			// - check the status code
-			assert.Equal(t, tt.outputs.statusCode, w.Code)
-
-			if w.Code != http.StatusOK {
-				assert.Len(t, respBytes, 0)
-				return
-			}
+			assert.Equal(t, http.StatusOK, w.Code, "status code should be 200")
 
 			jsonObj := parseJSON(t, respBytes)
 
@@ -179,6 +158,53 @@ func TestWorkbookHandler_FindWorkbook(t *testing.T) {
 			resultName0Expr := parseExpr(t, "$.results[0].name")
 			resultName0 := resultName0Expr.Get(jsonObj)
 			assert.Equal(t, tt.outputs.resultName0, resultName0[0])
+		})
+	}
+}
+
+func TestWorkbookHandler_FindWorkbook_Returns401(t *testing.T) {
+	ctx := context.Background()
+
+	type args struct {
+		authorizationHeader string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "authorization header is not specified",
+		},
+		{
+			name: "authorization header is invalid",
+			args: args{
+				authorizationHeader: "Bearer INVALID_TOKEN",
+			},
+		},
+	}
+
+	cocotolaAuthClient := new(servicemock.CocotolaAuthClient)
+	cocotolaAuthClient.On("RetrieveUserInfo", anythingOfContext, "INVALID_TOKEN").Return(nil, errors.New("invalid token"))
+	workbookUsecase := new(handlermock.WorkbookUsecaseInterface)
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			// given
+			r := initWorkbookRouter(t, ctx, cocotolaAuthClient, workbookUsecase)
+			w := httptest.NewRecorder()
+
+			// when
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/v1/workbook", nil)
+			require.NoError(t, err)
+			req.Header.Set("Authorization", tt.args.authorizationHeader)
+			r.ServeHTTP(w, req)
+			respBytes := readBytes(t, w.Body)
+
+			// then
+			assert.Equal(t, http.StatusUnauthorized, w.Code, "status code should be 401")
+			assert.Len(t, respBytes, 0, "response body should be empty")
 		})
 	}
 }

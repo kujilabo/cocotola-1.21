@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//cocotola-core/src/config",
         "//cocotola-core/src/controller/gin",
+        "//cocotola-core/src/controller/gin/middleware",
         "//cocotola-core/src/gateway",
         "//cocotola-core/src/service",
         "//cocotola-core/src/usecase/student",
@@ -15,7 +16,6 @@ go_library(
         "@com_github_gin_gonic_gin//:gin",
         "@com_github_kujilabo_redstart//lib/config",
         "@com_github_kujilabo_redstart//user/service",
-        "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
     ],
 )

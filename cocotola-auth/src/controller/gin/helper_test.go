@@ -5,10 +5,11 @@ import (
 	"io"
 	"testing"
 
-	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 	"github.com/ohler55/ojg/jp"
 	"github.com/ohler55/ojg/oj"
 	"github.com/stretchr/testify/require"
+
+	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 )
 
 func organizationID(t *testing.T, organizationID int) *rsuserdomain.OrganizationID {

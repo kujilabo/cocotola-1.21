@@ -1,0 +1,89 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push", "oci_tarball")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@rules_oci//oci:pull.bzl", "oci_pull")
+
+go_library(
+    name = "src_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//cocotola-synthesizer/src/config",
+        "//cocotola-synthesizer/src/gateway",
+        "//cocotola-synthesizer/src/initialize",
+        "//cocotola-synthesizer/src/service",
+        "//cocotola-synthesizer/src/sqls",
+        "//lib/controller/gin",
+        "//lib/log",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_kujilabo_redstart//lib/config",
+        "@com_github_kujilabo_redstart//lib/domain",
+        "@com_github_kujilabo_redstart//lib/errors",
+        "@com_github_kujilabo_redstart//lib/gateway",
+        "@com_github_kujilabo_redstart//lib/log",
+        "@com_github_kujilabo_redstart//user/gateway",
+        "@com_github_kujilabo_redstart//user/service",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+        "@io_opentelemetry_go_otel//propagation",
+        "@io_opentelemetry_go_otel_sdk//trace",
+        "@org_golang_x_sync//errgroup",
+    ],
+)
+
+go_binary(
+    name = "src",
+    embed = [":src_lib"],
+    visibility = ["//visibility:public"],
+)
+
+pkg_tar(
+    name = "app_layer",
+    srcs = [":src"],
+)
+
+oci_image(
+    name = "image",
+    base = "@distroless_base",
+    entrypoint = ["/src"],
+    tars = [":app_layer"],
+)
+
+oci_tarball(
+    name = "tarball",
+    image = ":image",
+    repo_tags = ["asia.gcr.io/cocotola-001/cocotola-synthesizer:latest"],
+)
+
+oci_push(
+    name = "push",
+    image = ":image",
+    remote_tags = ["latest"],
+    repository = "asia.gcr.io/cocotola-001/cocotola-synthesizer",
+)
+
+expand_template(
+    name = "stamped",
+    out = "_stamped.tags.txt",
+    stamp_substitutions = {"BUILD_VERSION": "{{BUILD_EMBED_LABEL}}"},
+    substitutions = {"BUILD_VERSION": "0.0.0"},
+    template = "tags_tmpl",
+)
+
+write_file(
+    name = "tags_tmpl",
+    out = "tags.txt.tmpl",
+    content = [
+        "BUILD_VERSION",
+    ],
+)
+
+oci_push(
+    name = "push1",
+    image = ":image",
+    remote_tags = ":stamped",
+    repository = "asia.gcr.io/cocotola-001/cocotola-synthesizer",
+)
