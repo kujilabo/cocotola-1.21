@@ -8,6 +8,7 @@ jobs:
         workdir:
           - cocotola-core
           - cocotola-auth
+          - cocotola-synthesizer
           - lib
     name: golang
     runs-on: ubuntu-latest

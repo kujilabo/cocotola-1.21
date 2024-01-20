@@ -1,10 +1,6 @@
 package handler
 
 import (
-	"context"
-	"fmt"
-	"log/slog"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,15 +36,15 @@ func (h *SynthesizerHandler) FindAudioByID(c *gin.Context) {
 
 }
 
-func (h *SynthesizerHandler) errorHandle(ctx context.Context, logger *slog.Logger, c *gin.Context, err error) bool {
-	// if errors.Is(err, service.ErrAudioNotFound) {
-	// 	logger.Warnf("PrivateSynthesizerHandler err: %+v", err)
-	// 	c.JSON(http.StatusNotFound, gin.H{"message": "Audio not found"})
-	// 	return true
-	// }
-	logger.ErrorContext(ctx, fmt.Sprintf("SynthesizerHandler. error: %+v", err))
-	return false
-}
+// func (h *SynthesizerHandler) errorHandle(ctx context.Context, logger *slog.Logger, c *gin.Context, err error) bool {
+// 	// if errors.Is(err, service.ErrAudioNotFound) {
+// 	// 	logger.Warnf("PrivateSynthesizerHandler err: %+v", err)
+// 	// 	c.JSON(http.StatusNotFound, gin.H{"message": "Audio not found"})
+// 	// 	return true
+// 	// }
+// 	logger.ErrorContext(ctx, fmt.Sprintf("SynthesizerHandler. error: %+v", err))
+// 	return false
+// }
 
 func NewInitSynthesizerRouterFunc(syntheziserUsecase SynthesizerInterface) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {

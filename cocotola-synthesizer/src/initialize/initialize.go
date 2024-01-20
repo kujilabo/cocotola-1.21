@@ -21,7 +21,7 @@ import (
 )
 
 // const readHeaderTimeout = time.Duration(30) * time.Second
-const authClientTimeout = time.Duration(5) * time.Second
+// const authClientTimeout = time.Duration(5) * time.Second
 
 func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) service.TransactionManager {
 	appTransactionManager, err := gateway.NewTransactionManager(db, rff)

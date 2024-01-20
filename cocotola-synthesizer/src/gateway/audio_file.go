@@ -3,6 +3,7 @@ package gateway
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"time"
 
@@ -25,7 +26,7 @@ func (a *AudioFile) Duration(ctx context.Context, audioContent []byte) (time.Dur
 	var t float64
 	for {
 		if err := d.Decode(&f, &skipped); err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return 0, err

@@ -91,7 +91,6 @@ func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.La
 }
 
 func (u *SynthesizerUsecase) FindAudioByID(ctx context.Context, audioID *domain.AudioID) (*domain.AudioModel, error) {
-
 	var audio *domain.AudioModel
 	if err := u.nonTxManager.Do(ctx, func(rf service.RepositoryFactory) error {
 		repo := rf.NewAudioRepository(ctx)
