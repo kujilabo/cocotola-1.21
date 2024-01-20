@@ -6,13 +6,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tcolgate/mp3"
@@ -31,7 +30,6 @@ func Test_googleTTSClient_Synthesize(t *testing.T) {
 	c := gateway.NewGoogleTTSClient(&httpClient, apiKey)
 	audioContent, err := c.Synthesize(ctx, libdomain.Lang5JAJP, "FEMALE", "こんにちは")
 	assert.Nil(t, err)
-	fmt.Println(audioContent)
 	log.Fatal(audioContent)
 }
 
@@ -59,15 +57,12 @@ func Test_Audio(t *testing.T) {
 	var x float64
 	for {
 		if err := d.Decode(&f, &skipped); err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			log.Fatal(err)
 		}
-		fmt.Println("a")
 		x = x + f.Duration().Seconds()
 	}
-	duration := time.Duration(x * float64(time.Second))
-	fmt.Println(duration)
 	// t.Fatalf("duration: %v", duration)
 }

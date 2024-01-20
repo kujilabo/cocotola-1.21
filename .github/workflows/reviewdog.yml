@@ -8,6 +8,7 @@ jobs:
         workdir:
           - cocotola-core
           - cocotola-auth
+          - cocotola-synthesizer
           - lib
     name: golang
     runs-on: ubuntu-latest
@@ -35,7 +36,7 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-      - name: golangci-lint-addtion
+      - name: golangci-lint-addition
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -55,10 +56,12 @@ jobs:
             -E gomnd
             -E gosec
             -E noctx
+            -E testpackage
+            -E thelper
             -E unconvert
             -E whitespace
             --timeout=10m
-          tool_name: golangci-lint-addtion
+          tool_name: golangci-lint-addition
           filter_mode: nofilter
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
