@@ -61,7 +61,8 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, internalA
 		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
 	synthesizerClient := gateway.NewGoogleTTSClient(&httpClient, ttsConfig.APIKey)
-	synthesizerUsecase := usecase.NewSynthesizerUsecase(txManager, nonTxManager, synthesizerClient)
+	audioFile := gateway.NewAudioFile()
+	synthesizerUsecase := usecase.NewSynthesizerUsecase(txManager, nonTxManager, synthesizerClient, audioFile)
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitSynthesizerRouterFunc(synthesizerUsecase),
 	}

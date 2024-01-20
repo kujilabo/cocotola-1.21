@@ -12,6 +12,7 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/helper"
 	workbookfinddomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookfind"
+	workbookretrievedomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookretrieve"
 )
 
 const defaultPageSize = 10
@@ -28,6 +29,8 @@ type WorkbookFindResult struct {
 
 type WorkbookUsecaseInterface interface {
 	FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookfinddomain.Parameter) (*workbookfinddomain.Result, error)
+
+	RetrieveWorkbookByID(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, workbookID int) (*workbookretrievedomain.WorkbookModel, error)
 }
 
 type WorkbookHandler struct {
@@ -90,6 +93,7 @@ func NewInitWorkbookRouterFunc(workbookUsecase WorkbookUsecaseInterface) InitRou
 			workbook.Use(m)
 		}
 		workbook.GET("", workbookHandler.FindWorkbooks)
+		workbook.GET(":workbookID", workbookHandler.RetrieveWorkbookByID)
 		// workbook.POST(":workbookID", privateWorkbookHandler.FindWorkbooks)
 		// workbook.GET(":workbookID", privateWorkbookHandler.FindWorkbookByID)
 		// workbook.PUT(":workbookID", privateWorkbookHandler.UpdateWorkbook)

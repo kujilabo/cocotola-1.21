@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"time"
+
 	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 
@@ -29,13 +31,15 @@ type AudioModel struct {
 	Lang5   *libdomain.Lang5
 	Text    string `validate:"required"`
 	Content string `validate:"required"`
+	Length  time.Duration
 }
 
-func NewAudioModel(audioID *AudioID, Lang5 *libdomain.Lang5, text, content string) (*AudioModel, error) {
+func NewAudioModel(audioID *AudioID, Lang5 *libdomain.Lang5, text, content string, length time.Duration) (*AudioModel, error) {
 	m := &AudioModel{
 		AudioID: audioID,
 		Text:    text,
 		Content: content,
+		Length:  length,
 	}
 	if err := rslibdomain.Validator.Struct(m); err != nil {
 		return nil, rsliberrors.Errorf("libdomain.Validator.Struct. err: %w", err)

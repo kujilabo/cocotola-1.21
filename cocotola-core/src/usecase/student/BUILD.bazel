@@ -7,6 +7,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-core/src/domain/workbookfind",
+        "//cocotola-core/src/domain/workbookretrieve",
         "//cocotola-core/src/service",
         "@com_github_kujilabo_redstart//user/domain",
     ],

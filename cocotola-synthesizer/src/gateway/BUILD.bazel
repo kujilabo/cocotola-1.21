@@ -3,6 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "gateway",
     srcs = [
+        "audio_file.go",
         "audio_repository.go",
         "google_tts_client.go",
         "init.go",
@@ -18,6 +19,7 @@ go_library(
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/errors",
         "@com_github_kujilabo_redstart//lib/gateway",
+        "@com_github_tcolgate_mp3//:go_default_library",
         "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_otel//:otel",
     ],
@@ -26,4 +28,10 @@ go_library(
 go_test(
     name = "gateway_test",
     srcs = ["google_tts_client_test.go"],
+    deps = [
+        ":gateway",
+        "//lib/domain",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_tcolgate_mp3//:go_default_library",
+    ],
 )
