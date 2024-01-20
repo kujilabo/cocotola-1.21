@@ -27,13 +27,13 @@ func NewSynthesizerUsecase(txManager service.TransactionManager, nonTxManager se
 	}
 }
 
-func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 libdomain.Lang5, text string) (*domain.AudioModel, error) {
+func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.Lang5, text string) (*domain.AudioModel, error) {
 	var audioModel *domain.AudioModel
 
 	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
 		// try to find the audio content from the DB
 		repo := rf.NewAudioRepository(ctx)
-		if tmpAudioModel, err := repo.FindByLangAndText(ctx, &lang5, text); err == nil {
+		if tmpAudioModel, err := repo.FindByLangAndText(ctx, lang5, text); err == nil {
 			audioModel = tmpAudioModel
 			return nil
 		} else if !errors.Is(err, service.ErrAudioNotFound) {
@@ -48,11 +48,11 @@ func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 libdomain.Lan
 	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
 		// synthesize text via the Web API
 		repo := rf.NewAudioRepository(ctx)
-		audioContent, err := u.synthesizerClient.Synthesize(ctx, lang5, text)
+		audioContent, err := u.synthesizerClient.Synthesize(ctx, lang5, "FEMALE", text)
 		if err != nil {
 			return rsliberrors.Errorf("to u.synthesizerClient.Synthesize. err: %w", err)
 		}
-		tmpAudioID, err := repo.AddAudio(ctx, &lang5, text, audioContent)
+		tmpAudioID, err := repo.AddAudio(ctx, lang5, text, audioContent)
 		if err != nil {
 			return rsliberrors.Errorf("repo.AddAudio. err: %w", err)
 		}

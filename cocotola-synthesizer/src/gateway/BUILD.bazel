@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "gateway",
@@ -21,4 +21,9 @@ go_library(
         "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_otel//:otel",
     ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = ["google_tts_client_test.go"],
 )
