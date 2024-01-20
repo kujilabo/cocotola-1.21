@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 
 	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
@@ -16,14 +17,16 @@ type SynthesizerUsecase struct {
 	txManager         service.TransactionManager
 	nonTxManager      service.TransactionManager
 	synthesizerClient service.SynthesizerClient
+	audioFile         service.AudioFile
 }
 
-func NewSynthesizerUsecase(txManager service.TransactionManager, nonTxManager service.TransactionManager, synthesizerClient service.SynthesizerClient) *SynthesizerUsecase {
+func NewSynthesizerUsecase(txManager service.TransactionManager, nonTxManager service.TransactionManager, synthesizerClient service.SynthesizerClient, audioFile service.AudioFile) *SynthesizerUsecase {
 	return &SynthesizerUsecase{
 
 		txManager:         txManager,
 		nonTxManager:      nonTxManager,
 		synthesizerClient: synthesizerClient,
+		audioFile:         audioFile,
 	}
 }
 
@@ -44,15 +47,24 @@ func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.La
 		return nil, err
 	}
 
+	audioContent, err := u.synthesizerClient.Synthesize(ctx, lang5, "FEMALE", text)
+	if err != nil {
+		return nil, rsliberrors.Errorf("to u.synthesizerClient.Synthesize. err: %w", err)
+	}
+	audioContentBytes, err := base64.StdEncoding.DecodeString(audioContent)
+	if err != nil {
+		return nil, rsliberrors.Errorf("to u.synthesizerClient.Synthesize. err: %w", err)
+	}
+	audioLength, err := u.audioFile.Duration(ctx, audioContentBytes)
+	if err != nil {
+		return nil, rsliberrors.Errorf("to u.synthesizerClient.Synthesize. err: %w", err)
+	}
+
 	var audioID *domain.AudioID
 	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
 		// synthesize text via the Web API
 		repo := rf.NewAudioRepository(ctx)
-		audioContent, err := u.synthesizerClient.Synthesize(ctx, lang5, "FEMALE", text)
-		if err != nil {
-			return rsliberrors.Errorf("to u.synthesizerClient.Synthesize. err: %w", err)
-		}
-		tmpAudioID, err := repo.AddAudio(ctx, lang5, text, audioContent)
+		tmpAudioID, err := repo.AddAudio(ctx, lang5, text, audioContent, audioLength)
 		if err != nil {
 			return rsliberrors.Errorf("repo.AddAudio. err: %w", err)
 		}

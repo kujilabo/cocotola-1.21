@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
 
 	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
 
@@ -12,7 +13,7 @@ import (
 var ErrAudioNotFound = errors.New("Audio not found")
 
 type AudioRepository interface {
-	AddAudio(ctx context.Context, lang5 *libdomain.Lang5, text, audioContent string) (*domain.AudioID, error)
+	AddAudio(ctx context.Context, lang5 *libdomain.Lang5, text, audioContent string, audioLength time.Duration) (*domain.AudioID, error)
 
 	FindAudioByAudioID(ctx context.Context, audioID *domain.AudioID) (*domain.AudioModel, error)
 

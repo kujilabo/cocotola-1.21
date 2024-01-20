@@ -103,7 +103,6 @@ func Test_GoogleAuthClient_RetrieveAccessToken_shouldReturnAuthenticationError_w
 }
 
 func Test_GoogleAuthClient_RetrieveAccessToken_shouldReturnOtherError_whenErrorOccurred(t *testing.T) {
-
 	ctx := context.Background()
 	t.Parallel()
 
