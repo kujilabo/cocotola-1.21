@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import logo from '@/assets/react.svg';
 import { Head } from '@/components/head';
@@ -15,15 +15,63 @@ export const Landing = () => {
   const [soundId, setSoundId] = useState(0);
   const userInfo = getUserInfo();
   let tmpSoundId = 0;
+  let tmpSoundIndex = 0;
   console.log('AAAAAAAAAAAAAAAAAAAAAAAAAaa');
-  let index = 0;
+  // let index = 0;
   // let soundId = 0;
   const { load } = useGlobalAudioPlayer();
-  // const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(0);
   // console.log('index', index);
   // if (userInfo) {
   //   return <Navigate to="/app" />;
   // }
+
+  let snd_3 = new Howl({
+    src: [header + ',' + base64_fortune + base64_weather],
+    sprite: {
+      track01: [0, 2736],
+      track02: [2736 + 3648, 2000],
+      track03: [2736, 3648],
+    },
+    loop: false, // 繰り返し
+    volume: 1.0, // 音量
+    rate: 1.0, // 再生速度
+    onplay: (id) => {
+      setPlay(true);
+      console.log('サウンド再生!!', id);
+      tmpSoundId = id;
+      setSoundId(id);
+    },
+    onstop: () => {
+      console.log('サウンド停止!!');
+    },
+    onpause: (id) => {
+      console.log('サウンド一時停止!!', id);
+    },
+  });
+  const resume = () => {
+    console.log('soundId==>', soundId);
+    sound.play(soundId);
+  };
+
+  useEffect(() => {
+    console.log('index', index);
+    if (index !== 0) {
+      const trackNo = 'track0' + index.toString();
+      console.log('trackNo', trackNo);
+      tmpSoundIndex = index;
+      sound.once('end', function (id: number) {
+        console.log('サウンド終了!!', id);
+        console.log('index', index);
+        if (index >= 3) {
+          setPlay(false);
+          return;
+        }
+        setIndex(index + 1);
+      });
+      sound.play(trackNo);
+    }
+  }, [index]);
   let snd_1 = new Howl({
     src: header + ',' + base64_fortune,
     loop: false, // 繰り返し
@@ -60,52 +108,12 @@ export const Landing = () => {
       console.log('サウンド終了!!');
     },
   });
-  let snd_3 = new Howl({
-    src: [header + ',' + base64_fortune + base64_weather],
-    sprite: {
-      track01: [0, 2736],
-      track02: [2736 + 3648, 2000],
-      track03: [2736, 3648],
-    },
-    loop: false, // 繰り返し
-    volume: 1.0, // 音量
-    rate: 1.0, // 再生速度
-    onplay: (id) => {
-      setPlay(true);
-      console.log('サウンド再生!!', id);
-      tmpSoundId = id;
-      setSoundId(id);
-    },
-    onstop: () => {
-      console.log('サウンド停止!!');
-    },
-    onpause: (id) => {
-      console.log('サウンド一時停止!!', id);
-    },
-    onend: (id) => {
-      // snd_3.pause(id);
-      // return;
-      console.log('id', id);
-      console.log('サウンド終了!!');
-      console.log('index', index);
-
-      index += 1;
-      if (index > 3) {
-        setPlay(false);
-        return;
-      }
-
-      const trackNo = 'track0' + index.toString();
-      console.log('trackNo', trackNo);
-      sound.play(trackNo);
-    },
-  });
   // load(base64_1);
   const [sound, setSound] = useState(snd_3);
 
   const pause = () => {
     console.log('soundId==>', soundId);
-    sound.pause(1007);
+    sound.pause(soundId);
   };
 
   return (
@@ -125,7 +133,7 @@ export const Landing = () => {
             onClick={() => {
               // snd_3.play('track01');
               // snd_3.play('track02');
-              index = 1;
+              // index = 1;
               tmpSoundId = snd_3.play('track01');
               // snd_3.pause();
               console.log('snd3 play', snd_3);
@@ -140,19 +148,21 @@ export const Landing = () => {
           <button onClick={() => snd_2.play()}>PLAY</button>
           <button
             onClick={() => {
-              // snd_3.play('track01');
-              // snd_3.play('track02');
-              index = 1;
-              tmpSoundId = sound.play('track01');
-              // snd_3.pause();
-              console.log('soundId', tmpSoundId);
-              // snd_3.play(0);
+              setIndex(1);
+            }}
+          >
+            PLAY
+          </button>
+          <button
+            onClick={() => {
+              setIndex(1);
             }}
           >
             PLAY
           </button>
           <br />
-          <button onClick={pause}>PAUSE</button>
+          <button onClick={pause}>pause</button>
+          <button onClick={() => resume()}>saikai</button>
           <br />
           {play ? 'Playing' : 'Idle'}
         </div>
