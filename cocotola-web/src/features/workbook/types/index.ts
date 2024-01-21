@@ -5,3 +5,15 @@ export type Workbook = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type Problem = {
+  type: string;
+  properties: { [key: string]: string };
+};
+
+export type WorkbookWithProblems = {
+  id: number;
+  name: string;
+  description: string;
+  problems: Problem[];
+};

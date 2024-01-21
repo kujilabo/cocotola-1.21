@@ -9,17 +9,16 @@ import (
 )
 
 const (
-	LibGatewayLoggerContextKey    rslibdomain.ContextKey = "lib_gateway"
-	AppGORMLoggerContextKey       rslibdomain.ContextKey = "app_gorm"
-	AppServiceLoggerContextKey    rslibdomain.ContextKey = "app_service"
-	AppGatewayLoggerContextKey    rslibdomain.ContextKey = "app_gateway"
-	AppControllerLoggerContextKey rslibdomain.ContextKey = "app_controller"
-	AppGinLoggerContextKey        rslibdomain.ContextKey = "app_gin"
-	AppTraceLoggerContextKey      rslibdomain.ContextKey = "app_trace"
-	AppAuthLoggerContextKey       rslibdomain.ContextKey = "app_auth"
-	AppUsecaseLoggerContextKey    rslibdomain.ContextKey = "app_usecase"
-	CoreMainLoggerContextKey      rslibdomain.ContextKey = "core_main"
-
+	LibGatewayLoggerContextKey     rslibdomain.ContextKey = "lib_gateway"
+	AppGORMLoggerContextKey        rslibdomain.ContextKey = "app_gorm"
+	AppServiceLoggerContextKey     rslibdomain.ContextKey = "app_service"
+	AppGatewayLoggerContextKey     rslibdomain.ContextKey = "app_gateway"
+	AppControllerLoggerContextKey  rslibdomain.ContextKey = "app_controller"
+	AppGinLoggerContextKey         rslibdomain.ContextKey = "app_gin"
+	AppTraceLoggerContextKey       rslibdomain.ContextKey = "app_trace"
+	AppAuthLoggerContextKey        rslibdomain.ContextKey = "app_auth"
+	AppUsecaseLoggerContextKey     rslibdomain.ContextKey = "app_usecase"
+	CoreMainLoggerContextKey       rslibdomain.ContextKey = "core_main"
 	AuthGatewayLoggerContextKey    rslibdomain.ContextKey = "auth_gateway"
 	AuthControllerLoggerContextKey rslibdomain.ContextKey = "auth_controller"
 	AuthUsecaseLoggerContextKey    rslibdomain.ContextKey = "auth_usecase"
@@ -37,6 +36,13 @@ var (
 		AppGinLoggerContextKey,
 		AppTraceLoggerContextKey,
 		AppAuthLoggerContextKey,
+		AppUsecaseLoggerContextKey,
+		CoreMainLoggerContextKey,
+		AuthGatewayLoggerContextKey,
+		AuthControllerLoggerContextKey,
+		AuthUsecaseLoggerContextKey,
+		AuthDomainLoggerContextKey,
+		AuthServiceLoggerContextKey,
 	}
 )
 
