@@ -94,6 +94,7 @@ export const Landing = () => {
         setPlay(false);
         return;
       }
+
       const trackNo = 'track0' + index.toString();
       console.log('trackNo', trackNo);
       sound.play(trackNo);
