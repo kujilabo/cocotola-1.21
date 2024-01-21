@@ -5,21 +5,16 @@ import logo from '@/assets/react.svg';
 import { Head } from '@/components/head';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { useAuthStore } from '@/stores/auth';
-import { useGlobalAudioPlayer } from 'react-use-audio-player';
 
 import { Howl, Howler } from 'howler';
 import { header, base64_weather, base64_fortune } from './data';
 export const Landing = () => {
   const getUserInfo = useAuthStore((state) => state.getUserInfo);
-  const [play, setPlay] = useState(false);
+  const [status, setStatus] = useState('IDLE');
   const [soundId, setSoundId] = useState(0);
+  const [loop, setLoop] = useState(false);
   const userInfo = getUserInfo();
-  let tmpSoundId = 0;
-  let tmpSoundIndex = 0;
-  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAaa');
-  // let index = 0;
-  // let soundId = 0;
-  const { load } = useGlobalAudioPlayer();
+  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAaa', status);
   const [index, setIndex] = useState(0);
   // console.log('index', index);
   // if (userInfo) {
@@ -37,9 +32,8 @@ export const Landing = () => {
     volume: 1.0, // 音量
     rate: 1.0, // 再生速度
     onplay: (id) => {
-      setPlay(true);
       console.log('サウンド再生!!', id);
-      tmpSoundId = id;
+      setStatus('PLAYING');
       setSoundId(id);
     },
     onstop: () => {
@@ -47,24 +41,40 @@ export const Landing = () => {
     },
     onpause: (id) => {
       console.log('サウンド一時停止!!', id);
+      setStatus('PAUSE');
     },
   });
+
+  const start = () => {
+    setIndex(1);
+  };
+  const stop = () => {
+    console.log('soundId', soundId);
+    sound.stop();
+    setStatus('IDLE');
+    setIndex(0);
+  };
   const resume = () => {
-    console.log('soundId==>', soundId);
     sound.play(soundId);
+  };
+  const pause = () => {
+    sound.pause(soundId);
   };
 
   useEffect(() => {
-    console.log('index', index);
     if (index !== 0) {
       const trackNo = 'track0' + index.toString();
       console.log('trackNo', trackNo);
-      tmpSoundIndex = index;
+      console.log('soundId', soundId);
       sound.once('end', function (id: number) {
         console.log('サウンド終了!!', id);
         console.log('index', index);
         if (index >= 3) {
-          setPlay(false);
+          if (loop) {
+            start();
+          } else {
+            stop();
+          }
           return;
         }
         setIndex(index + 1);
@@ -72,6 +82,7 @@ export const Landing = () => {
       sound.play(trackNo);
     }
   }, [index]);
+
   let snd_1 = new Howl({
     src: header + ',' + base64_fortune,
     loop: false, // 繰り返し
@@ -108,12 +119,26 @@ export const Landing = () => {
       console.log('サウンド終了!!');
     },
   });
-  // load(base64_1);
+
   const [sound, setSound] = useState(snd_3);
 
-  const pause = () => {
-    console.log('soundId==>', soundId);
-    sound.pause(soundId);
+  const palyButton = () => {
+    switch (status) {
+      case 'PLAYING':
+        return <button onClick={() => pause()}>pause</button>;
+      case 'IDLE':
+        return <button onClick={() => start()}>Play</button>;
+      case 'PAUSE':
+        return <button onClick={() => resume()}>Resume</button>;
+    }
+  };
+  const stopButton = () => {
+    switch (status) {
+      case 'PLAYING':
+        return <button onClick={() => stop()}>stop</button>;
+      default:
+        return <> </>;
+    }
   };
 
   return (
@@ -127,22 +152,6 @@ export const Landing = () => {
           <img src={logo} alt="react" />
           <LoginForm />
           Landing
-          <button onClick={() => snd_1.play()}>PLAY</button>
-          <button onClick={() => snd_2.play()}>PLAY</button>
-          <button
-            onClick={() => {
-              // snd_3.play('track01');
-              // snd_3.play('track02');
-              // index = 1;
-              tmpSoundId = snd_3.play('track01');
-              // snd_3.pause();
-              console.log('snd3 play', snd_3);
-              console.log('soundId', tmpSoundId);
-              // snd_3.play(0);
-            }}
-          >
-            PLAY
-          </button>
           <br />
           <button onClick={() => snd_1.play()}>PLAY</button>
           <button onClick={() => snd_2.play()}>PLAY</button>
@@ -153,18 +162,17 @@ export const Landing = () => {
           >
             PLAY
           </button>
-          <button
-            onClick={() => {
-              setIndex(1);
-            }}
-          >
-            PLAY
-          </button>
           <br />
-          <button onClick={pause}>pause</button>
-          <button onClick={() => resume()}>saikai</button>
+          <button onClick={() => setLoop(!loop)}>{loop ? <>LOOP</> : <>NOT LOOP</>}</button>
           <br />
-          {play ? 'Playing' : 'Idle'}
+          <br />
+          {palyButton()}
+          <br />
+          {stopButton()}
+          <br />
+          <br />
+          <h1>{status}</h1>
+          <h1>{index}</h1>
         </div>
       </div>
     </>
