@@ -15,18 +15,20 @@ export const Landing = () => {
   const [loop, setLoop] = useState(false);
   const userInfo = getUserInfo();
   console.log('AAAAAAAAAAAAAAAAAAAAAAAAAaa', status);
-  const [index, setIndex] = useState(0);
+  const [trackIndex, setTrackIndex] = useState(0);
   // console.log('index', index);
   // if (userInfo) {
   //   return <Navigate to="/app" />;
   // }
-
+  const trackLength = 4;
+  const tracks = [1, 2, 3, 4];
   let snd_3 = new Howl({
     src: [header + ',' + base64_fortune + base64_weather],
     sprite: {
       track01: [0, 2736],
-      track02: [2736 + 3648, 2000],
+      track02: [2736 + 3648, 2736], // wait
       track03: [2736, 3648],
+      track04: [2736 + 3648, 3648], // wait
     },
     loop: false, // 繰り返し
     volume: 1.0, // 音量
@@ -46,13 +48,13 @@ export const Landing = () => {
   });
 
   const start = () => {
-    setIndex(1);
+    setTrackIndex(1);
   };
   const stop = () => {
     console.log('soundId', soundId);
     sound.stop();
     setStatus('IDLE');
-    setIndex(0);
+    setTrackIndex(0);
   };
   const resume = () => {
     sound.play(soundId);
@@ -62,14 +64,14 @@ export const Landing = () => {
   };
 
   useEffect(() => {
-    if (index !== 0) {
-      const trackNo = 'track0' + index.toString();
+    if (trackIndex !== 0) {
+      const trackNo = 'track0' + trackIndex.toString();
       console.log('trackNo', trackNo);
       console.log('soundId', soundId);
       sound.once('end', function (id: number) {
         console.log('サウンド終了!!', id);
-        console.log('index', index);
-        if (index >= 3) {
+        console.log('index', trackIndex);
+        if (trackIndex >= trackLength) {
           if (loop) {
             start();
           } else {
@@ -77,11 +79,11 @@ export const Landing = () => {
           }
           return;
         }
-        setIndex(index + 1);
+        setTrackIndex(trackIndex + 1);
       });
       sound.play(trackNo);
     }
-  }, [index]);
+  }, [trackIndex]);
 
   let snd_1 = new Howl({
     src: header + ',' + base64_fortune,
@@ -157,11 +159,24 @@ export const Landing = () => {
           <button onClick={() => snd_2.play()}>PLAY</button>
           <button
             onClick={() => {
-              setIndex(1);
+              setTrackIndex(1);
             }}
           >
             PLAY
           </button>
+          <br />
+          <div>
+            {tracks.map((track) => {
+              return (
+                <div key={track}>
+                  <button onClick={() => sound.play('track0' + ((track - 1) * 2 + 1).toString())}>
+                    {track}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          <button onClick={() => snd_1.stop()}>STOP</button>
           <br />
           <button onClick={() => setLoop(!loop)}>{loop ? <>LOOP</> : <>NOT LOOP</>}</button>
           <br />
@@ -172,7 +187,7 @@ export const Landing = () => {
           <br />
           <br />
           <h1>{status}</h1>
-          <h1>{index}</h1>
+          <h1>{trackIndex}</h1>
         </div>
       </div>
     </>
