@@ -46,10 +46,11 @@ func (c *googleTTSClient) Synthesize(ctx context.Context, lang5 *libdomain.Lang5
 		},
 		"voice": m{
 			"languageCode": lang5.String(),
-			"ssmlGender":   voice,
+			"name":         voice,
 		},
 		"audioConfig": m{
 			"audioEncoding": "MP3",
+			"pitch":         0,
 			"speakingRate":  1,
 		},
 	}

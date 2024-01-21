@@ -1,17 +1,111 @@
 import { Navigate } from 'react-router';
+import { useState } from 'react';
 
 import logo from '@/assets/react.svg';
 import { Head } from '@/components/head';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { useAuthStore } from '@/stores/auth';
+import { useGlobalAudioPlayer } from 'react-use-audio-player';
 
+import { Howl, Howler } from 'howler';
+import { header, base64_weather, base64_fortune } from './data';
 export const Landing = () => {
   const getUserInfo = useAuthStore((state) => state.getUserInfo);
+  const [play, setPlay] = useState(false);
+  const [soundId, setSoundId] = useState(0);
   const userInfo = getUserInfo();
+  let tmpSoundId = 0;
+  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAaa');
+  let index = 0;
+  // let soundId = 0;
+  const { load } = useGlobalAudioPlayer();
+  // const [index, setIndex] = useState(0);
+  // console.log('index', index);
+  // if (userInfo) {
+  //   return <Navigate to="/app" />;
+  // }
+  let snd_1 = new Howl({
+    src: header + ',' + base64_fortune,
+    loop: false, // 繰り返し
+    volume: 1.0, // 音量
+    rate: 1.0, // 再生速度
+    onplay: () => {
+      console.log('サウンド再生!!');
+    },
+    onstop: () => {
+      console.log('サウンド停止!!');
+    },
+    onpause: () => {
+      console.log('サウンド一時停止!!');
+    },
+    onend: () => {
+      console.log('サウンド終了!!');
+    },
+  });
+  let snd_2 = new Howl({
+    src: header + ',' + base64_weather,
+    loop: false, // 繰り返し
+    volume: 1.0, // 音量
+    rate: 1.0, // 再生速度
+    onplay: () => {
+      console.log('サウンド再生!!');
+    },
+    onstop: () => {
+      console.log('サウンド停止!!');
+    },
+    onpause: () => {
+      console.log('サウンド一時停止!!');
+    },
+    onend: () => {
+      console.log('サウンド終了!!');
+    },
+  });
+  let snd_3 = new Howl({
+    src: [header + ',' + base64_fortune + base64_weather],
+    sprite: {
+      track01: [0, 2736],
+      track02: [2736 + 3648, 2000],
+      track03: [2736, 3648],
+    },
+    loop: false, // 繰り返し
+    volume: 1.0, // 音量
+    rate: 1.0, // 再生速度
+    onplay: (id) => {
+      setPlay(true);
+      console.log('サウンド再生!!', id);
+      tmpSoundId = id;
+      setSoundId(id);
+    },
+    onstop: () => {
+      console.log('サウンド停止!!');
+    },
+    onpause: (id) => {
+      console.log('サウンド一時停止!!', id);
+    },
+    onend: (id) => {
+      // snd_3.pause(id);
+      // return;
+      console.log('id', id);
+      console.log('サウンド終了!!');
+      console.log('index', index);
 
-  if (userInfo) {
-    return <Navigate to="/app" />;
-  }
+      index += 1;
+      if (index > 3) {
+        setPlay(false);
+        return;
+      }
+      const trackNo = 'track0' + index.toString();
+      console.log('trackNo', trackNo);
+      sound.play(trackNo);
+    },
+  });
+  // load(base64_1);
+  const [sound, setSound] = useState(snd_3);
+
+  const pause = () => {
+    console.log('soundId==>', soundId);
+    sound.pause(1007);
+  };
 
   return (
     <>
@@ -24,6 +118,42 @@ export const Landing = () => {
           <img src={logo} alt="react" />
           <LoginForm />
           Landing
+          <button onClick={() => snd_1.play()}>PLAY</button>
+          <button onClick={() => snd_2.play()}>PLAY</button>
+          <button
+            onClick={() => {
+              // snd_3.play('track01');
+              // snd_3.play('track02');
+              index = 1;
+              tmpSoundId = snd_3.play('track01');
+              // snd_3.pause();
+              console.log('snd3 play', snd_3);
+              console.log('soundId', tmpSoundId);
+              // snd_3.play(0);
+            }}
+          >
+            PLAY
+          </button>
+          <br />
+          <button onClick={() => snd_1.play()}>PLAY</button>
+          <button onClick={() => snd_2.play()}>PLAY</button>
+          <button
+            onClick={() => {
+              // snd_3.play('track01');
+              // snd_3.play('track02');
+              index = 1;
+              tmpSoundId = sound.play('track01');
+              // snd_3.pause();
+              console.log('soundId', tmpSoundId);
+              // snd_3.play(0);
+            }}
+          >
+            PLAY
+          </button>
+          <br />
+          <button onClick={pause}>PAUSE</button>
+          <br />
+          {play ? 'Playing' : 'Idle'}
         </div>
       </div>
     </>
