@@ -5,13 +5,107 @@ import { Head } from '@/components/head';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { useAuthStore } from '@/stores/auth';
 
+// import { Howl, Howler } from 'howler';
+// import { header, base64_weather, base64_fortune } from './data';
 export const Landing = () => {
   const getUserInfo = useAuthStore((state) => state.getUserInfo);
+  // const [status, setStatus] = useState('IDLE');
+  // const [soundId, setSoundId] = useState(0);
+  // const [loop, setLoop] = useState(false);
   const userInfo = getUserInfo();
-
+  // const [trackIndex, setTrackIndex] = useState(0);
   if (userInfo) {
     return <Navigate to="/app" />;
   }
+  // const trackLength = 4;
+  // const tracks = [1, 2, 3, 4];
+  // let snd_3 = new Howl({
+  //   src: [header + ',' + base64_fortune + base64_weather],
+  //   sprite: {
+  //     track01: [0, 2736],
+  //     track02: [2736 + 3648, 2736], // wait
+  //     track03: [2736, 3648],
+  //     track04: [2736 + 3648, 3648], // wait
+  //   },
+  //   loop: false, // 繰り返し
+  //   volume: 1.0, // 音量
+  //   rate: 1.0, // 再生速度
+  //   onplay: (id) => {
+  //     console.log('サウンド再生!!', id);
+  //     setStatus('PLAYING');
+  //     setSoundId(id);
+  //   },
+  //   onstop: () => {
+  //     console.log('サウンド停止!!');
+  //   },
+  //   onpause: (id) => {
+  //     console.log('サウンド一時停止!!', id);
+  //     setStatus('PAUSE');
+  //   },
+  //   onend: (id) => {
+  //     console.log('サウンド終了!!', id);
+  //     setStatus('IDLE');
+  //   },
+  // });
+
+  // const start = () => {
+  //   setTrackIndex(1);
+  // };
+  // const stop = () => {
+  //   console.log('soundId', soundId);
+  //   sound.stop();
+  //   setStatus('IDLE');
+  //   setTrackIndex(0);
+  // };
+  // const resume = () => {
+  //   sound.play(soundId);
+  // };
+  // const pause = () => {
+  //   sound.pause(soundId);
+  // };
+
+  // useEffect(() => {
+  //   if (trackIndex !== 0) {
+  //     const trackNo = 'track0' + trackIndex.toString();
+  //     console.log('trackNo', trackNo);
+  //     console.log('soundId', soundId);
+  //     sound.once('end', function (id: number) {
+  //       console.log('サウンド終了!!', id);
+  //       console.log('index', trackIndex);
+  //       if (trackIndex >= trackLength) {
+  //         if (loop) {
+  //           start();
+  //         } else {
+  //           stop();
+  //         }
+  //         return;
+  //       }
+  //       setTrackIndex(trackIndex + 1);
+  //     });
+  //     sound.play(trackNo);
+  //   }
+  // }, [trackIndex]);
+
+  // const [sound, setSound] = useState(snd_3);
+
+  // const palyButton = () => {
+  //   switch (status) {
+  //     case 'PLAYING':
+  //       return <button onClick={() => pause()}>pause</button>;
+  //     case 'IDLE':
+  //       return <button onClick={() => start()}>Play</button>;
+  //     case 'PAUSE':
+  //       return <button onClick={() => resume()}>Resume</button>;
+  //   }
+  // };
+  // const stopButton = () => {
+  //   switch (status) {
+  //     case 'PLAYING':
+  //       return <button onClick={() => stop()}>stop</button>;
+  //     default:
+  //       return <> </>;
+  //   }
+  // };
 
   return (
     <>
@@ -24,6 +118,37 @@ export const Landing = () => {
           <img src={logo} alt="react" />
           <LoginForm />
           Landing
+          <br />
+          {/* <button
+            onClick={() => {
+              setTrackIndex(1);
+            }}
+          >
+            PLAY
+          </button>
+          <br />
+          <div>
+            {tracks.map((track) => {
+              return (
+                <div key={track}>
+                  <button onClick={() => sound.play('track0' + ((track - 1) * 2 + 1).toString())}>
+                    {track}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          <br />
+          <button onClick={() => setLoop(!loop)}>{loop ? <>LOOP</> : <>NOT LOOP</>}</button>
+          <br />
+          <br />
+          {palyButton()}
+          <br />
+          {stopButton()}
+          <br />
+          <br />
+          <h1>{status}</h1>
+          <h1>{trackIndex}</h1> */}
         </div>
       </div>
     </>

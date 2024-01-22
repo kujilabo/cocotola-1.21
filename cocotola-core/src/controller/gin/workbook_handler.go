@@ -27,6 +27,14 @@ type WorkbookFindResult struct {
 	Results    []*WorkbookFindModel `json:"results"`
 }
 
+type Problem struct {
+	Type       string            `json:"type"`
+	Properties map[string]string `json:"properties"`
+}
+type WorkbookWithProblem struct {
+	ID       int        `json:"id"`
+	Problems []*Problem `json:"problems"`
+}
 type WorkbookUsecaseInterface interface {
 	FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookfinddomain.Parameter) (*workbookfinddomain.Result, error)
 
@@ -72,7 +80,30 @@ func (h *WorkbookHandler) toWorkbookFindResultEntity(model *workbookfinddomain.R
 }
 
 func (h *WorkbookHandler) RetrieveWorkbookByID(c *gin.Context) {
+	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID) error {
+		result, err := h.workbookusecase.RetrieveWorkbookByID(ctx, organizationID, operatorID, 1)
+		if err != nil {
+			return err
+		}
 
+		c.JSON(http.StatusOK, h.toWorkbookRetrieveResultEntity(result))
+		return nil
+	}, h.errorHandle)
+}
+
+func (h *WorkbookHandler) toWorkbookRetrieveResultEntity(model *workbookretrievedomain.WorkbookModel) *WorkbookWithProblem {
+	problems := make([]*Problem, len(model.Problems))
+	for i, r := range model.Problems {
+		problems[i] = &Problem{
+			Type:       r.Type,
+			Properties: r.Properties,
+		}
+	}
+
+	return &WorkbookWithProblem{
+		ID:       model.ID,
+		Problems: problems,
+	}
 }
 
 func (h *WorkbookHandler) errorHandle(ctx context.Context, logger *slog.Logger, c *gin.Context, err error) bool {
