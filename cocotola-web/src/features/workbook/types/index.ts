@@ -7,6 +7,7 @@ export type Workbook = {
 };
 
 export type Problem = {
+  // id: number;
   type: string;
   properties: { [key: string]: string };
 };

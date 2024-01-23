@@ -98,11 +98,9 @@ type MainLayoutProps = {
 
 export const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div>
+    <Box>
       <NavBar />
-      <div>
-        <main>{children}</main>
-      </div>
-    </div>
+      <Box>{children}</Box>
+    </Box>
   );
 };
