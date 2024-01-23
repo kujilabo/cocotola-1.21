@@ -21,13 +21,13 @@ db:
 authApi:
   endpoint: http://localhost:8080/api/auth
   authType: static
-  username: $AUTH_API_USERNAME
-  password: $AUTH_API_PASSWORD
+  username: auth_username
+  password: auth_password
 synthesizerApi:
   endpoint: http://localhost:8080/api/synthesizer
   authType: static
-  username: $SYNTHESIZER_API_USERNAME
-  password: $SYNTHESIZER_API_USERNAME
+  username: synthesizer_username
+  password: synthesizer_password
 auth:
   signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
   accessTokenTtlMin: 5
