@@ -78,6 +78,9 @@ func main() {
 	ctx = liblog.InitLogger(ctx)
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
 
+	logger1 := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
+	logger1.InfoContext(ctx, "test1")
+
 	authRFF := func(ctx context.Context, db *gorm.DB) (authservice.RepositoryFactory, error) {
 		return authgateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
