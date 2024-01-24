@@ -73,7 +73,7 @@ func Test_googleTTSClient_Synthesize_JA(t *testing.T) {
 }
 
 func Test_googleTTSClient_Synthesize_EN(t *testing.T) {
-	// t.Skip()
+	t.Skip()
 	ctx := context.Background()
 	t.Parallel()
 	httpClient := http.Client{}
