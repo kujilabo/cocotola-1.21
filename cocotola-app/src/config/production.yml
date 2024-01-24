@@ -21,12 +21,12 @@ synthesizerApi:
   endpoint: http://localhost:8080/api/synthesizer
   authType: static
   username: $SYNTHESIZER_API_USERNAME
-  password: $SYNTHESIZER_API_USERNAME
+  password: $SYNTHESIZER_API_PASSWORD
 auth:
   signingKey: $SIGNING_KEY
   accessTokenTtlMin: 30
   refreshTokenTtlHour: 720
-  googleCallbackUrl: https://www.cocotola.com/app/callback
+  googleCallbackUrl: https://www.cocotola.com/app/auth/callback
   googleClientId: 751610212628-2puqbj6bomdj9d6htri9rp4jsi383msn.apps.googleusercontent.com
   googleClientSecret: $GOOGLE_CLIENT_SECRET
   apiTimeoutSec: 5

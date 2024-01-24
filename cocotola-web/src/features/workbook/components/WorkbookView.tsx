@@ -1,10 +1,36 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Container, Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@chakra-ui/react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
+import {
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  Container,
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spacer,
+  Text,
+} from '@chakra-ui/react';
 import { Howl, SoundSpriteDefinitions } from 'howler';
+import { FaPlay } from 'react-icons/fa';
+import { RxLoop } from 'react-icons/rx';
 import { useParams, Link } from 'react-router-dom';
 
+import { BasicButton } from '@/components/buttons/BasicButton';
+
 import { useWorkbookRetrieveStore } from '../api/workbook_retrieve';
+import { Problem } from '../types';
 
 export const header = 'data:audio/mp3;base64';
 const toNumber = (s: string | undefined): number => {
@@ -21,6 +47,94 @@ const pad = (num: number, size: number): string => {
 const makeTrackNo = (num: number): string => {
   return 'track' + pad(num, 2);
 };
+const createSpriteForSourceOnly = (problems: Problem[]): SoundSpriteDefinitions => {
+  let offset = 0;
+  const tmpSprite: SoundSpriteDefinitions = {};
+  for (let i = 0; i < problems.length; i++) {
+    const problem = problems[i];
+    const audioLength = +problem.properties['srcAudioLength'];
+    const trackNo = makeTrackNo(i + 1);
+    tmpSprite[trackNo] = [offset, audioLength];
+    offset += audioLength;
+  }
+  return tmpSprite;
+};
+const createSpriteForSourceAndDestination = (
+  problems: Problem[],
+  totalAudioLength: number
+): SoundSpriteDefinitions => {
+  let offset = 0;
+  const tmpSprite: SoundSpriteDefinitions = {};
+
+  for (let i = 0; i < problems.length; i++) {
+    const problem = problems[i];
+    const audioLength = +problem.properties['srcAudioLength'];
+    const trackNo1 = makeTrackNo(i * 2 + 1);
+    tmpSprite[trackNo1] = [offset, audioLength];
+    offset += audioLength;
+
+    const trackNo2 = makeTrackNo(i * 2 + 2);
+    tmpSprite[trackNo2] = [totalAudioLength, 500];
+  }
+  return tmpSprite;
+};
+
+const createSprite = (
+  player: number,
+  problems: Problem[],
+  totalAudioLength: number
+): SoundSpriteDefinitions => {
+  if (player === PLAYER_SOURCE_ONLY) {
+    return createSpriteForSourceOnly(problems);
+  } else if (player === PLAYER_SOURCE_AND_DESTINATION) {
+    return createSpriteForSourceAndDestination(problems, totalAudioLength);
+  } else {
+    return {};
+  }
+};
+const createCard = (problems: Problem[], activeIndex: number) => {
+  const activeColor = 'green.300';
+  const inactiveColor = 'gray.100';
+  return (
+    <Box>
+      {problems.map((problem: Problem, i: number) => {
+        const color = activeIndex == i ? activeColor : inactiveColor;
+        return (
+          <Box key={i}>
+            <Box p={1}>
+              <HStack>
+                <Spacer />
+                <Card bg="gray.100" width="90%" borderColor={color} borderWidth={1}>
+                  <CardBody>
+                    <Box>
+                      <Heading size="xs">{problem.properties['dstText']}</Heading>
+                      <Text pt="2" fontSize="sm">
+                        {problem.properties['srcText']}
+                      </Text>
+                    </Box>
+                  </CardBody>
+                </Card>
+              </HStack>
+            </Box>
+            <Box p={1}>
+              <HStack>
+                <Spacer />
+                <Box>
+                  <ButtonGroup>
+                    <Button>Learned!</Button>
+                    <Button>PLay!</Button>
+                  </ButtonGroup>
+                </Box>
+              </HStack>
+            </Box>
+          </Box>
+        );
+      })}
+    </Box>
+  );
+};
+const PLAYER_SOURCE_ONLY = 0;
+const PLAYER_SOURCE_AND_DESTINATION = 1;
 export const WorkbookView = (): JSX.Element => {
   const { _workbookId } = useParams();
   const once = useRef(false);
@@ -32,19 +146,10 @@ export const WorkbookView = (): JSX.Element => {
   const [trackIndex, setTrackIndex] = useState(0);
   const [loop, setLoop] = useState(false);
   const [trackLength, setTrackLength] = useState(0);
-  const tracks = [1, 2, 3, 4];
   const [player, setPlayer] = useState(0);
 
   const [sprite, setSprite] = useState<SoundSpriteDefinitions>({});
   const [src, setSrc] = useState('');
-
-  const changePlayer = () => {
-    if (player === 0) {
-      setPlayer(1);
-    } else {
-      setPlayer(0);
-    }
-  };
 
   const newSound = (src: string, sprite: SoundSpriteDefinitions): Howl => {
     return new Howl({
@@ -65,14 +170,9 @@ export const WorkbookView = (): JSX.Element => {
         console.log('サウンド一時停止!!', id);
         setStatus('PAUSE');
       },
-      // onend: (id) => {
-      //   console.log('サウンド終了!!', id);
-      //   setStatus('IDLE');
-      // },
     });
   };
 
-  // src and wait(dst)
   const [sound, setSound] = useState(newSound(src, sprite));
 
   const start = () => {
@@ -108,33 +208,10 @@ export const WorkbookView = (): JSX.Element => {
       totalAudioLength += +problem.properties['srcAudioLength'];
     }
 
-    let offset = 0;
-    const tmpSprite: SoundSpriteDefinitions = {};
-    if (player === 0) {
-      for (let i = 0; i < workbook.problems.length; i++) {
-        const problem = workbook.problems[i];
-        const audioLength = +problem.properties['srcAudioLength'];
-        const trackNo = makeTrackNo(i + 1);
-        tmpSprite[trackNo] = [offset, audioLength];
-        offset += audioLength;
-      }
-      setTrackLength(workbook.problems.length);
-    } else if (player === 1) {
-      for (let i = 0; i < workbook.problems.length; i++) {
-        const problem = workbook.problems[i];
-        const audioLength = +problem.properties['srcAudioLength'];
-        const trackNo1 = makeTrackNo(i * 2 + 1);
-        tmpSprite[trackNo1] = [offset, audioLength];
-        offset += audioLength;
-
-        const trackNo2 = makeTrackNo(i * 2 + 2);
-        tmpSprite[trackNo2] = [totalAudioLength, 500];
-      }
-      setTrackLength(workbook.problems.length * 2);
-    }
-
-    setSrc(src);
+    const tmpSprite = createSprite(player, workbook.problems, totalAudioLength);
     setSprite(tmpSprite);
+    setTrackLength(Object.keys(tmpSprite).length);
+    setSrc(src);
     setSound(newSound(src, tmpSprite));
   }, [workbookId, workbooks, player]);
 
@@ -150,6 +227,7 @@ export const WorkbookView = (): JSX.Element => {
     }
   }, [workbookId, workbooks, state, retrieveWorkbook]);
 
+  // play track
   useEffect(() => {
     if (trackIndex !== 0) {
       const trackNo = makeTrackNo(trackIndex);
@@ -169,72 +247,124 @@ export const WorkbookView = (): JSX.Element => {
     }
   }, [trackIndex]);
 
-  const palyButton = () => {
+  const playButton = () => {
     switch (status) {
       case 'PLAYING':
-        return <button onClick={() => pause()}>Pause</button>;
+        return <BasicButton onClick={() => pause()} value="PAUSE" />;
       case 'IDLE':
-        return <button onClick={() => start()}>Play</button>;
+        // return <BasicButton onClick={() => start()} value="PLAY" />;
+        return (
+          <IconButton
+            colorScheme="teal"
+            aria-label="Play"
+            size="lg"
+            icon={<FaPlay />}
+            onClick={() => start()}
+          />
+        );
       case 'PAUSE':
-        return <button onClick={() => resume()}>Resume</button>;
+        return <BasicButton onClick={() => resume()} value="RESUME" />;
     }
   };
   const stopButton = () => {
-    switch (status) {
-      case 'PLAYING':
-        return <button onClick={() => stop()}>stop</button>;
-      default:
-        return <> </>;
-    }
+    // switch (status) {
+    //   case 'PLAYING':
+    //     return <BasicButton onClick={() => stop()} value="STOP" />;
+    //   default:
+    //     return <> </>;
+    // }
+    return <></>;
   };
+  if (workbookId === 0) {
+    return <> </>;
+  }
+  if (!(workbookId in workbooks)) {
+    return <> </>;
+  }
+  const workbook = workbooks[workbookId];
 
+  const card = createCard(workbook.problems, trackIndex - 1);
+
+  const footer = (
+    // <ButtonGroup>
+    <Flex>
+      <Spacer />
+      <ButtonGroup>
+        <IconButton
+          colorScheme="teal"
+          variant={loop ? 'solid' : 'outline'}
+          aria-label="Loop"
+          size="lg"
+          icon={<RxLoop />}
+          onClick={() => setLoop(!loop)}
+        />
+        <Menu>
+          <MenuButton colorScheme="teal" size="lg" as={Button} rightIcon={<ChevronDownIcon />}>
+            {player === PLAYER_SOURCE_ONLY ? <>Source Only</> : <>Source and Destination</>}
+          </MenuButton>
+          <MenuList>
+            <MenuItem onClick={() => setPlayer(PLAYER_SOURCE_ONLY)}>Source Only</MenuItem>
+            <MenuItem onClick={() => setPlayer(PLAYER_SOURCE_AND_DESTINATION)}>
+              Source and Destination
+            </MenuItem>
+          </MenuList>
+        </Menu>
+        {playButton()}{' '}
+      </ButtonGroup>
+    </Flex>
+    //
+  );
+
+  //   <div>
+  //   {tracks.map((track) => {
+  //     return (
+  //       <div key={track}>
+  //         <button onClick={() => sound.play('track0' + ((track - 1) * 2 + 1).toString())}>
+  //           {track}
+  //         </button>
+  //       </div>
+  //     );
+  //   })}
+  // </div>
   let main = <></>;
   if (workbookId !== 0 && workbookId in workbooks) {
     main = (
-      <div>
-        <button onClick={() => changePlayer()}>change player</button>
-        {player === 0 ? <div>Source only</div> : <div>Source and Destination</div>}
-        <br />
-        {palyButton()}
-        <br />
-        <div>
-          {tracks.map((track) => {
-            return (
-              <div key={track}>
-                <button onClick={() => sound.play('track0' + ((track - 1) * 2 + 1).toString())}>
-                  {track}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+      <Box flex="1">
         <br />
         <button onClick={() => setLoop(!loop)}>{loop ? <>LOOP</> : <>NOT LOOP</>}</button>
         <br />
         {stopButton()}
         <br />
-      </div>
+        {card}
+        <br />
+      </Box>
     );
   }
 
   return (
-    <Container>
-      <Breadcrumb>
-        <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/">
-            Home
-          </BreadcrumbLink>
-        </BreadcrumbItem>
+    <Container bg="white" minH="calc(100vh - 72px)">
+      {/* <Box> */}
+      <Box height="calc(100vh - 72px - 60px)" bg="orange.100">
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <BreadcrumbLink as={Link} to="/">
+              Home
+            </BreadcrumbLink>
+          </BreadcrumbItem>
 
-        <BreadcrumbItem>
-          <BreadcrumbLink href="#">Docs</BreadcrumbLink>
-        </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+          </BreadcrumbItem>
 
-        <BreadcrumbItem isCurrentPage>
-          <BreadcrumbLink href="#">Breadcrumb</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
-      {main}
+          <BreadcrumbItem isCurrentPage>
+            <BreadcrumbLink href="#">Breadcrumb</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
+        {main}
+      </Box>
+      <Box p="2" bg="tomato" height="60px">
+        {footer}
+      </Box>
     </Container>
   );
 };
