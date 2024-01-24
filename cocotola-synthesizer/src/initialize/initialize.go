@@ -53,7 +53,7 @@ func InitTransactionManager(db *gorm.DB, rff gateway.RepositoryFactoryFunc) serv
 // 	return systemOwner, nil
 // }
 
-func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, internalAuthConfig config.InternalAuthConfig, corsConfig *rslibconfig.CORSConfig, debugConfig *libconfig.DebugConfig, ttsConfig *config.GoogleTextToSpeechConfig, appName string, txManager service.TransactionManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
+func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, internalAuthConfig config.InternalAuthConfig, corsConfig *rslibconfig.CORSConfig, debugConfig *libconfig.DebugConfig, ttsConfig *config.GoogleTextToSpeechConfig, appName string, txManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
 	// cors
 	gincorsConfig := rslibconfig.InitCORS(corsConfig)
 	httpClient := http.Client{

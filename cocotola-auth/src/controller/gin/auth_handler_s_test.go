@@ -26,11 +26,11 @@ import (
 )
 
 var (
-	anythingOfContext = mock.MatchedBy(func(_ context.Context) bool { return true })
-	corsConfig        cors.Config
-	appConfig         *config.AppConfig
-	authConfig        *config.AuthConfig
-	debugConfig       *libconfig.DebugConfig
+	anyOfCtx    = mock.MatchedBy(func(_ context.Context) bool { return true })
+	corsConfig  cors.Config
+	appConfig   *config.AppConfig
+	authConfig  *config.AuthConfig
+	debugConfig *libconfig.DebugConfig
 	// authTokenManager  auth.AuthTokenManager
 )
 
@@ -127,8 +127,8 @@ func TestAuthHandler_GetUserInfo(t *testing.T) {
 		Username:       "USERNAME",
 	}
 	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
-	authenticationUsecase.On("GetUserInfo", anythingOfContext, "VALID_TOKEN").Return(appUserInfo, nil)
-	authenticationUsecase.On("GetUserInfo", anythingOfContext, "INVALID_TOKEN").Return(nil, errors.New("INVALID"))
+	authenticationUsecase.On("GetUserInfo", anyOfCtx, "VALID_TOKEN").Return(appUserInfo, nil)
+	authenticationUsecase.On("GetUserInfo", anyOfCtx, "INVALID_TOKEN").Return(nil, errors.New("INVALID"))
 
 	for _, tt := range tests {
 		tt := tt
@@ -221,8 +221,8 @@ func TestAuthHandler_RefreshToken(t *testing.T) {
 	}
 	// given
 	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
-	authenticationUsecase.On("RefreshToken", anythingOfContext, "VALID_TOKEN").Return("ACCESS_TOKEN", nil)
-	authenticationUsecase.On("RefreshToken", anythingOfContext, "INVALID_TOKEN").Return("", errors.New("INVALID"))
+	authenticationUsecase.On("RefreshToken", anyOfCtx, "VALID_TOKEN").Return("ACCESS_TOKEN", nil)
+	authenticationUsecase.On("RefreshToken", anyOfCtx, "INVALID_TOKEN").Return("", errors.New("INVALID"))
 
 	for _, tt := range tests {
 		tt := tt

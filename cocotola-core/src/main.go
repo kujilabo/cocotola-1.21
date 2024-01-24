@@ -22,8 +22,6 @@ import (
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
-	rsusergateway "github.com/kujilabo/redstart/user/gateway"
-	rsuserservice "github.com/kujilabo/redstart/user/service"
 
 	libcontroller "github.com/kujilabo/cocotola-1.21/lib/controller/gin"
 	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
@@ -69,10 +67,6 @@ func main() {
 	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
 		return gateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
-	rsrf, err := rsusergateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC)
-	if err != nil {
-		panic(err)
-	}
 
 	txManager, err := gateway.NewTransactionManager(db, rff)
 	if err != nil {
@@ -94,7 +88,7 @@ func main() {
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, txManager, nonTxManager, rsrf)
+	result := run(ctx, cfg, db, txManager, nonTxManager)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
@@ -129,7 +123,7 @@ func Initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func run(ctx context.Context, cfg *config.Config, txManager service.TransactionManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
+func run(ctx context.Context, cfg *config.Config, db *gorm.DB, txManager, nonTxManager service.TransactionManager) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -139,7 +133,7 @@ func run(ctx context.Context, cfg *config.Config, txManager service.TransactionM
 
 	eg.Go(func() error {
 		router := gin.New()
-		if err := initialize.InitAppServer(ctx, router, *cfg.AuthAPI, cfg.CORS, cfg.Debug, cfg.App.Name, txManager, nonTxManager, rsrf); err != nil {
+		if err := initialize.InitAppServer(ctx, router, *cfg.AuthAPI, cfg.CORS, cfg.Debug, cfg.App.Name, db, txManager, nonTxManager); err != nil {
 			return err
 		}
 		return libcontroller.AppServerProcess(ctx, cfg.App.Name, router, cfg.App.HTTPPort, readHeaderTimeout, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck

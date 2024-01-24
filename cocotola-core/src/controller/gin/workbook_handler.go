@@ -12,7 +12,7 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/helper"
 	workbookfinddomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookfind"
-	workbookretrievedomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookretrieve"
+	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student"
 )
 
 const defaultPageSize = 10
@@ -38,7 +38,7 @@ type WorkbookWithProblem struct {
 type WorkbookUsecaseInterface interface {
 	FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookfinddomain.Parameter) (*workbookfinddomain.Result, error)
 
-	RetrieveWorkbookByID(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, workbookID int) (*workbookretrievedomain.WorkbookModel, error)
+	RetrieveWorkbookByID(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, workbookID int) (*studentusecase.WorkbookRetrieveModel, error)
 }
 
 type WorkbookHandler struct {
@@ -86,25 +86,25 @@ func (h *WorkbookHandler) RetrieveWorkbookByID(c *gin.Context) {
 			return err
 		}
 
-		c.JSON(http.StatusOK, h.toWorkbookRetrieveResultEntity(result))
+		c.JSON(http.StatusOK, result)
 		return nil
 	}, h.errorHandle)
 }
 
-func (h *WorkbookHandler) toWorkbookRetrieveResultEntity(model *workbookretrievedomain.WorkbookModel) *WorkbookWithProblem {
-	problems := make([]*Problem, len(model.Problems))
-	for i, r := range model.Problems {
-		problems[i] = &Problem{
-			Type:       r.Type,
-			Properties: r.Properties,
-		}
-	}
+// func (h *WorkbookHandler) toWorkbookRetrieveResultEntity(model *workbookretrievedomain.WorkbookModel) *WorkbookWithProblem {
+// 	problems := make([]*Problem, len(model.Problems))
+// 	for i, r := range model.Problems {
+// 		problems[i] = &Problem{
+// 			Type:       r.Type,
+// 			Properties: r.Properties,
+// 		}
+// 	}
 
-	return &WorkbookWithProblem{
-		ID:       model.ID,
-		Problems: problems,
-	}
-}
+// 	return &WorkbookWithProblem{
+// 		ID:       model.ID,
+// 		Problems: problems,
+// 	}
+// }
 
 func (h *WorkbookHandler) errorHandle(ctx context.Context, logger *slog.Logger, c *gin.Context, err error) bool {
 	// if errors.Is(err, service.ErrAudioNotFound) {

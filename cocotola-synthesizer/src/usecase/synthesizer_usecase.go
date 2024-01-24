@@ -20,7 +20,7 @@ type SynthesizerUsecase struct {
 	audioFile         service.AudioFile
 }
 
-func NewSynthesizerUsecase(txManager service.TransactionManager, nonTxManager service.TransactionManager, synthesizerClient service.SynthesizerClient, audioFile service.AudioFile) *SynthesizerUsecase {
+func NewSynthesizerUsecase(txManager, nonTxManager service.TransactionManager, synthesizerClient service.SynthesizerClient, audioFile service.AudioFile) *SynthesizerUsecase {
 	return &SynthesizerUsecase{
 
 		txManager:         txManager,

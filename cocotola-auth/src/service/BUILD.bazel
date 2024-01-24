@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "auth_token_manager.go",
         "repository_factory.go",
+        "state_repository.go",
         "transaction_manager.go",
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service",

@@ -39,4 +39,8 @@ func (f *RepositoryFactory) NewRedstartRepositoryFactory(ctx context.Context) (r
 	return rsusergateway.NewRepositoryFactory(ctx, f.dialect, f.driverName, f.db, f.location)
 }
 
+func (f *RepositoryFactory) NewStateRepository(ctx context.Context) (service.StateRepository, error) {
+	return NewStateRepository(ctx)
+}
+
 type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)

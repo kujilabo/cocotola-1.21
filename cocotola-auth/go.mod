@@ -6,8 +6,9 @@ require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240122135142-6b23f0e1cc96
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240122135142-6b23f0e1cc96
+	github.com/google/uuid v1.6.0
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240124013713-b9cdbfba3fcb
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240124013713-b9cdbfba3fcb
 	github.com/kujilabo/redstart v0.0.10
 	github.com/ohler55/ojg v1.21.0
 	github.com/samber/slog-gin v1.10.1
@@ -56,7 +57,6 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0 // indirect

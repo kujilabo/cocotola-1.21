@@ -5,8 +5,14 @@ import { persist, devtools } from 'zustand/middleware';
 
 import { backendAuthUrl, extractErrorMessage } from '@/lib/base';
 
+type GoogleGenerateStateResponse = {
+  state: string;
+};
+
 type GoogleAuthorizeParameter = {
   organizationName: string;
+  sessionState: string;
+  paramState: string;
   code: string;
 };
 type GoogleAuthorizeResponse = {
@@ -32,13 +38,15 @@ type UserInfo = {
 };
 
 type State = {
+  sessionState: string | null;
   accessToken: string | null;
   refreshToken: string | null;
   error: string | null;
 };
 type Action = {
   resetTokens: () => void;
-  authenticate: (code: string) => Promise<void>;
+  generateState: (callback: (state: string) => void) => Promise<void>;
+  authenticate: (sessionState: string, paramState: string, code: string) => Promise<void>;
   reauthenticate: (refreshToken: string) => Promise<void>;
   getUserInfo: () => UserInfo | null;
 };
@@ -62,6 +70,7 @@ export const useAuthStore = create<State & Action>()(
   devtools(
     persist(
       (set, get) => ({
+        sessionState: null,
         accessToken: null,
         refreshToken: null,
         error: null,
@@ -75,11 +84,37 @@ export const useAuthStore = create<State & Action>()(
             refreshToken: null,
           });
         },
-        authenticate: async (code: string): Promise<void> => {
+        generateState: async (callback: (state: string) => void): Promise<void> => {
+          set({ error: null });
+          console.log('aaa');
+          await axios
+            .get(`${backendAuthUrl}/v1/google/state`, { data: {} })
+            .then((resp) => {
+              console.log('callback then');
+              const data = resp.data as GoogleGenerateStateResponse;
+              set({ sessionState: data.state });
+              callback(data.state);
+            })
+            .catch((err: Error) => {
+              console.log('callback err');
+              const errorMessage = extractErrorMessage(err);
+              //   arg.postFailureProcess(errorMessage);
+              //   return thunkAPI.rejectWithValue(errorMessage);
+              set({ error: errorMessage });
+              return '';
+            });
+        },
+        authenticate: async (
+          sessionState: string,
+          paramState: string,
+          code: string
+        ): Promise<void> => {
           set({ error: null });
           console.log('aaa');
           const param: GoogleAuthorizeParameter = {
             organizationName: 'cocotola',
+            sessionState: sessionState,
+            paramState: paramState,
             code: code,
           };
           await axios
@@ -133,6 +168,7 @@ export const useAuthStore = create<State & Action>()(
         name: 'auth-storage',
 
         partialize: (state) => ({
+          sessionState: state.sessionState,
           accessToken: state.accessToken,
           refreshToken: state.refreshToken,
           userInfo: decodeJwt(state.accessToken),

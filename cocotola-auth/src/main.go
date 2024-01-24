@@ -126,7 +126,7 @@ func Initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func Run(ctx context.Context, cfg *config.Config, txManager service.TransactionManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
+func Run(ctx context.Context, cfg *config.Config, txManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 

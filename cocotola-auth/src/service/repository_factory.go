@@ -8,4 +8,6 @@ import (
 
 type RepositoryFactory interface {
 	NewRedstartRepositoryFactory(ctx context.Context) (rsuserservice.RepositoryFactory, error)
+
+	NewStateRepository(ctx context.Context) (StateRepository, error)
 }

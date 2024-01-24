@@ -85,6 +85,9 @@ update-mod:
 		go get -u ./... && \
 	popd
 
+.PHONY: mod
+mod: update-mod go-mod-tidy gazelle gazelle-update-repos
+
 bazel-run-app:
 	@bazelisk run //cocotola-app/src
 

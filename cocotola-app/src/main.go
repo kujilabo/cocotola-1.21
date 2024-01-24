@@ -126,7 +126,7 @@ func main() {
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(ctx, cfg, authTxManager, authNonTxManager, coreTxManager, coreNonTxManager, rsrf)
+	result := run(ctx, cfg, db, authTxManager, authNonTxManager, coreTxManager, coreNonTxManager, rsrf)
 
 	time.Sleep(gracefulShutdownTime2)
 	logger.InfoContext(ctx, "exited")
@@ -164,7 +164,7 @@ func initialize(ctx context.Context, env string) (*config.Config, rslibgateway.D
 	return cfg, dialect, db, sqlDB, tp
 }
 
-func run(ctx context.Context, cfg *config.Config, authTxManager authservice.TransactionManager, authNonTxManager authservice.TransactionManager, coreTxManager coreservice.TransactionManager, coreNonTxManager coreservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
+func run(ctx context.Context, cfg *config.Config, db *gorm.DB, authTxManager authservice.TransactionManager, authNonTxManager authservice.TransactionManager, coreTxManager coreservice.TransactionManager, coreNonTxManager coreservice.TransactionManager, rsrf rsuserservice.RepositoryFactory) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -198,7 +198,7 @@ func run(ctx context.Context, cfg *config.Config, authTxManager authservice.Tran
 			return err
 		}
 		core := api.Group("core")
-		if err := coreinit.InitAppServer(ctx, core, *cfg.AuthAPI, cfg.CORS, cfg.Debug, cfg.App.Name, coreTxManager, coreNonTxManager, rsrf); err != nil {
+		if err := coreinit.InitAppServer(ctx, core, *cfg.AuthAPI, cfg.CORS, cfg.Debug, cfg.App.Name, db, coreTxManager, coreNonTxManager); err != nil {
 			return err
 		}
 

@@ -6,8 +6,8 @@ go_library(
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student",
     visibility = ["//visibility:public"],
     deps = [
+        "//cocotola-core/src/domain",
         "//cocotola-core/src/domain/workbookfind",
-        "//cocotola-core/src/domain/workbookretrieve",
         "//cocotola-core/src/service",
         "@com_github_kujilabo_redstart//user/domain",
     ],

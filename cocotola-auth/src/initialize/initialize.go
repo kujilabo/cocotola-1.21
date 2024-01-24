@@ -56,7 +56,7 @@ func (s systemOwnerByOrganizationName) Get(ctx context.Context, rf service.Repos
 	return systemOwner, nil
 }
 
-func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, authConfig *config.AuthConfig, debugConfig *libconfig.DebugConfig, appName string, txManager service.TransactionManager, txNonManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
+func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfig *rslibconfig.CORSConfig, authConfig *config.AuthConfig, debugConfig *libconfig.DebugConfig, appName string, txManager, nonTxManager service.TransactionManager, rsrf rsuserservice.RepositoryFactory) error {
 	// cors
 	gincorsConfig := rslibconfig.InitCORS(corsConfig)
 	httpClient := http.Client{
@@ -70,7 +70,7 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 	authTokenManager := gateway.NewAuthTokenManager(signingKey, signingMethod, time.Duration(authConfig.AccessTokenTTLMin)*time.Minute, time.Duration(authConfig.RefreshTokenTTLHour)*time.Hour)
 
 	authenticationUsecase := usecase.NewAuthentication(txManager, authTokenManager, &systemOwnerByOrganizationName{})
-	googleUserUsecase := usecase.NewGoogleUserUsecase(txManager, authTokenManager, googleAuthClient)
+	googleUserUsecase := usecase.NewGoogleUserUsecase(txManager, nonTxManager, authTokenManager, googleAuthClient)
 
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{}
 
@@ -87,7 +87,7 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 	return nil
 }
 
-func InitApp1(ctx context.Context, txManager service.TransactionManager, nonTxManager service.TransactionManager, organizationName string, password string) {
+func InitApp1(ctx context.Context, txManager, nonTxManager service.TransactionManager, organizationName string, password string) {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.CoreMainLoggerContextKey)
 	addOrganizationFunc := func(ctx context.Context, systemAdmin *rsuserservice.SystemAdmin) error {
 		organization, err := systemAdmin.FindOrganizationByName(ctx, organizationName)
