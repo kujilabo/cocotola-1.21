@@ -70,189 +70,187 @@ func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.Au
 	return router
 }
 
-func TestAuthHandler_GetUserInfo(t *testing.T) {
+func TestAuthHandler_GetUserInfo_shouldReturn401_whenAuthorizationHeaderIsEmpty(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	type args struct {
-		authorizationHeader string
-	}
-	type outputs struct {
-		statusCode     int
-		appUserID      int
-		organizationID int
-		loginID        string
-		username       string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		outputs outputs
-	}{
-		{
-			name: "authorization header is not specified",
-			outputs: outputs{
-				statusCode: http.StatusUnauthorized,
-			},
-		},
-		{
-			name: "authorization header is invalid",
-			args: args{
-				authorizationHeader: "Bearer INVALID_TOKEN",
-			},
-			outputs: outputs{
-				statusCode: http.StatusUnauthorized,
-			},
-		},
-		{
-			name: "authorization header is valid",
-			args: args{
-				authorizationHeader: "Bearer VALID_TOKEN",
-			},
-			outputs: outputs{
-				statusCode:     http.StatusOK,
-				appUserID:      123,
-				organizationID: 456,
-				loginID:        "LOGIN_ID",
-				username:       "USERNAME",
-			},
-		},
-	}
+
 	// given
-	appUserID := appUserID(t, 123)
-	organizaionID := organizationID(t, 456)
+	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
+
+	// given
+	r := initAuthRouter(t, ctx, authenticationUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/v1/auth/userinfo", nil)
+	require.NoError(t, err)
+	req.Header.Set("Authorization", "")
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusUnauthorized, w.Code, "status code should be 401")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Len(t, message, 1, "response should have one message")
+	assert.Equal(t, "Unauthorized", message[0], "message should be 'Unauthorized'")
+}
+
+func TestAuthHandler_GetUserInfo_shouldReturn401_whenAuthorizationHeaderIsInvalid(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
+	authenticationUsecase.On("GetUserInfo", anyOfCtx, "INVALID_TOKEN").Return(nil, errors.New("INVALID"))
+
+	r := initAuthRouter(t, ctx, authenticationUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/v1/auth/userinfo", nil)
+	require.NoError(t, err)
+	req.Header.Set("Authorization", "Bearer INVALID_TOKEN")
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusUnauthorized, w.Code, "status code should be 401")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Len(t, message, 1, "response should have one message")
+	assert.Equal(t, "Unauthorized", message[0], "message should be 'Unauthorized'")
+}
+
+func TestAuthHandler_GetUserInfo_shouldReturn200_whenAuthorizationHeaderIsValid(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
 	appUserInfo := &rsuserdomain.AppUserModel{
-		AppUserID:      appUserID,
-		OrganizationID: organizaionID,
+		AppUserID:      appUserID(t, 123),
+		OrganizationID: organizationID(t, 456),
 		LoginID:        "LOGIN_ID",
 		Username:       "USERNAME",
 	}
 	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
 	authenticationUsecase.On("GetUserInfo", anyOfCtx, "VALID_TOKEN").Return(appUserInfo, nil)
-	authenticationUsecase.On("GetUserInfo", anyOfCtx, "INVALID_TOKEN").Return(nil, errors.New("INVALID"))
 
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			// given
-			r := initAuthRouter(t, ctx, authenticationUsecase)
-			w := httptest.NewRecorder()
+	r := initAuthRouter(t, ctx, authenticationUsecase)
+	w := httptest.NewRecorder()
 
-			// when
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/v1/auth/userinfo", nil)
-			require.NoError(t, err)
-			req.Header.Set("Authorization", tt.args.authorizationHeader)
-			r.ServeHTTP(w, req)
-			respBytes := readBytes(t, w.Body)
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/v1/auth/userinfo", nil)
+	require.NoError(t, err)
+	req.Header.Set("Authorization", "Bearer VALID_TOKEN")
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
 
-			// - check the status code
-			assert.Equal(t, tt.outputs.statusCode, w.Code)
+	// then
+	assert.Equal(t, http.StatusOK, w.Code, "status code should be 200")
 
-			if w.Code != http.StatusOK {
-				assert.Len(t, respBytes, 0)
-				return
-			}
+	jsonObj := parseJSON(t, respBytes)
 
-			jsonObj := parseJSON(t, respBytes)
+	appUserIDExpr := parseExpr(t, "$.appUserId")
+	appUserID := appUserIDExpr.Get(jsonObj)
+	assert.Equal(t, int64(123), appUserID[0])
 
-			// - check the appUserId
-			appUserIDExpr := parseExpr(t, "$.appUserId")
-			appUserID := appUserIDExpr.Get(jsonObj)
-			assert.Equal(t, int64(tt.outputs.appUserID), appUserID[0])
+	organizationIDExpr := parseExpr(t, "$.organizationId")
+	organizationID := organizationIDExpr.Get(jsonObj)
+	assert.Equal(t, int64(456), organizationID[0])
 
-			// - check the organizationId
-			organizationIDExpr := parseExpr(t, "$.organizationId")
-			organizationID := organizationIDExpr.Get(jsonObj)
-			assert.Equal(t, int64(tt.outputs.organizationID), organizationID[0])
+	loginIDExpr := parseExpr(t, "$.loginId")
+	loginID := loginIDExpr.Get(jsonObj)
+	assert.Equal(t, "LOGIN_ID", loginID[0])
 
-			// - check the loginId
-			loginIDExpr := parseExpr(t, "$.loginId")
-			loginID := loginIDExpr.Get(jsonObj)
-			assert.Equal(t, tt.outputs.loginID, loginID[0])
-
-			// - check the username
-			usernameExpr := parseExpr(t, "$.username")
-			username := usernameExpr.Get(jsonObj)
-			assert.Equal(t, tt.outputs.username, username[0])
-		})
-	}
+	usernameExpr := parseExpr(t, "$.username")
+	username := usernameExpr.Get(jsonObj)
+	assert.Equal(t, "USERNAME", username[0])
 }
 
-func TestAuthHandler_RefreshToken(t *testing.T) {
+func TestAuthHandler_RefreshToken_shouldReturn400_whenRequestBodyIsEmpty(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	type args struct {
-		requestBody string
-	}
-	type outputs struct {
-		statusCode  int
-		accessToken string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		outputs outputs
-	}{
-		{
-			name: "requetyBody is empty",
-			outputs: outputs{
-				statusCode: http.StatusBadRequest,
-			},
-		},
-		{
-			name: "requetyBody is invalid",
-			args: args{
-				requestBody: `{"refreshToken": "INVALID_TOKEN"}`,
-			},
-			outputs: outputs{
-				statusCode: http.StatusUnauthorized,
-			},
-		},
-		{
-			name: "requetyBody is valid",
-			args: args{
-				requestBody: `{"refreshToken": "VALID_TOKEN"}`,
-			},
-			outputs: outputs{
-				statusCode:  http.StatusOK,
-				accessToken: "ACCESS_TOKEN",
-			},
-		},
-	}
+
+	// given
+	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
+	r := initAuthRouter(t, ctx, authenticationUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/auth/refresh_token", bytes.NewBuffer([]byte("")))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusBadRequest, w.Code, "status code should be 400")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Len(t, message, 1, "response should have one message")
+	assert.Equal(t, "Bad Request", message[0], "message should be 'Bad Request'")
+}
+
+func TestAuthHandler_RefreshToken_shouldReturn401_whenTokenIsInvalid(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
+	authenticationUsecase.On("RefreshToken", anyOfCtx, "INVALID_TOKEN").Return("", errors.New("INVALID"))
+
+	r := initAuthRouter(t, ctx, authenticationUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/auth/refresh_token", bytes.NewBuffer([]byte(`{"refreshToken": "INVALID_TOKEN"}`)))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusUnauthorized, w.Code, "status code should be 401")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Len(t, message, 1, "response should have one message")
+	assert.Equal(t, "Unauthorized", message[0], "message should be 'Unauthorized'")
+}
+
+func TestAuthHandler_RefreshToken_shouldReturn200_whenTokenIsValid(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
 	// given
 	authenticationUsecase := new(handlermock.AuthenticationUsecaseInterface)
 	authenticationUsecase.On("RefreshToken", anyOfCtx, "VALID_TOKEN").Return("ACCESS_TOKEN", nil)
-	authenticationUsecase.On("RefreshToken", anyOfCtx, "INVALID_TOKEN").Return("", errors.New("INVALID"))
 
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			// given
-			r := initAuthRouter(t, ctx, authenticationUsecase)
-			w := httptest.NewRecorder()
+	r := initAuthRouter(t, ctx, authenticationUsecase)
+	w := httptest.NewRecorder()
 
-			// when
-			req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/auth/refresh_token", bytes.NewBuffer([]byte(tt.args.requestBody)))
-			require.NoError(t, err)
-			r.ServeHTTP(w, req)
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/auth/refresh_token", bytes.NewBuffer([]byte(`{"refreshToken": "VALID_TOKEN"}`)))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
 
-			respBytes := readBytes(t, w.Body)
+	// then
+	assert.Equal(t, http.StatusOK, w.Code, "status code should be 200")
 
-			// - check the status code
-			assert.Equal(t, tt.outputs.statusCode, w.Code)
+	jsonObj := parseJSON(t, respBytes)
 
-			if w.Code != http.StatusOK {
-				assert.Len(t, respBytes, 0)
-				return
-			}
-
-			jsonObj := parseJSON(t, respBytes)
-
-			// - check the organizationId
-			accessTokenExpr := parseExpr(t, "$.accessToken")
-			accessToken := accessTokenExpr.Get(jsonObj)
-			assert.Equal(t, tt.outputs.accessToken, accessToken[0])
-		})
-	}
+	accessTokenExpr := parseExpr(t, "$.accessToken")
+	accessToken := accessTokenExpr.Get(jsonObj)
+	assert.Equal(t, "ACCESS_TOKEN", accessToken[0], "accessToken should be 'ACCESS_TOKEN'")
 }

@@ -76,14 +76,10 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, authAPICo
 		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
 	workbookQuerySerivce := studentusecasegateway.NewWorkbookQueryService(db)
-	studentUsecaseWorkbook := studentusecase.NewStudentUsecaseWorkbook(txManager, nonTxManager, workbookQuerySerivce)
+	workbookQueryUsecase := studentusecase.NewWorkbookQueryUsecase(txManager, nonTxManager, workbookQuerySerivce)
+	workbookCommandUsecase := studentusecase.NewWorkbookCommandUsecase()
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
-		controller.NewInitPrivateWorkbookRouterFunc(studentUsecaseWorkbook),
-		controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
-		// controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
-		// controller.NewInitStudyRouterFunc(studentUseCaseStudy),
-		// controller.NewInitAudioRouterFunc(studentUsecaseAudio),
-		// controller.NewInitStatRouterFunc(studentUsecaseStat),
+		controller.NewInitWorkbookRouterFunc(workbookQueryUsecase, workbookCommandUsecase),
 	}
 	authEndpoint, err := url.Parse(authAPIConfig.Endpoint)
 	if err != nil {

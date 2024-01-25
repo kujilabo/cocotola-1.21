@@ -1172,8 +1172,8 @@ go_repository(
 go_repository(
     name = "com_github_mattn_go_sqlite3",
     importpath = "github.com/mattn/go-sqlite3",
-    sum = "h1:fhGleo2h1p8tVChob4I9HpmVFIAkKGpiukdrgQbWfGI=",
-    version = "v1.14.19",
+    sum = "h1:BAZ50Ns0OFBNxdAqFhbZqdPcht1Xlb16pDCqkq1spr0=",
+    version = "v1.14.20",
 )
 
 go_repository(

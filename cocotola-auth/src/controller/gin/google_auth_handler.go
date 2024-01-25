@@ -44,7 +44,7 @@ func (h *GoogleUserHandler) GenerateState(c *gin.Context) {
 
 	state, err := h.googleUserUsecase.GenerateState(ctx)
 	if err != nil {
-		c.Status(http.StatusInternalServerError)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
 

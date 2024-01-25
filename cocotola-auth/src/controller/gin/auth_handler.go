@@ -38,7 +38,7 @@ func (h *AuthHandler) GetUserInfo(c *gin.Context) {
 	authorization := c.GetHeader("Authorization")
 	if !strings.HasPrefix(authorization, "Bearer ") {
 		logger.InfoContext(ctx, "invalid header. Bearer not found")
-		c.Status(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
@@ -46,7 +46,7 @@ func (h *AuthHandler) GetUserInfo(c *gin.Context) {
 	appUserInfo, err := h.authenticationUsecase.GetUserInfo(ctx, bearerToken)
 	if err != nil {
 		logger.InfoContext(ctx, "GetUserInfo", slog.Any("err", (err)))
-		c.Status(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
@@ -65,13 +65,13 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	logger.InfoContext(ctx, "Authorize")
 	refreshTokenParameter := RefreshTokenParameter{}
 	if err := c.ShouldBindJSON(&refreshTokenParameter); err != nil {
-		c.Status(http.StatusBadRequest)
+		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 		return
 	}
 
 	accessToken, err := h.authenticationUsecase.RefreshToken(ctx, refreshTokenParameter.RefreshToken)
 	if err != nil {
-		c.Status(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 

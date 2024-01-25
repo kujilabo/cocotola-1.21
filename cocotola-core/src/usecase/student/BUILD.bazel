@@ -2,12 +2,15 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "student",
-    srcs = ["student_usecase_workbook.go"],
+    srcs = [
+        "workbook_command_usecase.go",
+        "workbook_query_usecase.go",
+    ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student",
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-core/src/domain",
-        "//cocotola-core/src/domain/workbookfind",
+        "//cocotola-core/src/domain/workbookadd",
         "//cocotola-core/src/service",
         "@com_github_kujilabo_redstart//user/domain",
     ],

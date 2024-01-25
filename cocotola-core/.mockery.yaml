@@ -9,7 +9,8 @@ packages:
     config:
       dir: src/controller/gin/mocks
     interfaces:
-      WorkbookUsecaseInterface:
+      WorkbookQueryUsecase:
+      WorkbookCommandUsecase:
   github.com/kujilabo/cocotola-1.21/cocotola-core/src/service:
     config:
       dir: src/service/mocks
