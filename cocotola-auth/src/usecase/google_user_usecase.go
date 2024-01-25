@@ -67,20 +67,65 @@ type GoogleUserInfo struct {
 }
 
 type GoogleUserUsecase struct {
-	transactionManager service.TransactionManager
-	authTokenManager   service.AuthTokenManager
-	googleAuthClient   GoogleAuthClient
+	txManager        service.TransactionManager
+	nonTxManager     service.TransactionManager
+	authTokenManager service.AuthTokenManager
+	googleAuthClient GoogleAuthClient
 }
 
-func NewGoogleUserUsecase(transactionManager service.TransactionManager, authTokenManager service.AuthTokenManager, googleAuthClient GoogleAuthClient) *GoogleUserUsecase {
+func NewGoogleUserUsecase(txManager, nonTxManager service.TransactionManager, authTokenManager service.AuthTokenManager, googleAuthClient GoogleAuthClient) *GoogleUserUsecase {
 	return &GoogleUserUsecase{
-		transactionManager: transactionManager,
-		authTokenManager:   authTokenManager,
-		googleAuthClient:   googleAuthClient,
+		txManager:        txManager,
+		nonTxManager:     nonTxManager,
+		authTokenManager: authTokenManager,
+		googleAuthClient: googleAuthClient,
 	}
 }
 
-func (u *GoogleUserUsecase) Authorize(ctx context.Context, code, organizationName string) (*domain.AuthTokenSet, error) {
+func (u *GoogleUserUsecase) GenerateState(ctx context.Context) (string, error) {
+	var state string
+	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
+		stateRepo, err := rf.NewStateRepository(ctx)
+		if err != nil {
+			return err
+		}
+
+		tmpState, err := stateRepo.GenerateState(ctx)
+		if err != nil {
+			return err
+		}
+
+		state = tmpState
+		return nil
+	}); err != nil {
+		return "", err
+	}
+
+	return state, nil
+}
+
+func (u *GoogleUserUsecase) Authorize(ctx context.Context, state, code, organizationName string) (*domain.AuthTokenSet, error) {
+	var matched bool
+	if err := u.nonTxManager.Do(ctx, func(rf service.RepositoryFactory) error {
+		stateRepo, err := rf.NewStateRepository(ctx)
+		if err != nil {
+			return err
+		}
+		tmpMatched, err := stateRepo.DoesStateExists(ctx, state)
+		if err != nil {
+			return err
+		}
+
+		matched = tmpMatched
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	if !matched {
+		return nil, rsliberrors.Errorf("invalid state. err: %w", domain.ErrUnauthenticated)
+	}
+
 	resp, err := u.googleAuthClient.RetrieveAccessToken(ctx, code)
 	if err != nil {
 		return nil, rsliberrors.Errorf(". err: %w", err)
@@ -95,7 +140,7 @@ func (u *GoogleUserUsecase) Authorize(ctx context.Context, code, organizationNam
 
 	var targetOorganization *organization
 	var targetAppUser *appUser
-	if err := u.transactionManager.Do(ctx, func(rf service.RepositoryFactory) error {
+	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
 		tmpOrganization, tmpAppUser, err := u.registerAppUser(ctx, rf, organizationName, info.Email, info.Name, info.Email, resp.AccessToken, resp.RefreshToken)
 		if err != nil && !errors.Is(err, rsuserservice.ErrAppUserAlreadyExists) {
 			return rsliberrors.Errorf("s.registerAppUser. err: %w", err)

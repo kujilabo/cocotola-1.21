@@ -23,25 +23,25 @@ func (_m *GoogleUserUsecaseInterface) EXPECT() *GoogleUserUsecaseInterface_Expec
 	return &GoogleUserUsecaseInterface_Expecter{mock: &_m.Mock}
 }
 
-// Authorize provides a mock function with given fields: ctx, code, organizationName
-func (_m *GoogleUserUsecaseInterface) Authorize(ctx context.Context, code string, organizationName string) (*domain.AuthTokenSet, error) {
-	ret := _m.Called(ctx, code, organizationName)
+// Authorize provides a mock function with given fields: ctx, state, code, organizationName
+func (_m *GoogleUserUsecaseInterface) Authorize(ctx context.Context, state string, code string, organizationName string) (*domain.AuthTokenSet, error) {
+	ret := _m.Called(ctx, state, code, organizationName)
 
 	var r0 *domain.AuthTokenSet
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*domain.AuthTokenSet, error)); ok {
-		return rf(ctx, code, organizationName)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) (*domain.AuthTokenSet, error)); ok {
+		return rf(ctx, state, code, organizationName)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) *domain.AuthTokenSet); ok {
-		r0 = rf(ctx, code, organizationName)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *domain.AuthTokenSet); ok {
+		r0 = rf(ctx, state, code, organizationName)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*domain.AuthTokenSet)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, code, organizationName)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, state, code, organizationName)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -56,15 +56,16 @@ type GoogleUserUsecaseInterface_Authorize_Call struct {
 
 // Authorize is a helper method to define mock.On call
 //   - ctx context.Context
+//   - state string
 //   - code string
 //   - organizationName string
-func (_e *GoogleUserUsecaseInterface_Expecter) Authorize(ctx interface{}, code interface{}, organizationName interface{}) *GoogleUserUsecaseInterface_Authorize_Call {
-	return &GoogleUserUsecaseInterface_Authorize_Call{Call: _e.mock.On("Authorize", ctx, code, organizationName)}
+func (_e *GoogleUserUsecaseInterface_Expecter) Authorize(ctx interface{}, state interface{}, code interface{}, organizationName interface{}) *GoogleUserUsecaseInterface_Authorize_Call {
+	return &GoogleUserUsecaseInterface_Authorize_Call{Call: _e.mock.On("Authorize", ctx, state, code, organizationName)}
 }
 
-func (_c *GoogleUserUsecaseInterface_Authorize_Call) Run(run func(ctx context.Context, code string, organizationName string)) *GoogleUserUsecaseInterface_Authorize_Call {
+func (_c *GoogleUserUsecaseInterface_Authorize_Call) Run(run func(ctx context.Context, state string, code string, organizationName string)) *GoogleUserUsecaseInterface_Authorize_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string))
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string))
 	})
 	return _c
 }
@@ -74,7 +75,59 @@ func (_c *GoogleUserUsecaseInterface_Authorize_Call) Return(_a0 *domain.AuthToke
 	return _c
 }
 
-func (_c *GoogleUserUsecaseInterface_Authorize_Call) RunAndReturn(run func(context.Context, string, string) (*domain.AuthTokenSet, error)) *GoogleUserUsecaseInterface_Authorize_Call {
+func (_c *GoogleUserUsecaseInterface_Authorize_Call) RunAndReturn(run func(context.Context, string, string, string) (*domain.AuthTokenSet, error)) *GoogleUserUsecaseInterface_Authorize_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GenerateState provides a mock function with given fields: _a0
+func (_m *GoogleUserUsecaseInterface) GenerateState(_a0 context.Context) (string, error) {
+	ret := _m.Called(_a0)
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (string, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) string); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GoogleUserUsecaseInterface_GenerateState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GenerateState'
+type GoogleUserUsecaseInterface_GenerateState_Call struct {
+	*mock.Call
+}
+
+// GenerateState is a helper method to define mock.On call
+//   - _a0 context.Context
+func (_e *GoogleUserUsecaseInterface_Expecter) GenerateState(_a0 interface{}) *GoogleUserUsecaseInterface_GenerateState_Call {
+	return &GoogleUserUsecaseInterface_GenerateState_Call{Call: _e.mock.On("GenerateState", _a0)}
+}
+
+func (_c *GoogleUserUsecaseInterface_GenerateState_Call) Run(run func(_a0 context.Context)) *GoogleUserUsecaseInterface_GenerateState_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *GoogleUserUsecaseInterface_GenerateState_Call) Return(_a0 string, _a1 error) *GoogleUserUsecaseInterface_GenerateState_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *GoogleUserUsecaseInterface_GenerateState_Call) RunAndReturn(run func(context.Context) (string, error)) *GoogleUserUsecaseInterface_GenerateState_Call {
 	_c.Call.Return(run)
 	return _c
 }

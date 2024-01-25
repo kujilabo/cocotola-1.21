@@ -17,11 +17,14 @@ import (
 
 type googleAuthParameter struct {
 	OrganizationName string `json:"organizationName"`
+	SessionState     string `json:"sessionState"`
+	ParamState       string `json:"paramState"`
 	Code             string `json:"code"`
 }
 
 type GoogleUserUsecaseInterface interface {
-	Authorize(ctx context.Context, code, organizationName string) (*domain.AuthTokenSet, error)
+	GenerateState(context.Context) (string, error)
+	Authorize(ctx context.Context, state, code, organizationName string) (*domain.AuthTokenSet, error)
 }
 
 type GoogleUserHandler struct {
@@ -32,6 +35,20 @@ func NewGoogleAuthHandler(googleUserUsecase GoogleUserUsecaseInterface) *GoogleU
 	return &GoogleUserHandler{
 		googleUserUsecase: googleUserUsecase,
 	}
+}
+
+func (h *GoogleUserHandler) GenerateState(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	logger.Info("GenerateState")
+
+	state, err := h.googleUserUsecase.GenerateState(ctx)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"state": state})
 }
 
 func (h *GoogleUserHandler) Authorize(c *gin.Context) {
@@ -70,6 +87,19 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 	// 	return
 	// }
 
+	// user, err := c.Cookie("auth_user")
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"message": "auth_user is empty"})
+	// 	return
+	// }
+	if googleAuthParameter.SessionState == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "sessionState is empty"})
+		return
+	}
+	if googleAuthParameter.ParamState == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "paramState is empty"})
+		return
+	}
 	if googleAuthParameter.Code == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "code is empty"})
 		return
@@ -78,8 +108,12 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "organizationName is empty"})
 		return
 	}
+	if googleAuthParameter.SessionState != googleAuthParameter.ParamState {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "sessionState and paramState are not equal"})
+		return
+	}
 
-	authResult, err := h.googleUserUsecase.Authorize(ctx, googleAuthParameter.Code, googleAuthParameter.OrganizationName)
+	authResult, err := h.googleUserUsecase.Authorize(ctx, googleAuthParameter.ParamState, googleAuthParameter.Code, googleAuthParameter.OrganizationName)
 	if err != nil {
 		if errors.Is(err, domain.ErrUnauthenticated) {
 			logger.InfoContext(ctx, fmt.Sprintf("invalid parameter. err: %v", err))
@@ -106,6 +140,7 @@ func NewInitGoogleRouterFunc(googleUser GoogleUserUsecaseInterface) InitRouterGr
 		}
 
 		googleAuthHandler := NewGoogleAuthHandler(googleUser)
+		auth.GET("state", googleAuthHandler.GenerateState)
 		auth.POST("authorize", googleAuthHandler.Authorize)
 		return nil
 	}

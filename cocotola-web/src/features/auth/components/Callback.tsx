@@ -10,6 +10,8 @@ export const Callback = (): ReactElement => {
 
   const location = window.location.search;
   const parsed = queryString.parse(location);
+  const sessionState = useAuthStore((state) => state.sessionState) || '';
+  const paramState = parsed ? String(parsed.state) : '';
   const code = parsed ? String(parsed.code) : '';
 
   const authenticate = useAuthStore((state) => state.authenticate);
@@ -32,12 +34,12 @@ export const Callback = (): ReactElement => {
       once.current = true;
       if (!accessToken) {
         const f = async () => {
-          await authenticate(code);
+          await authenticate(sessionState, paramState, code);
         };
         f().catch(console.error);
       }
     }
-  }, [accessToken, authenticate, code]);
+  }, [accessToken, authenticate, sessionState, paramState, code]);
 
   if (error) {
     return <div>{error}</div>;

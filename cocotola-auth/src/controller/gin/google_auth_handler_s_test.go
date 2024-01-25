@@ -33,113 +33,142 @@ func initGoogleRouter(t *testing.T, ctx context.Context, googleUser handler.Goog
 	return router
 }
 
-func TestGoogleAuthHandler_Authorize(t *testing.T) {
+func TestGoogleAuthHandler_Authorize_shouldReturn400_whenRequestBodyIsEmpty(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	type args struct {
-		requestBody string
-	}
-	type outputs struct {
-		statusCode   int
-		accessToken  string
-		refreshToken string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		outputs outputs
-	}{
-		{
-			name: "request body is empty",
-			outputs: outputs{
-				statusCode: http.StatusBadRequest,
-			},
-		},
-		{
-			name: "request body is invalid",
-			args: args{
-				requestBody: "[]",
-			},
-			outputs: outputs{
-				statusCode: http.StatusBadRequest,
-			},
-		},
-		{
-			name: "code is invalid(error)",
-			args: args{
-				requestBody: `{"organizationName": "ORGANIZATION_NAME", "code": "ERROR_CODE"}`,
-			},
-			outputs: outputs{
-				statusCode: http.StatusInternalServerError,
-			},
-		},
-		{
-			name: "code is invalid(unauthenticated)",
-			args: args{
-				requestBody: `{"organizationName": "ORGANIZATION_NAME", "code": "UNAUTHENTICATED_CODE"}`,
-			},
-			outputs: outputs{
-				statusCode: http.StatusUnauthorized,
-			},
-		},
-		{
-			name: "code is valid",
-			args: args{
-				requestBody: `{"organizationName": "ORGANIZATION_NAME", "code": "VALID_CODE"}`,
-			},
-			outputs: outputs{
-				statusCode:   http.StatusOK,
-				accessToken:  "ACCESS_TOKEN",
-				refreshToken: "REFRESH_TOKEN",
-			},
-		},
-	}
+
+	// given
+	googleUserUsecase := new(handlermock.GoogleUserUsecaseInterface)
+	r := initGoogleRouter(t, ctx, googleUserUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/google/authorize", bytes.NewBuffer([]byte("")))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusBadRequest, w.Code, "status code should be 400")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Equal(t, "Bad Request", message[0], "message should be 'Bad Request'")
+}
+
+func TestGoogleAuthHandler_Authorize_shouldReturn400_whenRequestBodyIsInvalid(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	googleUserUsecase := new(handlermock.GoogleUserUsecaseInterface)
+	r := initGoogleRouter(t, ctx, googleUserUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/google/authorize", bytes.NewBuffer([]byte("[]")))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusBadRequest, w.Code, "status code should be 400")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Equal(t, "Bad Request", message[0], "message should be 'Bad Request'")
+}
+
+func TestGoogleAuthHandler_Authorize_shouldReturn500_whenErrorOccur(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	googleUserUsecase := new(handlermock.GoogleUserUsecaseInterface)
+	googleUserUsecase.On("Authorize", anyOfCtx, "VALID_STATE", "ERROR_CODE", "ORG_NAME").Return(nil, errors.New("ERROR"))
+	r := initGoogleRouter(t, ctx, googleUserUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/google/authorize", bytes.NewBuffer([]byte(`{"organizationName": "ORG_NAME", "sessionState": "VALID_STATE", "paramState": "VALID_STATE", "code": "ERROR_CODE"}`)))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusInternalServerError, w.Code, "status code should be 500")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Equal(t, "Internal Server Error", message[0], "message should be 'Internal Server Error'")
+}
+
+func TestGoogleAuthHandler_Authorize_shouldReturn401_whenCodeIsInvalid(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	// given
+	googleUserUsecase := new(handlermock.GoogleUserUsecaseInterface)
+	googleUserUsecase.On("Authorize", anyOfCtx, "VALID_STATE", "INVALID_CODE", "ORG_NAME").Return(nil, domain.ErrUnauthenticated)
+	r := initGoogleRouter(t, ctx, googleUserUsecase)
+	w := httptest.NewRecorder()
+
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/google/authorize", bytes.NewBuffer([]byte(`{"organizationName": "ORG_NAME", "sessionState": "VALID_STATE", "paramState": "VALID_STATE", "code": "INVALID_CODE"}`)))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
+
+	// then
+	assert.Equal(t, http.StatusUnauthorized, w.Code, "status code should be 500")
+
+	jsonObj := parseJSON(t, respBytes)
+
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Equal(t, "Unauthorized", message[0], "message should be 'Unauthorized'")
+}
+
+func TestGoogleAuthHandler_Authorize_shouldReturn401_whenCodeIsValid(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
 	// given
 	authToksenSet := &domain.AuthTokenSet{
 		AccessToken:  "ACCESS_TOKEN",
 		RefreshToken: "REFRESH_TOKEN",
 	}
 	googleUserUsecase := new(handlermock.GoogleUserUsecaseInterface)
-	googleUserUsecase.On("Authorize", anythingOfContext, "VALID_CODE", "ORGANIZATION_NAME").Return(authToksenSet, nil)
-	googleUserUsecase.On("Authorize", anythingOfContext, "ERROR_CODE", "ORGANIZATION_NAME").Return(nil, errors.New("INVALID"))
-	googleUserUsecase.On("Authorize", anythingOfContext, "UNAUTHENTICATED_CODE", "ORGANIZATION_NAME").Return(nil, domain.ErrUnauthenticated)
+	googleUserUsecase.On("Authorize", anyOfCtx, "VALID_STATE", "VALID_CODE", "ORG_NAME").Return(authToksenSet, nil)
+	r := initGoogleRouter(t, ctx, googleUserUsecase)
+	w := httptest.NewRecorder()
 
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			// given
-			r := initGoogleRouter(t, ctx, googleUserUsecase)
-			w := httptest.NewRecorder()
+	// when
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/google/authorize", bytes.NewBuffer([]byte(`{"organizationName": "ORG_NAME", "sessionState": "VALID_STATE", "paramState": "VALID_STATE", "code": "VALID_CODE"}`)))
+	require.NoError(t, err)
+	r.ServeHTTP(w, req)
+	respBytes := readBytes(t, w.Body)
 
-			// when
-			req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/v1/google/authorize", bytes.NewBuffer([]byte(tt.args.requestBody)))
-			require.NoError(t, err)
-			r.ServeHTTP(w, req)
-			respBytes := readBytes(t, w.Body)
+	// then
+	assert.Equal(t, http.StatusOK, w.Code, "status code should be 200")
 
-			// - check the status code
-			assert.Equal(t, tt.outputs.statusCode, w.Code)
+	jsonObj := parseJSON(t, respBytes)
 
-			jsonObj := parseJSON(t, respBytes)
+	messageExpr := parseExpr(t, "$.message")
+	message := messageExpr.Get(jsonObj)
+	assert.Len(t, message, 0, "message should be null")
 
-			if w.Code != http.StatusOK {
-				// - check the message
-				messageExpr := parseExpr(t, "$.message")
-				message := messageExpr.Get(jsonObj)
-				assert.Equal(t, http.StatusText(w.Code), message[0])
-				return
-			}
+	accessTokenExpr := parseExpr(t, "$.accessToken")
+	accessToken := accessTokenExpr.Get(jsonObj)
+	assert.Equal(t, "ACCESS_TOKEN", accessToken[0], "accessToken should be 'ACCESS_TOKEN'")
 
-			// - check the accessToken
-			accessTokenExpr := parseExpr(t, "$.accessToken")
-			accessToken := accessTokenExpr.Get(jsonObj)
-			assert.Equal(t, tt.outputs.accessToken, accessToken[0])
-
-			// - check the refreshToken
-			refreshTokenExpr := parseExpr(t, "$.refreshToken")
-			refreshToken := refreshTokenExpr.Get(jsonObj)
-			assert.Equal(t, tt.outputs.refreshToken, refreshToken[0])
-		})
-	}
+	refreshTokenExpr := parseExpr(t, "$.refreshToken")
+	refreshToken := refreshTokenExpr.Get(jsonObj)
+	assert.Equal(t, "REFRESH_TOKEN", refreshToken[0], "refreshToken should be 'REFRESH_TOKEN'")
 }

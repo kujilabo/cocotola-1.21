@@ -10,5 +10,6 @@ create table workbook (
 ,problem_type varchar(20) not null
 ,lang2 varchar(2) not null
 ,description text
+,content jsonb not null
 ,primary key(id)
 );
