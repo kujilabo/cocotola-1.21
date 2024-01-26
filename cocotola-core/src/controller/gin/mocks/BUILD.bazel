@@ -2,11 +2,15 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "mocks",
-    srcs = ["WorkbookUsecaseInterface.go"],
+    srcs = [
+        "WorkbookCommandUsecase.go",
+        "WorkbookQueryUsecase.go",
+    ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/mocks",
     visibility = ["//visibility:public"],
     deps = [
-        "//cocotola-core/src/domain/workbookfind",
+        "//cocotola-core/src/domain",
+        "//cocotola-core/src/domain/workbookadd",
         "//cocotola-core/src/usecase/student",
         "@com_github_kujilabo_redstart//user/domain",
         "@com_github_stretchr_testify//mock",

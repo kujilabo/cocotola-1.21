@@ -11,77 +11,60 @@ import (
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/helper"
-	workbookfinddomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookfind"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
+	workbookadddomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookadd"
 	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student"
 )
 
 const defaultPageSize = 10
 
-type WorkbookFindModel struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
+// type WorkbookFindModel struct {
+// 	ID   int    `json:"id"`
+// 	Name string `json:"name"`
+// }
 
-type WorkbookFindResult struct {
-	TotalCount int                  `json:"totalCount"`
-	Results    []*WorkbookFindModel `json:"results"`
-}
+// type WorkbookFindResult struct {
+// 	TotalCount int                  `json:"totalCount"`
+// 	Results    []*WorkbookFindModel `json:"results"`
+// }
 
-type Problem struct {
-	Type       string            `json:"type"`
-	Properties map[string]string `json:"properties"`
-}
-type WorkbookWithProblem struct {
-	ID       int        `json:"id"`
-	Problems []*Problem `json:"problems"`
-}
-type WorkbookUsecaseInterface interface {
-	FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookfinddomain.Parameter) (*workbookfinddomain.Result, error)
+//	type Problem struct {
+//		Type       string            `json:"type"`
+//		Properties map[string]string `json:"properties"`
+//	}
+//
+//	type WorkbookWithProblem struct {
+//		ID       int        `json:"id"`
+//		Problems []*Problem `json:"problems"`
+//	}
+type WorkbookQueryUsecase interface {
+	FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *studentusecase.WorkbookFindParameter) (*studentusecase.WorkbookFindResult, error)
 
 	RetrieveWorkbookByID(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, workbookID int) (*studentusecase.WorkbookRetrieveModel, error)
 }
-
-type WorkbookHandler struct {
-	workbookusecase WorkbookUsecaseInterface
+type WorkbookCommandUsecase interface {
+	AddWorkbook(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookadddomain.Parameter) (*domain.WorkbookID, error)
 }
 
-func NewWorkbookHandler(workbookusecase WorkbookUsecaseInterface) *WorkbookHandler {
+type WorkbookHandler struct {
+	workbookQueryUsecase   WorkbookQueryUsecase
+	workbookCommandUsecase WorkbookCommandUsecase
+}
+
+func NewWorkbookHandler(workbookQueryUsecase WorkbookQueryUsecase, workbookCommandUsecase WorkbookCommandUsecase) *WorkbookHandler {
 	return &WorkbookHandler{
-		workbookusecase: workbookusecase,
+		workbookQueryUsecase:   workbookQueryUsecase,
+		workbookCommandUsecase: workbookCommandUsecase,
 	}
 }
 
 func (h *WorkbookHandler) FindWorkbooks(c *gin.Context) {
 	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID) error {
-		param := workbookfinddomain.Parameter{
+		param := studentusecase.WorkbookFindParameter{
 			PageNo:   1,
 			PageSize: defaultPageSize,
 		}
-		result, err := h.workbookusecase.FindWorkbooks(ctx, organizationID, operatorID, &param)
-		if err != nil {
-			return err
-		}
-
-		c.JSON(http.StatusOK, h.toWorkbookFindResultEntity(result))
-		return nil
-	}, h.errorHandle)
-}
-
-func (h *WorkbookHandler) toWorkbookFindResultEntity(model *workbookfinddomain.Result) *WorkbookFindResult {
-	results := make([]*WorkbookFindModel, len(model.Results))
-	for i, r := range model.Results {
-		results[i] = &WorkbookFindModel{ID: r.ID, Name: r.Name}
-	}
-
-	return &WorkbookFindResult{
-		TotalCount: model.TotalCount,
-		Results:    results,
-	}
-}
-
-func (h *WorkbookHandler) RetrieveWorkbookByID(c *gin.Context) {
-	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID) error {
-		result, err := h.workbookusecase.RetrieveWorkbookByID(ctx, organizationID, operatorID, 1)
+		result, err := h.workbookQueryUsecase.FindWorkbooks(ctx, organizationID, operatorID, &param)
 		if err != nil {
 			return err
 		}
@@ -89,6 +72,37 @@ func (h *WorkbookHandler) RetrieveWorkbookByID(c *gin.Context) {
 		c.JSON(http.StatusOK, result)
 		return nil
 	}, h.errorHandle)
+}
+
+// func (h *WorkbookHandler) toWorkbookFindResultEntity(model *studentusecase.WorkbookFindResult) *WorkbookFindResult {
+// 	results := make([]*WorkbookFindModel, len(model.Results))
+// 	for i, r := range model.Results {
+// 		results[i] = &WorkbookFindModel{ID: r.ID, Name: r.Name}
+// 	}
+
+// 	return &WorkbookFindResult{
+// 		TotalCount: model.TotalCount,
+// 		Results:    results,
+// 	}
+// }
+
+func (h *WorkbookHandler) RetrieveWorkbookByID(c *gin.Context) {
+	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID) error {
+		result, err := h.workbookQueryUsecase.RetrieveWorkbookByID(ctx, organizationID, operatorID, 1)
+		if err != nil {
+			return err
+		}
+
+		c.JSON(http.StatusOK, result)
+		return nil
+	}, h.errorHandle)
+}
+
+func (h *WorkbookHandler) AddWorkbook(c *gin.Context) {
+
+}
+func (h *WorkbookHandler) UpdateWorkbook(c *gin.Context) {
+
 }
 
 // func (h *WorkbookHandler) toWorkbookRetrieveResultEntity(model *workbookretrievedomain.WorkbookModel) *WorkbookWithProblem {
@@ -116,10 +130,10 @@ func (h *WorkbookHandler) errorHandle(ctx context.Context, logger *slog.Logger, 
 	return false
 }
 
-func NewInitWorkbookRouterFunc(workbookUsecase WorkbookUsecaseInterface) InitRouterGroupFunc {
+func NewInitWorkbookRouterFunc(workbookQueryUsecase WorkbookQueryUsecase, workbookCommandUsecase WorkbookCommandUsecase) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 		workbook := parentRouterGroup.Group("workbook")
-		workbookHandler := NewWorkbookHandler(workbookUsecase)
+		workbookHandler := NewWorkbookHandler(workbookQueryUsecase, workbookCommandUsecase)
 		for _, m := range middleware {
 			workbook.Use(m)
 		}
@@ -127,9 +141,9 @@ func NewInitWorkbookRouterFunc(workbookUsecase WorkbookUsecaseInterface) InitRou
 		workbook.GET(":workbookID", workbookHandler.RetrieveWorkbookByID)
 		// workbook.POST(":workbookID", privateWorkbookHandler.FindWorkbooks)
 		// workbook.GET(":workbookID", privateWorkbookHandler.FindWorkbookByID)
-		// workbook.PUT(":workbookID", privateWorkbookHandler.UpdateWorkbook)
+		workbook.PUT(":workbookID", workbookHandler.UpdateWorkbook)
 		// workbook.DELETE(":workbookID", privateWorkbookHandler.RemoveWorkbook)
-		// workbook.POST("", privateWorkbookHandler.AddWorkbook)
+		workbook.POST("", workbookHandler.AddWorkbook)
 		return nil
 	}
 }

@@ -5,8 +5,8 @@ go 1.21.4
 require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240124013713-b9cdbfba3fcb
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240124013713-b9cdbfba3fcb
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240125090208-d36bc222db5d
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240125090208-d36bc222db5d
 	github.com/kujilabo/redstart v0.0.10
 	github.com/ohler55/ojg v1.21.0
 	github.com/samber/slog-gin v1.10.1
@@ -64,7 +64,7 @@ require (
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.19 // indirect
+	github.com/mattn/go-sqlite3 v1.14.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/orandin/slog-gorm v1.1.0 // indirect

@@ -19,25 +19,25 @@ func HandleSecuredFunction(c *gin.Context, fn func(ctx context.Context, logger *
 
 	organizationIDInt := c.GetInt("OrganizationID")
 	if organizationIDInt == 0 {
-		c.Status(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
 	organizationID, err := rsuserdomain.NewOrganizationID(organizationIDInt)
 	if err != nil {
-		c.Status(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
 	appUserID := c.GetInt("AuthorizedUser")
 	if appUserID == 0 {
-		c.Status(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
 	operatorID, err := rsuserdomain.NewAppUserID(appUserID)
 	if err != nil {
-		c.Status(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
@@ -46,7 +46,7 @@ func HandleSecuredFunction(c *gin.Context, fn func(ctx context.Context, logger *
 	controllerLogger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 	if err := fn(ctx, controllerLogger, organizationID, operatorID); err != nil {
 		if handled := errorHandle(ctx, controllerLogger, c, err); !handled {
-			c.Status(http.StatusInternalServerError)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": http.StatusText(http.StatusInternalServerError)})
 		}
 	}
 }

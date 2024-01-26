@@ -4,9 +4,9 @@ go 1.21.4
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240124013713-b9cdbfba3fcb
-	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240124013713-b9cdbfba3fcb
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240124013713-b9cdbfba3fcb
+	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240125090208-d36bc222db5d
+	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240125090208-d36bc222db5d
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240125090208-d36bc222db5d
 	github.com/kujilabo/redstart v0.0.10
 	go.opentelemetry.io/otel v1.22.0
 	go.opentelemetry.io/otel/sdk v1.22.0
@@ -68,7 +68,7 @@ require (
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.19 // indirect
+	github.com/mattn/go-sqlite3 v1.14.20 // indirect
 	github.com/microsoft/go-mssqldb v1.6.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
