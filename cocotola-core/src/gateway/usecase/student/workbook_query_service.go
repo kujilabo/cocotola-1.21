@@ -7,6 +7,7 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/gateway"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student"
 )
 
@@ -24,7 +25,11 @@ func NewWorkbookQueryService(db *gorm.DB) studentusecase.WorkbookQueryService {
 	}
 }
 
-func (s *workbookQueryService) RetrieveWorkbookByID(ctx context.Context, workbookID *domain.WorkbookID) (*studentusecase.WorkbookRetrieveModel, error) {
+func (s *workbookQueryService) FindWorkbooks(ctx context.Context, operator service.OperatorInterface, param *studentusecase.WorkbookFindParameter) (*studentusecase.WorkbookFindResult, error) {
+	return nil, nil
+}
+
+func (s *workbookQueryService) RetrieveWorkbookByID(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID) (*studentusecase.WorkbookRetrieveResult, error) {
 	// workbookE := workbookEntity{}
 	// if result := s.db.Where("workbook.id = ?", workbookID.Int()).First(&workbookE); result.Error != nil {
 	// 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {

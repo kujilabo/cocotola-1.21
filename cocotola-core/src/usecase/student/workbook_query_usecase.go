@@ -4,15 +4,14 @@ import (
 	"context"
 	"errors"
 
-	rsuserdomain "github.com/kujilabo/redstart/user/domain"
-
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 )
 
 type WorkbookQueryService interface {
-	RetrieveWorkbookByID(ctx context.Context, workbookID *domain.WorkbookID) (*WorkbookRetrieveModel, error)
+	FindWorkbooks(ctx context.Context, operator service.OperatorInterface, param *WorkbookFindParameter) (*WorkbookFindResult, error)
+	RetrieveWorkbookByID(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID) (*WorkbookRetrieveResult, error)
 }
 
 type WorkbookQueryUsecase struct {
@@ -29,16 +28,23 @@ func NewWorkbookQueryUsecase(txManager, nonTxManager service.TransactionManager,
 	}
 }
 
-func (u *WorkbookQueryUsecase) FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *WorkbookFindParameter) (*WorkbookFindResult, error) {
-	return &WorkbookFindResult{
-		TotalCount: 1,
-		Results: []*WorkbookFindWorkbookModel{
-			{
-				ID:   1,
-				Name: "test",
-			},
-		},
-	}, nil
+func (u *WorkbookQueryUsecase) FindWorkbooks(ctx context.Context, operator service.OperatorInterface, param *WorkbookFindParameter) (*WorkbookFindResult, error) {
+	workbooks, err := u.workbookQuerySerivce.FindWorkbooks(ctx, operator, param)
+	if err != nil {
+		return nil, err
+	}
+
+	return workbooks, nil
+
+	// return &WorkbookFindResult{
+	// 	TotalCount: 1,
+	// 	Results: []*WorkbookFindWorkbookModel{
+	// 		{
+	// 			ID:   1,
+	// 			Name: "test",
+	// 		},
+	// 	},
+	// }, nil
 
 	// var result domain.WorkbookSearchResult
 	// fn := func(student service.Student) error {
@@ -63,15 +69,15 @@ func (u *WorkbookQueryUsecase) FindWorkbooks(ctx context.Context, organizationID
 	// return result, nil
 }
 
-func (u *WorkbookQueryUsecase) RetrieveWorkbookByID(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, workbookID int) (*WorkbookRetrieveModel, error) {
+func (u *WorkbookQueryUsecase) RetrieveWorkbookByID(ctx context.Context, operator service.OperatorInterface, workbookID int) (*WorkbookRetrieveResult, error) {
 	// TODO: check RBAC
 
-	model, err := u.workbookQuerySerivce.RetrieveWorkbookByID(ctx, &domain.WorkbookID{Value: workbookID})
+	workbook, err := u.workbookQuerySerivce.RetrieveWorkbookByID(ctx, operator, &domain.WorkbookID{Value: workbookID})
 	if err != nil {
 		return nil, err
 	}
 
-	return model, nil
+	return workbook, nil
 }
 
 type EnglishSentenceModel struct {
@@ -90,7 +96,9 @@ type EnglishSentencesModel struct {
 }
 type EnglishConversationModel struct {
 }
-type WorkbookRetrieveModel struct {
+
+// Retrieve
+type WorkbookRetrieveResult struct {
 	ID                  int                       `json:"id"`
 	Name                string                    `json:"name"`
 	ProblemType         string                    `json:"problmeType"`
@@ -98,6 +106,7 @@ type WorkbookRetrieveModel struct {
 	EnglishConversation *EnglishConversationModel `json:"englishConversation,omitempty"`
 }
 
+// Find
 type WorkbookFindParameter struct {
 	PageNo   int
 	PageSize int

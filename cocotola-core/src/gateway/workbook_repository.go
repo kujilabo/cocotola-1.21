@@ -63,7 +63,7 @@ func (e *WorkbookEntity) TableName() string {
 	return "workbook"
 }
 
-func (e *WorkbookEntity) ToModel() (*studentusecase.WorkbookRetrieveModel, error) {
+func (e *WorkbookEntity) ToModel() (*studentusecase.WorkbookRetrieveResult, error) {
 	if e.ProblemType == "english_sentences" {
 		gwEngSentences, err := ToEnglishSentenceModel([]byte(e.Content))
 		if err != nil {
@@ -85,7 +85,7 @@ func (e *WorkbookEntity) ToModel() (*studentusecase.WorkbookRetrieveModel, error
 			}
 		}
 
-		return &studentusecase.WorkbookRetrieveModel{
+		return &studentusecase.WorkbookRetrieveResult{
 			ID:          e.ID,
 			Name:        e.Name,
 			ProblemType: e.ProblemType,
@@ -108,7 +108,7 @@ func NewWorkbookQueryService(db *gorm.DB) service.WorkbookRepository {
 	}
 }
 
-func (r *workbookRepository) AddWorkbook(ctx context.Context, operator service.AppUserIDInterface, param service.WorkbookAddParameter) (*domain.WorkbookID, error) {
+func (r *workbookRepository) AddWorkbook(ctx context.Context, operator service.OperatorInterface, param service.WorkbookAddParameter) (*domain.WorkbookID, error) {
 	_, span := tracer.Start(ctx, "workbookRepository.AddWorkbook")
 	defer span.End()
 
@@ -135,7 +135,7 @@ func (r *workbookRepository) AddWorkbook(ctx context.Context, operator service.A
 	return workbookID, nil
 }
 
-func (r *workbookRepository) UpdateWorkbook(ctx context.Context, operator service.AppUserIDInterface, workbookID *domain.WorkbookID, version int, param service.WorkbookUpdateParameter) error {
+func (r *workbookRepository) UpdateWorkbook(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID, version int, param service.WorkbookUpdateParameter) error {
 	_, span := tracer.Start(ctx, "workbookRepository.UpdateWorkbook")
 	defer span.End()
 

@@ -25,7 +25,7 @@ type WorkbookUpdateParameter struct {
 	Content     string
 }
 
-type AppUserIDInterface interface {
+type OperatorInterface interface {
 	AppUserID() *rsuserdomain.AppUserID
 	OrganizationID() *rsuserdomain.OrganizationID
 	// LoginID() string
@@ -33,7 +33,7 @@ type AppUserIDInterface interface {
 }
 
 type WorkbookRepository interface {
-	AddWorkbook(ctx context.Context, operator AppUserIDInterface, param WorkbookAddParameter) (*domain.WorkbookID, error)
+	AddWorkbook(ctx context.Context, operator OperatorInterface, param WorkbookAddParameter) (*domain.WorkbookID, error)
 
-	UpdateWorkbook(ctx context.Context, operator AppUserIDInterface, workbookID *domain.WorkbookID, version int, param WorkbookUpdateParameter) error
+	UpdateWorkbook(ctx context.Context, operator OperatorInterface, workbookID *domain.WorkbookID, version int, param WorkbookUpdateParameter) error
 }

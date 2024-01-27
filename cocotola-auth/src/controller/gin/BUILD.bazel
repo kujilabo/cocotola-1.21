@@ -7,6 +7,8 @@ go_library(
         "auth.go",
         "auth_handler.go",
         "google_auth_handler.go",
+        "password_auth_handler.go",
+        "user_handler.go",
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin",
     visibility = ["//visibility:public"],

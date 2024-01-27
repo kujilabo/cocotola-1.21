@@ -70,6 +70,7 @@ func (u *Authentication) GetUserInfo(ctx context.Context, bearerToken string) (*
 
 	return targetAppUserModel, nil
 }
+
 func (u *Authentication) RefreshToken(ctx context.Context, refreshToken string) (string, error) {
 	accessToken, err := u.authTokenManager.RefreshToken(ctx, refreshToken)
 	if err != nil {

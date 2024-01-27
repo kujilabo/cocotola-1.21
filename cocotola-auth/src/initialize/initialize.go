@@ -71,6 +71,7 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 
 	authenticationUsecase := usecase.NewAuthentication(txManager, authTokenManager, &systemOwnerByOrganizationName{})
 	googleUserUsecase := usecase.NewGoogleUserUsecase(txManager, nonTxManager, authTokenManager, googleAuthClient)
+	passwordUsecase := usecase.NewPasswordUsecae(txManager, nonTxManager, authTokenManager)
 
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{}
 
@@ -78,6 +79,7 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 		controller.NewInitTestRouterFunc(),
 		controller.NewInitAuthRouterFunc(authenticationUsecase),
 		controller.NewInitGoogleRouterFunc(googleUserUsecase),
+		controller.NewInitPasswordRouterFunc(passwordUsecase),
 	}
 
 	if err := controller.InitRouter(ctx, parentRouterGroup, publicRouterGroupFunc, privateRouterGroupFunc, gincorsConfig, debugConfig, appName); err != nil {
@@ -87,7 +89,7 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 	return nil
 }
 
-func InitApp1(ctx context.Context, txManager, nonTxManager service.TransactionManager, organizationName string, password string) {
+func InitApp1(ctx context.Context, txManager, nonTxManager service.TransactionManager, organizationName, loginID, password string) {
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.CoreMainLoggerContextKey)
 	addOrganizationFunc := func(ctx context.Context, systemAdmin *rsuserservice.SystemAdmin) error {
 		organization, err := systemAdmin.FindOrganizationByName(ctx, organizationName)
@@ -98,7 +100,7 @@ func InitApp1(ctx context.Context, txManager, nonTxManager service.TransactionMa
 			return rsliberrors.Errorf("failed to AddOrganization. err: %w", err)
 		}
 
-		firstOwnerAddParam, err := rsuserservice.NewAppUserAddParameter("cocotola-owner", "Owner(cocotola)", password, "", "", "", "")
+		firstOwnerAddParam, err := rsuserservice.NewAppUserAddParameter(loginID, "Owner(cocotola)", password, "", "", "", "")
 		if err != nil {
 			return rsliberrors.Errorf("NewFirstOwnerAddParameter. err: %w", err)
 		}

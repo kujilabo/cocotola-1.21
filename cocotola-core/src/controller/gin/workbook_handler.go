@@ -8,11 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	rsuserdomain "github.com/kujilabo/redstart/user/domain"
-
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/helper"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 	workbookadddomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookadd"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student"
 )
 
@@ -38,12 +37,12 @@ const defaultPageSize = 10
 //		Problems []*Problem `json:"problems"`
 //	}
 type WorkbookQueryUsecase interface {
-	FindWorkbooks(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *studentusecase.WorkbookFindParameter) (*studentusecase.WorkbookFindResult, error)
+	FindWorkbooks(ctx context.Context, operator service.OperatorInterface, param *studentusecase.WorkbookFindParameter) (*studentusecase.WorkbookFindResult, error)
 
-	RetrieveWorkbookByID(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, workbookID int) (*studentusecase.WorkbookRetrieveModel, error)
+	RetrieveWorkbookByID(ctx context.Context, operator service.OperatorInterface, workbookID int) (*studentusecase.WorkbookRetrieveResult, error)
 }
 type WorkbookCommandUsecase interface {
-	AddWorkbook(ctx context.Context, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID, param *workbookadddomain.Parameter) (*domain.WorkbookID, error)
+	AddWorkbook(ctx context.Context, operator service.OperatorInterface, param *workbookadddomain.Parameter) (*domain.WorkbookID, error)
 }
 
 type WorkbookHandler struct {
@@ -59,12 +58,12 @@ func NewWorkbookHandler(workbookQueryUsecase WorkbookQueryUsecase, workbookComma
 }
 
 func (h *WorkbookHandler) FindWorkbooks(c *gin.Context) {
-	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID) error {
+	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, operator service.OperatorInterface) error {
 		param := studentusecase.WorkbookFindParameter{
 			PageNo:   1,
 			PageSize: defaultPageSize,
 		}
-		result, err := h.workbookQueryUsecase.FindWorkbooks(ctx, organizationID, operatorID, &param)
+		result, err := h.workbookQueryUsecase.FindWorkbooks(ctx, operator, &param)
 		if err != nil {
 			return err
 		}
@@ -87,8 +86,8 @@ func (h *WorkbookHandler) FindWorkbooks(c *gin.Context) {
 // }
 
 func (h *WorkbookHandler) RetrieveWorkbookByID(c *gin.Context) {
-	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, organizationID *rsuserdomain.OrganizationID, operatorID *rsuserdomain.AppUserID) error {
-		result, err := h.workbookQueryUsecase.RetrieveWorkbookByID(ctx, organizationID, operatorID, 1)
+	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, operator service.OperatorInterface) error {
+		result, err := h.workbookQueryUsecase.RetrieveWorkbookByID(ctx, operator, 1)
 		if err != nil {
 			return err
 		}

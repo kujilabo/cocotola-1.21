@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
 	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	rsliblog "github.com/kujilabo/redstart/lib/log"
@@ -126,7 +127,7 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, AuthResponse{
+	c.JSON(http.StatusOK, libapi.AuthResponse{
 		AccessToken:  &authResult.AccessToken,
 		RefreshToken: &authResult.RefreshToken,
 	})

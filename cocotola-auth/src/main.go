@@ -87,7 +87,7 @@ func main() {
 
 	logger.Info(fmt.Sprintf("%+v", proto.HelloRequest{}))
 
-	initialize.InitApp1(ctx, txManager, nonTxManager, "cocotola", cfg.App.OwnerPassword)
+	initialize.InitApp1(ctx, txManager, nonTxManager, "cocotola", cfg.App.OwnerLoginID, cfg.App.OwnerPassword)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
