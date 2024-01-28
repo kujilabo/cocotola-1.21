@@ -33,3 +33,7 @@ coverage.lcov
 # proto/*.go
 
 genhtml
+
+
+*.csv
+
