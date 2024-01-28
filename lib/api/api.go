@@ -32,3 +32,62 @@ type SynthesizeResponse struct {
 	AudioContent           string `json:"audioContent"`
 	AudioLengthMillisecond int    `json:"audioLengthMillisecond"`
 }
+
+// Find
+type WorkbookFindParameter struct {
+	PageNo   int
+	PageSize int
+}
+
+type WorkbookFindWorkbookModel struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type WorkbookFindResult struct {
+	TotalCount int                          `json:"totalCount"`
+	Results    []*WorkbookFindWorkbookModel `json:"results"`
+}
+
+// Retrieve
+type WorkbookRetrieveResult struct {
+	ID                  int                       `json:"id"`
+	Version             int                       `json:"version"`
+	Name                string                    `json:"name"`
+	Lang2               string                    `json:"lang2" binding:"required"`
+	Description         string                    `json:"description"`
+	ProblemType         string                    `json:"problmeType"`
+	EnglishSentences    *EnglishSentencesModel    `json:"englishSentences,omitempty"`
+	EnglishConversation *EnglishConversationModel `json:"englishConversation,omitempty"`
+}
+
+type WorkbookAddParameter struct {
+	Name        string `json:"name" binding:"required"`
+	ProblemType string `json:"problemType" binding:"required"`
+	Lang2       string `json:"lang2" binding:"required"`
+	Description string `json:"description"`
+	Content     string `json:"content"`
+}
+
+type WorkbookUpdateParameter struct {
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description"`
+	Content     string `json:"content"`
+}
+type EnglishConversationModel struct {
+}
+
+type EnglishSentenceModel struct {
+	SrcLang2                  string `json:"srcLang2"`
+	SrcAudioContent           string `json:"srcAudioContent"`
+	SrcAudioLengthMillisecond int    `json:"SrcAudioLengthMillisecond"`
+	SrcText                   string `json:"srcText"`
+	DstLang2                  string `json:"dstLang2"`
+	DstAudioContent           string `json:"dstAudioContent"`
+	DstAudioLengthMillisecond int    `json:"DstAudioLengthMillisecond"`
+	DstText                   string `json:"dstText"`
+}
+
+type EnglishSentencesModel struct {
+	Sentences []*EnglishSentenceModel `json:"sentences"`
+}

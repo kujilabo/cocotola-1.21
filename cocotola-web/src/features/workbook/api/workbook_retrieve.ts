@@ -2,7 +2,7 @@ import axios from 'axios';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
-import { WorkbookWithProblems } from 'src/features/workbook/types';
+import { WorkbookWithProblems, EnglishSentences } from 'src/features/workbook/types';
 
 import { backendCoreUrl, extractErrorMessage } from '@/lib/base';
 import { jsonHeaders } from '@/lib/util';
@@ -20,10 +20,11 @@ type WorkbookRetrieveResponse = {
   id: number;
   name: string;
   description: string;
-  problems: {
-    type: string;
-    properties: { [key: string]: string };
-  }[];
+  englishSentences: EnglishSentences;
+  // problems: {
+  //   type: string;
+  //   properties: { [key: string]: string };
+  // }[];
 };
 
 export const useWorkbookRetrieveStore = create<State & Action>()(

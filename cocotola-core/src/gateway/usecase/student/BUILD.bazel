@@ -10,6 +10,7 @@ go_library(
         "//cocotola-core/src/gateway",
         "//cocotola-core/src/service",
         "//cocotola-core/src/usecase/student",
+        "//lib/api",
         "@io_gorm_gorm//:gorm",
     ],
 )

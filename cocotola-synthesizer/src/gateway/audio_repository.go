@@ -3,13 +3,16 @@ package gateway
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
 
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/service"
@@ -95,15 +98,23 @@ func (r *audioRepository) FindByLangAndText(ctx context.Context, lang5 *libdomai
 	_, span := tracer.Start(ctx, "audioRepository.FindByLangAndText")
 	defer span.End()
 
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppUsecaseLoggerContextKey)
+
 	entity := audioEntity{}
 	if result := r.db.Where("lang5 = ? and text = ?", lang5.String(), text).First(&entity); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.InfoContext(ctx, "audio not found. lang: %s, text: %s", lang5.String(), text)
 			return nil, service.ErrAudioNotFound
 		}
+
+		logger.InfoContext(ctx, fmt.Sprintf("err: %v", result.Error))
 		return nil, result.Error
 	}
+
+	logger.InfoContext(ctx, fmt.Sprintf("found: %s", text))
 	audioModel, err := entity.toAudioModel()
 	if err != nil {
+		logger.InfoContext(ctx, fmt.Sprintf("err: %v", err))
 		return nil, err
 	}
 

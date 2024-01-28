@@ -14,7 +14,6 @@ go_library(
     deps = [
         "//cocotola-core/src/domain",
         "//cocotola-core/src/service",
-        "//cocotola-core/src/usecase/student",
         "//lib/api",
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/errors",

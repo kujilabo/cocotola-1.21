@@ -33,4 +33,8 @@ func NewRepositoryFactory(ctx context.Context, dialect rslibgateway.DialectRDBMS
 	}, nil
 }
 
+func (f *RepositoryFactory) NewWorkbookRepository(ctx context.Context) (service.WorkbookRepository, error) {
+	return NewWorkbookRepository(f.db), nil
+}
+
 type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)

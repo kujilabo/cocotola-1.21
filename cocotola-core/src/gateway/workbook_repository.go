@@ -13,7 +13,7 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
-	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student"
+	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
 )
 
 type EnglishSentenceModel struct {
@@ -63,17 +63,17 @@ func (e *WorkbookEntity) TableName() string {
 	return "workbook"
 }
 
-func (e *WorkbookEntity) ToModel() (*studentusecase.WorkbookRetrieveResult, error) {
+func (e *WorkbookEntity) ToModel() (*libapi.WorkbookRetrieveResult, error) {
 	if e.ProblemType == "english_sentences" {
 		gwEngSentences, err := ToEnglishSentenceModel([]byte(e.Content))
 		if err != nil {
 			return nil, err
 		}
 
-		sentences := make([]*studentusecase.EnglishSentenceModel, len(gwEngSentences.Sentences))
+		sentences := make([]*libapi.EnglishSentenceModel, len(gwEngSentences.Sentences))
 		for i := range gwEngSentences.Sentences {
 			gwEngSentence := gwEngSentences.Sentences[i]
-			sentences[i] = &studentusecase.EnglishSentenceModel{
+			sentences[i] = &libapi.EnglishSentenceModel{
 				SrcLang2:                  gwEngSentence.SrcLang2,
 				SrcAudioContent:           gwEngSentence.SrcAudioContent,
 				SrcAudioLengthMillisecond: gwEngSentence.SrcAudioLengthMillisecond,
@@ -85,11 +85,12 @@ func (e *WorkbookEntity) ToModel() (*studentusecase.WorkbookRetrieveResult, erro
 			}
 		}
 
-		return &studentusecase.WorkbookRetrieveResult{
+		return &libapi.WorkbookRetrieveResult{
 			ID:          e.ID,
+			Version:     e.Version,
 			Name:        e.Name,
 			ProblemType: e.ProblemType,
-			EnglishSentences: &studentusecase.EnglishSentencesModel{
+			EnglishSentences: &libapi.EnglishSentencesModel{
 				Sentences: sentences,
 			},
 		}, nil
@@ -102,13 +103,13 @@ type workbookRepository struct {
 	db *gorm.DB
 }
 
-func NewWorkbookQueryService(db *gorm.DB) service.WorkbookRepository {
+func NewWorkbookRepository(db *gorm.DB) service.WorkbookRepository {
 	return &workbookRepository{
 		db: db,
 	}
 }
 
-func (r *workbookRepository) AddWorkbook(ctx context.Context, operator service.OperatorInterface, param service.WorkbookAddParameter) (*domain.WorkbookID, error) {
+func (r *workbookRepository) AddWorkbook(ctx context.Context, operator service.OperatorInterface, param *service.WorkbookAddParameter) (*domain.WorkbookID, error) {
 	_, span := tracer.Start(ctx, "workbookRepository.AddWorkbook")
 	defer span.End()
 
@@ -135,7 +136,7 @@ func (r *workbookRepository) AddWorkbook(ctx context.Context, operator service.O
 	return workbookID, nil
 }
 
-func (r *workbookRepository) UpdateWorkbook(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID, version int, param service.WorkbookUpdateParameter) error {
+func (r *workbookRepository) UpdateWorkbook(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID, version int, param *service.WorkbookUpdateParameter) error {
 	_, span := tracer.Start(ctx, "workbookRepository.UpdateWorkbook")
 	defer span.End()
 

@@ -64,7 +64,7 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, authAPICo
 	}
 	workbookQuerySerivce := studentusecasegateway.NewWorkbookQueryService(db)
 	workbookQueryUsecase := studentusecase.NewWorkbookQueryUsecase(txManager, nonTxManager, workbookQuerySerivce)
-	workbookCommandUsecase := studentusecase.NewWorkbookCommandUsecase()
+	workbookCommandUsecase := studentusecase.NewWorkbookCommandUsecase(txManager, nonTxManager)
 	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitWorkbookRouterFunc(workbookQueryUsecase, workbookCommandUsecase),
 	}
