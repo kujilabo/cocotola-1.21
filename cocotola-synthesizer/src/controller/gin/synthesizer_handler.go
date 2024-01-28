@@ -1,13 +1,19 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-)
+	"context"
+	"log/slog"
+	"net/http"
 
-type SynthesizeParameter struct {
-	Lang5 string `json:"lang2" binding:"required,len=5"`
-	Text  string `json:"text" binding:"required"`
-}
+	"github.com/gin-gonic/gin"
+
+	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
+	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
+	rsliblog "github.com/kujilabo/redstart/lib/log"
+
+	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/domain"
+)
 
 type AudioResponse struct {
 	ID      int    `json:"id"`
@@ -17,6 +23,7 @@ type AudioResponse struct {
 }
 
 type SynthesizerInterface interface {
+	Synthesize(ctx context.Context, lang5 *libdomain.Lang5, void, text string) (*domain.AudioModel, error)
 }
 
 type SynthesizerHandler struct {
@@ -30,6 +37,32 @@ func NewSynthesizerHandler(syntheziserUsecase SynthesizerInterface) *Synthesizer
 }
 
 func (h *SynthesizerHandler) Synthesize(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+
+	synthesizeParameter := libapi.SynthesizeParameter{}
+	if err := c.ShouldBindJSON(&synthesizeParameter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	lang5, err := libdomain.NewLang5(synthesizeParameter.Lang5)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	audioModel, err := h.syntheziserUsecase.Synthesize(ctx, lang5, synthesizeParameter.Voice, synthesizeParameter.Text)
+	if err != nil {
+		logger.ErrorContext(ctx, "syntheziserUsecase.Synthesize", slog.Any("err", err))
+		c.JSON(http.StatusInternalServerError, gin.H{"message": http.StatusText(http.StatusInternalServerError)})
+		return
+	}
+
+	c.JSON(http.StatusOK, &libapi.SynthesizeResponse{
+		AudioContent:           audioModel.Content,
+		AudioLengthMillisecond: int(audioModel.Length.Milliseconds()),
+	})
 }
 
 func (h *SynthesizerHandler) FindAudioByID(c *gin.Context) {

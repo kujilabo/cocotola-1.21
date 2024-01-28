@@ -122,7 +122,7 @@ func main() {
 		panic(err)
 	}
 
-	authinit.InitApp1(ctx, authTxManager, authNonTxManager, "cocotola", cfg.App.OwnerPassword)
+	authinit.InitApp1(ctx, authTxManager, authNonTxManager, "cocotola", cfg.App.OwnerLoginID, cfg.App.OwnerPassword)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 

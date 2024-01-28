@@ -21,3 +21,14 @@ type AuthResponse struct {
 type RefreshTokenParameter struct {
 	RefreshToken string `json:"refreshToken"`
 }
+
+type SynthesizeParameter struct {
+	Lang5 string `json:"lang5" binding:"required,len=5"`
+	Voice string `json:"voice"`
+	Text  string `json:"text"`
+}
+
+type SynthesizeResponse struct {
+	AudioContent           string `json:"audioContent"`
+	AudioLengthMillisecond int    `json:"audioLengthMillisecond"`
+}

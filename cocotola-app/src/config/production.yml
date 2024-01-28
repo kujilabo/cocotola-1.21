@@ -3,6 +3,7 @@ app:
   name: cocotola-app
   httpPort: 8080
   metricsPort: 8081
+  ownerLoginId: $OWNER_LOGIN_ID
   ownerPassword: $OWNER_PASSWORD
 db:
   driverName: postgres

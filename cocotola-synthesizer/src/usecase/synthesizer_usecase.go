@@ -30,7 +30,7 @@ func NewSynthesizerUsecase(txManager, nonTxManager service.TransactionManager, s
 	}
 }
 
-func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.Lang5, text string) (*domain.AudioModel, error) {
+func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.Lang5, voice, text string) (*domain.AudioModel, error) {
 	var audioModel *domain.AudioModel
 
 	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
@@ -44,10 +44,12 @@ func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.La
 		}
 		return service.ErrAudioNotFound
 	}); err != nil {
-		return nil, err
+		if !errors.Is(err, service.ErrAudioNotFound) {
+			return nil, err
+		}
 	}
 
-	audioContent, err := u.synthesizerClient.Synthesize(ctx, lang5, "FEMALE", text)
+	audioContent, err := u.synthesizerClient.Synthesize(ctx, lang5, voice, text)
 	if err != nil {
 		return nil, rsliberrors.Errorf("to u.synthesizerClient.Synthesize. err: %w", err)
 	}
