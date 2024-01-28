@@ -81,7 +81,9 @@ func TestWorkbookHandler_FindWorkbook_shouldReturn200(t *testing.T) {
 	}, nil)
 
 	workbookQueryUsecase := new(handlermock.WorkbookQueryUsecase)
-	workbookQueryUsecase.On("FindWorkbooks", anyOfCtx, organizationID(t, 456), appUserID(t, 123), mock.Anything).Return(&studentusecase.WorkbookFindResult{
+	workbookQueryUsecase.On("FindWorkbooks", anyOfCtx, mock.MatchedBy(func(o service.OperatorInterface) bool {
+		return o.OrganizationID().Int() == 456 && o.AppUserID().Int() == 123
+	}), mock.Anything).Return(&studentusecase.WorkbookFindResult{
 		TotalCount: 789,
 		Results: []*studentusecase.WorkbookFindWorkbookModel{
 			{

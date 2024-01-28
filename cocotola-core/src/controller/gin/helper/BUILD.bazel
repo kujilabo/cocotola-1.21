@@ -6,6 +6,7 @@ go_library(
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/helper",
     visibility = ["//visibility:public"],
     deps = [
+        "//cocotola-core/src/service",
         "//lib/log",
         "@com_github_gin_gonic_gin//:gin",
         "@com_github_kujilabo_redstart//lib/log",

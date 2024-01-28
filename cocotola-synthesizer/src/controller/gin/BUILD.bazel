@@ -10,8 +10,11 @@ go_library(
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/controller/gin",
     visibility = ["//visibility:public"],
     deps = [
+        "//cocotola-synthesizer/src/domain",
+        "//lib/api",
         "//lib/config",
         "//lib/controller/gin/middleware",
+        "//lib/domain",
         "//lib/log",
         "@com_github_gin_contrib_cors//:cors",
         "@com_github_gin_gonic_gin//:gin",

@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//cocotola-core/src/domain",
         "//cocotola-core/src/gateway",
+        "//cocotola-core/src/service",
         "//cocotola-core/src/usecase/student",
         "@io_gorm_gorm//:gorm",
     ],

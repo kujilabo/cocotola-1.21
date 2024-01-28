@@ -11,7 +11,7 @@ services:
       MYSQL_DATABASE: testdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      TZ: "Etc/GMT"
+      TZ: 'Etc/GMT'
     ports:
       - 3307:3306
   test-auth-mysql:
@@ -24,6 +24,30 @@ services:
       MYSQL_DATABASE: testdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      TZ: "Etc/GMT"
+      TZ: 'Etc/GMT'
     ports:
       - 3317:3306
+  test-core-postgres:
+    image: postgres:15.5-alpine3.19
+    container_name: test-core-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5433:5432
+  test-auth-postgres:
+    image: postgres:15.5-alpine3.19
+    container_name: test-auth-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5443:5432
+  test-synthesizer-postgres:
+    image: postgres:15.5-alpine3.19
+    container_name: test-synthesizer-postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5453:5432

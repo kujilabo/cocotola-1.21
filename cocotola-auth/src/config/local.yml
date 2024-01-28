@@ -3,6 +3,7 @@ app:
   name: cocotola-auth
   httpPort: 8010
   metricsPort: 8011
+  ownerLoginId: cocotola-owner
   ownerPassword: password
 db:
   driverName: postgres

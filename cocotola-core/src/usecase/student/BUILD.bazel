@@ -12,6 +12,5 @@ go_library(
         "//cocotola-core/src/domain",
         "//cocotola-core/src/domain/workbookadd",
         "//cocotola-core/src/service",
-        "@com_github_kujilabo_redstart//user/domain",
     ],
 )

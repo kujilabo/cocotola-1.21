@@ -5,11 +5,11 @@ package mocks
 import (
 	context "context"
 
-	domain "github.com/kujilabo/redstart/user/domain"
+	domain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 
 	mock "github.com/stretchr/testify/mock"
 
-	srcdomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
+	service "github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 
 	workbookadddomain "github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain/workbookadd"
 )
@@ -27,25 +27,25 @@ func (_m *WorkbookCommandUsecase) EXPECT() *WorkbookCommandUsecase_Expecter {
 	return &WorkbookCommandUsecase_Expecter{mock: &_m.Mock}
 }
 
-// AddWorkbook provides a mock function with given fields: ctx, organizationID, operatorID, param
-func (_m *WorkbookCommandUsecase) AddWorkbook(ctx context.Context, organizationID *domain.OrganizationID, operatorID *domain.AppUserID, param *workbookadddomain.Parameter) (*srcdomain.WorkbookID, error) {
-	ret := _m.Called(ctx, organizationID, operatorID, param)
+// AddWorkbook provides a mock function with given fields: ctx, operator, param
+func (_m *WorkbookCommandUsecase) AddWorkbook(ctx context.Context, operator service.OperatorInterface, param *workbookadddomain.Parameter) (*domain.WorkbookID, error) {
+	ret := _m.Called(ctx, operator, param)
 
-	var r0 *srcdomain.WorkbookID
+	var r0 *domain.WorkbookID
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *domain.OrganizationID, *domain.AppUserID, *workbookadddomain.Parameter) (*srcdomain.WorkbookID, error)); ok {
-		return rf(ctx, organizationID, operatorID, param)
+	if rf, ok := ret.Get(0).(func(context.Context, service.OperatorInterface, *workbookadddomain.Parameter) (*domain.WorkbookID, error)); ok {
+		return rf(ctx, operator, param)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *domain.OrganizationID, *domain.AppUserID, *workbookadddomain.Parameter) *srcdomain.WorkbookID); ok {
-		r0 = rf(ctx, organizationID, operatorID, param)
+	if rf, ok := ret.Get(0).(func(context.Context, service.OperatorInterface, *workbookadddomain.Parameter) *domain.WorkbookID); ok {
+		r0 = rf(ctx, operator, param)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*srcdomain.WorkbookID)
+			r0 = ret.Get(0).(*domain.WorkbookID)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *domain.OrganizationID, *domain.AppUserID, *workbookadddomain.Parameter) error); ok {
-		r1 = rf(ctx, organizationID, operatorID, param)
+	if rf, ok := ret.Get(1).(func(context.Context, service.OperatorInterface, *workbookadddomain.Parameter) error); ok {
+		r1 = rf(ctx, operator, param)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -60,26 +60,25 @@ type WorkbookCommandUsecase_AddWorkbook_Call struct {
 
 // AddWorkbook is a helper method to define mock.On call
 //   - ctx context.Context
-//   - organizationID *domain.OrganizationID
-//   - operatorID *domain.AppUserID
+//   - operator service.OperatorInterface
 //   - param *workbookadddomain.Parameter
-func (_e *WorkbookCommandUsecase_Expecter) AddWorkbook(ctx interface{}, organizationID interface{}, operatorID interface{}, param interface{}) *WorkbookCommandUsecase_AddWorkbook_Call {
-	return &WorkbookCommandUsecase_AddWorkbook_Call{Call: _e.mock.On("AddWorkbook", ctx, organizationID, operatorID, param)}
+func (_e *WorkbookCommandUsecase_Expecter) AddWorkbook(ctx interface{}, operator interface{}, param interface{}) *WorkbookCommandUsecase_AddWorkbook_Call {
+	return &WorkbookCommandUsecase_AddWorkbook_Call{Call: _e.mock.On("AddWorkbook", ctx, operator, param)}
 }
 
-func (_c *WorkbookCommandUsecase_AddWorkbook_Call) Run(run func(ctx context.Context, organizationID *domain.OrganizationID, operatorID *domain.AppUserID, param *workbookadddomain.Parameter)) *WorkbookCommandUsecase_AddWorkbook_Call {
+func (_c *WorkbookCommandUsecase_AddWorkbook_Call) Run(run func(ctx context.Context, operator service.OperatorInterface, param *workbookadddomain.Parameter)) *WorkbookCommandUsecase_AddWorkbook_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*domain.OrganizationID), args[2].(*domain.AppUserID), args[3].(*workbookadddomain.Parameter))
+		run(args[0].(context.Context), args[1].(service.OperatorInterface), args[2].(*workbookadddomain.Parameter))
 	})
 	return _c
 }
 
-func (_c *WorkbookCommandUsecase_AddWorkbook_Call) Return(_a0 *srcdomain.WorkbookID, _a1 error) *WorkbookCommandUsecase_AddWorkbook_Call {
+func (_c *WorkbookCommandUsecase_AddWorkbook_Call) Return(_a0 *domain.WorkbookID, _a1 error) *WorkbookCommandUsecase_AddWorkbook_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *WorkbookCommandUsecase_AddWorkbook_Call) RunAndReturn(run func(context.Context, *domain.OrganizationID, *domain.AppUserID, *workbookadddomain.Parameter) (*srcdomain.WorkbookID, error)) *WorkbookCommandUsecase_AddWorkbook_Call {
+func (_c *WorkbookCommandUsecase_AddWorkbook_Call) RunAndReturn(run func(context.Context, service.OperatorInterface, *workbookadddomain.Parameter) (*domain.WorkbookID, error)) *WorkbookCommandUsecase_AddWorkbook_Call {
 	_c.Call.Return(run)
 	return _c
 }

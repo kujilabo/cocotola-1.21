@@ -198,11 +198,11 @@ dev-docker-down:
 
 .PHONY: test-docker-up
 test-docker-up:
-	@docker compose -f docker-compose-test.yml up -d
+	@docker compose -f docker/test/docker-compose.yml up -d
 
 .PHONY: test-docker-down
 test-docker-down:
-	@docker compose -f docker-compose-test.yml down
+	@docker compose -f docker/test/docker-compose.yml down
 
 fly-deploy:
 	make build-web

@@ -63,7 +63,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	ctx := c.Request.Context()
 	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
 	logger.InfoContext(ctx, "Authorize")
-	refreshTokenParameter := RefreshTokenParameter{}
+	refreshTokenParameter := libapi.RefreshTokenParameter{}
 	if err := c.ShouldBindJSON(&refreshTokenParameter); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": http.StatusText(http.StatusBadRequest)})
 		return
@@ -75,7 +75,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, AuthResponse{
+	c.JSON(http.StatusOK, libapi.AuthResponse{
 		AccessToken: &accessToken,
 	})
 }

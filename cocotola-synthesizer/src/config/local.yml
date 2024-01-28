@@ -23,10 +23,10 @@ db:
     host: 127.0.0.1
     port: 5452
     database: postgres
-authApi:
-  endpoint: http://localhost:8010
-  username: username
-  password: password
+# authApi:
+#   endpoint: http://localhost:8010
+#   username: username
+#   password: password
 googleTextToSpeech:
   apiKey: $GOOGLE_TEXT_TO_SPEECH_API_KEY
   apiTimeoutSec: 5
