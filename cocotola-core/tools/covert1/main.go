@@ -35,6 +35,7 @@ func main() {
 	}
 	defer out_file.Close()
 	synthesizerClient := synthesizeClient{
+		endpoint: "http://localhost:8020",
 		username: "username",
 		password: "password",
 	}
@@ -96,6 +97,7 @@ func (r *englishSentencesCSVReader) Next(ctx context.Context) error {
 }
 
 type synthesizeClient struct {
+	endpoint string
 	username string
 	password string
 }
@@ -105,7 +107,7 @@ func (c *synthesizeClient) synthesize(ctx context.Context, lang5, voice, text st
 	logger.InfoContext(ctx, "synthesize")
 	httpClient := http.Client{}
 
-	authEndpoint, err := url.Parse("http://localhost:8020")
+	authEndpoint, err := url.Parse(c.endpoint)
 	if err != nil {
 		return "", 0, err
 	}
