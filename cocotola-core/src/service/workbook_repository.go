@@ -11,6 +11,8 @@ import (
 
 var ErrWorkbookAlreadyExists = errors.New("Workbook already exists")
 
+var ErrWorkbookNotFound = errors.New("workbook not found")
+
 type WorkbookAddParameter struct {
 	Name        string
 	ProblemType string
@@ -33,7 +35,7 @@ type OperatorInterface interface {
 }
 
 type WorkbookRepository interface {
-	AddWorkbook(ctx context.Context, operator OperatorInterface, param WorkbookAddParameter) (*domain.WorkbookID, error)
+	AddWorkbook(ctx context.Context, operator OperatorInterface, param *WorkbookAddParameter) (*domain.WorkbookID, error)
 
-	UpdateWorkbook(ctx context.Context, operator OperatorInterface, workbookID *domain.WorkbookID, version int, param WorkbookUpdateParameter) error
+	UpdateWorkbook(ctx context.Context, operator OperatorInterface, workbookID *domain.WorkbookID, version int, param *WorkbookUpdateParameter) error
 }

@@ -68,12 +68,17 @@ func main() {
 		return gateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
 	}
 
+	rf, err := rff(ctx, db)
+	if err != nil {
+		panic(err)
+	}
+
 	txManager, err := gateway.NewTransactionManager(db, rff)
 	if err != nil {
 		panic(err)
 	}
 
-	nonTxManager, err := gateway.NewNonTransactionManager(rff)
+	nonTxManager, err := gateway.NewNonTransactionManager(rf)
 	if err != nil {
 		panic(err)
 	}

@@ -24,7 +24,6 @@ import (
 	handlermock "github.com/kujilabo/cocotola-1.21/cocotola-core/src/controller/gin/mocks"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
 	servicemock "github.com/kujilabo/cocotola-1.21/cocotola-core/src/service/mocks"
-	studentusecase "github.com/kujilabo/cocotola-1.21/cocotola-core/src/usecase/student"
 )
 
 var (
@@ -83,9 +82,9 @@ func TestWorkbookHandler_FindWorkbook_shouldReturn200(t *testing.T) {
 	workbookQueryUsecase := new(handlermock.WorkbookQueryUsecase)
 	workbookQueryUsecase.On("FindWorkbooks", anyOfCtx, mock.MatchedBy(func(o service.OperatorInterface) bool {
 		return o.OrganizationID().Int() == 456 && o.AppUserID().Int() == 123
-	}), mock.Anything).Return(&studentusecase.WorkbookFindResult{
+	}), mock.Anything).Return(&libapi.WorkbookFindResult{
 		TotalCount: 789,
-		Results: []*studentusecase.WorkbookFindWorkbookModel{
+		Results: []*libapi.WorkbookFindWorkbookModel{
 			{
 				ID:   135,
 				Name: "WORKBOOK_NAME",

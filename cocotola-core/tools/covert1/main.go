@@ -93,6 +93,8 @@ func (r *englishSentencesCSVReader) Next(ctx context.Context) error {
 		return err
 	}
 
+	r.writer1.Flush()
+
 	return nil
 }
 

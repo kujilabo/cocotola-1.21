@@ -30,7 +30,7 @@ import { useParams, Link } from 'react-router-dom';
 import { BasicButton } from '@/components/buttons/BasicButton';
 
 import { useWorkbookRetrieveStore } from '../api/workbook_retrieve';
-import { Problem } from '../types';
+import { EnglishSentence } from '../types';
 
 export const header = 'data:audio/mp3;base64';
 const toNumber = (s: string | undefined): number => {
@@ -47,12 +47,12 @@ const pad = (num: number, size: number): string => {
 const makeTrackNo = (num: number): string => {
   return 'track' + pad(num, 2);
 };
-const createSpriteForSourceOnly = (problems: Problem[]): SoundSpriteDefinitions => {
+const createSpriteForSourceOnly = (englishSentences: EnglishSentence[]): SoundSpriteDefinitions => {
   let offset = 0;
   const tmpSprite: SoundSpriteDefinitions = {};
-  for (let i = 0; i < problems.length; i++) {
-    const problem = problems[i];
-    const audioLength = +problem.properties['srcAudioLength'];
+  for (let i = 0; i < englishSentences.length; i++) {
+    const englishSentence = englishSentences[i];
+    const audioLength = englishSentence.srcAudioLengthMillisecones;
     const trackNo = makeTrackNo(i + 1);
     tmpSprite[trackNo] = [offset, audioLength];
     offset += audioLength;
@@ -60,15 +60,15 @@ const createSpriteForSourceOnly = (problems: Problem[]): SoundSpriteDefinitions 
   return tmpSprite;
 };
 const createSpriteForSourceAndDestination = (
-  problems: Problem[],
+  englishSentences: EnglishSentence[],
   totalAudioLength: number
 ): SoundSpriteDefinitions => {
   let offset = 0;
   const tmpSprite: SoundSpriteDefinitions = {};
 
-  for (let i = 0; i < problems.length; i++) {
-    const problem = problems[i];
-    const audioLength = +problem.properties['srcAudioLength'];
+  for (let i = 0; i < englishSentences.length; i++) {
+    const englishSentence = englishSentences[i];
+    const audioLength = englishSentence.srcAudioLengthMillisecones;
     const trackNo1 = makeTrackNo(i * 2 + 1);
     tmpSprite[trackNo1] = [offset, audioLength];
     offset += audioLength;
@@ -81,23 +81,23 @@ const createSpriteForSourceAndDestination = (
 
 const createSprite = (
   player: number,
-  problems: Problem[],
+  englishSentences: EnglishSentence[],
   totalAudioLength: number
 ): SoundSpriteDefinitions => {
   if (player === PLAYER_SOURCE_ONLY) {
-    return createSpriteForSourceOnly(problems);
+    return createSpriteForSourceOnly(englishSentences);
   } else if (player === PLAYER_SOURCE_AND_DESTINATION) {
-    return createSpriteForSourceAndDestination(problems, totalAudioLength);
+    return createSpriteForSourceAndDestination(englishSentences, totalAudioLength);
   } else {
     return {};
   }
 };
-const createCard = (problems: Problem[], activeIndex: number) => {
+const createCard = (englishSentences: EnglishSentence[], activeIndex: number) => {
   const activeColor = 'green.300';
   const inactiveColor = 'gray.100';
   return (
     <Box>
-      {problems.map((problem: Problem, i: number) => {
+      {englishSentences.map((englishSentence: EnglishSentence, i: number) => {
         const color = activeIndex == i ? activeColor : inactiveColor;
         return (
           <Box key={i}>
@@ -107,9 +107,9 @@ const createCard = (problems: Problem[], activeIndex: number) => {
                 <Card bg="gray.100" width="90%" borderColor={color} borderWidth={1}>
                   <CardBody>
                     <Box>
-                      <Heading size="xs">{problem.properties['dstText']}</Heading>
+                      <Heading size="xs">{englishSentence.dstText}</Heading>
                       <Text pt="2" fontSize="sm">
-                        {problem.properties['srcText']}
+                        {englishSentence.srcText}
                       </Text>
                     </Box>
                   </CardBody>
@@ -202,13 +202,13 @@ export const WorkbookView = (): JSX.Element => {
     const workbook = workbooks[workbookId];
     let src = header + ',';
     let totalAudioLength = 0;
-    for (let i = 0; i < workbook.problems.length; i++) {
-      const problem = workbook.problems[i];
-      src += problem.properties['srcAudioContent'];
-      totalAudioLength += +problem.properties['srcAudioLength'];
+    for (let i = 0; i < workbook.englishSentences.sentences.length; i++) {
+      const sentence = workbook.englishSentences.sentences[i];
+      src += sentence.srcAudioContent;
+      totalAudioLength += +sentence.srcAudioLengthMillisecones;
     }
 
-    const tmpSprite = createSprite(player, workbook.problems, totalAudioLength);
+    const tmpSprite = createSprite(player, workbook.englishSentences.sentences, totalAudioLength);
     setSprite(tmpSprite);
     setTrackLength(Object.keys(tmpSprite).length);
     setSrc(src);
@@ -283,7 +283,7 @@ export const WorkbookView = (): JSX.Element => {
   }
   const workbook = workbooks[workbookId];
 
-  const card = createCard(workbook.problems, trackIndex - 1);
+  const card = createCard(workbook.englishSentences.sentences, trackIndex - 1);
 
   const footer = (
     // <ButtonGroup>

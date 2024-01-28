@@ -4,13 +4,17 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 
 	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
 
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
+	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/service"
+
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 type SynthesizerUsecase struct {
@@ -31,23 +35,34 @@ func NewSynthesizerUsecase(txManager, nonTxManager service.TransactionManager, s
 }
 
 func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.Lang5, voice, text string) (*domain.AudioModel, error) {
+	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppUsecaseLoggerContextKey)
 	var audioModel *domain.AudioModel
 
 	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
 		// try to find the audio content from the DB
 		repo := rf.NewAudioRepository(ctx)
-		if tmpAudioModel, err := repo.FindByLangAndText(ctx, lang5, text); err == nil {
-			audioModel = tmpAudioModel
-			return nil
-		} else if !errors.Is(err, service.ErrAudioNotFound) {
+		tmpAudioModel, err := repo.FindByLangAndText(ctx, lang5, text)
+		if err != nil {
+			if errors.Is(err, service.ErrAudioNotFound) {
+				return service.ErrAudioNotFound
+			}
+
 			return rsliberrors.Errorf("FindByLangAndText. err: %w", err)
 		}
-		return service.ErrAudioNotFound
+
+		audioModel = tmpAudioModel
+		return nil
 	}); err != nil {
 		if !errors.Is(err, service.ErrAudioNotFound) {
 			return nil, err
 		}
 	}
+
+	if audioModel != nil {
+		return audioModel, nil
+	}
+
+	logger.InfoContext(ctx, fmt.Sprintf("audio not found. lang: %s, text: %s", lang5.String(), text))
 
 	audioContent, err := u.synthesizerClient.Synthesize(ctx, lang5, voice, text)
 	if err != nil {

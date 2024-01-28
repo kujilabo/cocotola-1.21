@@ -10,9 +10,8 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-core/src/domain",
-        "//cocotola-core/src/domain/workbookadd",
         "//cocotola-core/src/service",
-        "//cocotola-core/src/usecase/student",
+        "//lib/api",
         "@com_github_stretchr_testify//mock",
     ],
 )

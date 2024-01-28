@@ -5,7 +5,10 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/tools/import1",
     visibility = ["//visibility:private"],
-    deps = ["//lib/api"],
+    deps = [
+        "//cocotola-core/src/domain",
+        "//lib/api",
+    ],
 )
 
 go_binary(
