@@ -4,7 +4,7 @@ go 1.21.4
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240128043145-ec650553dc24
+	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240128153617-66e14a9f9ede
 	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240128043145-ec650553dc24
 	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240128043145-ec650553dc24
 	github.com/kujilabo/redstart v0.0.11
