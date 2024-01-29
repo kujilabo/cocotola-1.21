@@ -7,7 +7,6 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
@@ -228,7 +227,8 @@ func (u *GoogleUserUsecase) Authorize(ctx context.Context, state, code, organiza
 
 func (u *GoogleUserUsecase) registerAppUser(ctx context.Context, rf service.RepositoryFactory, organizationName string, loginID string, username string,
 	providerID, providerAccessToken, providerRefreshToken string) (*rsuserdomain.OrganizationModel, *rsuserdomain.AppUserModel, error) {
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthUsecaseLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	rsrf, err := rf.NewRedstartRepositoryFactory(ctx)
 	if err != nil {

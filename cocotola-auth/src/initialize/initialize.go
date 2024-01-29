@@ -17,7 +17,6 @@ import (
 	rsuserservice "github.com/kujilabo/redstart/user/service"
 
 	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/config"
 	controller "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin"
@@ -90,7 +89,9 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 }
 
 func InitApp1(ctx context.Context, txManager, nonTxManager service.TransactionManager, organizationName, loginID, password string) {
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.CoreMainLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	addOrganizationFunc := func(ctx context.Context, systemAdmin *rsuserservice.SystemAdmin) error {
 		organization, err := systemAdmin.FindOrganizationByName(ctx, organizationName)
 		if err == nil {

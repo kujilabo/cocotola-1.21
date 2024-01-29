@@ -9,7 +9,6 @@ import (
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 func NewAuthMiddleware(cocotolaAuthClient service.CocotolaAuthClient) gin.HandlerFunc {
@@ -18,7 +17,7 @@ func NewAuthMiddleware(cocotolaAuthClient service.CocotolaAuthClient) gin.Handle
 		ctx, span := tracer.Start(ctx, "authMiddleware")
 		defer span.End()
 
-		logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppTraceLoggerContextKey)
+		logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 		authorization := c.GetHeader("Authorization")
 		if !strings.HasPrefix(authorization, "Bearer ") {

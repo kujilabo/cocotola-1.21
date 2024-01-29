@@ -7,6 +7,7 @@ go_library(
         "auth.go",
         "auth_handler.go",
         "google_auth_handler.go",
+        "init.go",
         "password_auth_handler.go",
         "user_handler.go",
     ],

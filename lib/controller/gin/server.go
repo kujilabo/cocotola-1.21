@@ -13,8 +13,9 @@ import (
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 )
 
-func AppServerProcess(ctx context.Context, appName string, router http.Handler, port int, readHeaderTimeout time.Duration, shutdownTime time.Duration) error {
-	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(appName))
+func AppServerProcess(ctx context.Context, loggerKey rslibdomain.ContextKey, router http.Handler, port int, readHeaderTimeout time.Duration, shutdownTime time.Duration) error {
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	httpServer := http.Server{
 		Addr:              ":" + strconv.Itoa(port),

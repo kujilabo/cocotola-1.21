@@ -12,7 +12,6 @@ import (
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
 	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 type AuthenticationUsecaseInterface interface {
@@ -32,7 +31,9 @@ func NewAuthHandler(authenticationUsecase AuthenticationUsecaseInterface) *AuthH
 
 func (h *AuthHandler) GetUserInfo(c *gin.Context) {
 	ctx := c.Request.Context()
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	logger.InfoContext(ctx, "GetUserInfo")
 
 	authorization := c.GetHeader("Authorization")
@@ -61,7 +62,9 @@ func (h *AuthHandler) GetUserInfo(c *gin.Context) {
 
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	ctx := c.Request.Context()
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	logger.InfoContext(ctx, "Authorize")
 	refreshTokenParameter := libapi.RefreshTokenParameter{}
 	if err := c.ShouldBindJSON(&refreshTokenParameter); err != nil {

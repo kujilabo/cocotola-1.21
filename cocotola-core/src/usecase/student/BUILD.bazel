@@ -3,6 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "student",
     srcs = [
+        "init.go",
         "workbook_command_usecase.go",
         "workbook_query_usecase.go",
     ],

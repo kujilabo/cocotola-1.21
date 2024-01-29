@@ -13,7 +13,6 @@ import (
 
 	libconfig "github.com/kujilabo/cocotola-1.21/lib/config"
 	libmiddleware "github.com/kujilabo/cocotola-1.21/lib/controller/gin/middleware"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 type InitRouterGroupFunc func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) error
@@ -32,7 +31,8 @@ func NewInitTestRouterFunc() InitRouterGroupFunc {
 }
 
 func InitRouter(ctx context.Context, parentRouterGroup gin.IRouter, initPublicRouterFunc []InitRouterGroupFunc, initPrivateRouterFunc []InitRouterGroupFunc, corsConfig cors.Config, debugConfig *libconfig.DebugConfig, appName string) error {
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	parentRouterGroup.Use(cors.New(corsConfig))
 	parentRouterGroup.Use(sloggin.New(logger))

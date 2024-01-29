@@ -2,7 +2,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "initialize",
-    srcs = ["initialize.go"],
+    srcs = [
+        "init.go",
+        "initialize.go",
+    ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/initialize",
     visibility = ["//visibility:public"],
     deps = [

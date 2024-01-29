@@ -10,6 +10,14 @@ go_library(
 
 go_binary(
     name = "covert1",
-    embed = [":covert1_lib"],
+    embed = [":convert1_lib"],
     visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "convert1_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/tools/convert1",
+    visibility = ["//visibility:private"],
+    deps = ["//lib/api"],
 )

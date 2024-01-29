@@ -11,7 +11,6 @@ import (
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 )
@@ -31,8 +30,8 @@ func NewPasswordAuthHandler(passwordUsecase PasswordUsecaseInterface) *PasswordA
 
 func (h *PasswordAuthHandler) Authorize(c *gin.Context) {
 	ctx := c.Request.Context()
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
-	logger.Info("Authorize")
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	passwordAuthParameter := libapi.PasswordAuthParameter{}
 	if err := c.ShouldBindJSON(&passwordAuthParameter); err != nil {

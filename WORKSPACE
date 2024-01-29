@@ -1949,8 +1949,8 @@ go_repository(
 go_repository(
     name = "org_modernc_libc",
     importpath = "modernc.org/libc",
-    sum = "h1:oeLS0G067ZqUu+v143Dqad0btMfKmNS7SuOsnkq0Ysg=",
-    version = "v1.40.7",
+    sum = "h1:ZHN83BZzEytp4ctJMC2lxGTU3l8jo+2kGW7AUatIDZw=",
+    version = "v1.40.8",
 )
 
 go_repository(
@@ -2077,8 +2077,8 @@ go_repository(
 go_repository(
     name = "com_github_kujilabo_redstart",
     importpath = "github.com/kujilabo/redstart",
-    sum = "h1:1DSTyCtF5O1tQrOWTD4uzgezGN0H0DFwVnSKdd2Z81w=",
-    version = "v0.0.11",
+    sum = "h1:XyNPqeIfUlmKZjfhqVrXAhRA3h9m6MpU++I73Y9Gptw=",
+    version = "v0.0.12",
 )
 
 go_repository(

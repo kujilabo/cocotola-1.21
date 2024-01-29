@@ -52,7 +52,9 @@ shutdown:
   timeSec1: 10
   timeSec2: 10
 log:
-  level: $LOG_LEVEL
+  level:
+    default: info
+    cocotola-auth: info
 swagger:
   enabled: false
   host: localhost:8080

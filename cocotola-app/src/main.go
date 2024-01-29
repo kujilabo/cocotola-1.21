@@ -44,7 +44,11 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-app/src/config"
 )
 
-const readHeaderTimeout = time.Duration(30) * time.Second
+const (
+	readHeaderTimeout = time.Duration(30) * time.Second
+
+	loggerKey = liblog.AppMainLoggerContextKey
+)
 
 //go:embed web_dist
 var web embed.FS
@@ -64,11 +68,6 @@ func main() {
 	flag.Parse()
 	appEnv := getValue(*env, os.Getenv("APP_ENV"), "local")
 	slog.InfoContext(ctx, fmt.Sprintf("env: %s", appEnv))
-	{
-		logger := slog.Default()
-		logger.InfoContext(ctx, fmt.Sprintf("SECRET: %s", os.Getenv("GOOGLE_CLIENT_SECRET")))
-	}
-
 	rsliberrors.UseXerrorsErrorf()
 
 	cfg, dialect, db, sqlDB, tp := initialize(ctx, appEnv)
@@ -76,10 +75,8 @@ func main() {
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
 	ctx = liblog.InitLogger(ctx)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
 	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
-
-	logger1 := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
-	logger1.InfoContext(ctx, "test1")
 
 	authRFF := func(ctx context.Context, db *gorm.DB) (authservice.RepositoryFactory, error) {
 		return authgateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
@@ -202,7 +199,7 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, authTxManager aut
 			return err
 		}
 
-		return libcontroller.AppServerProcess(ctx, cfg.App.Name, router, cfg.App.HTTPPort, readHeaderTimeout, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck
+		return libcontroller.AppServerProcess(ctx, loggerKey, router, cfg.App.HTTPPort, readHeaderTimeout, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		return rslibgateway.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck

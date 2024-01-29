@@ -13,8 +13,6 @@ import (
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/service"
-
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 type SynthesizerUsecase struct {
@@ -35,7 +33,9 @@ func NewSynthesizerUsecase(txManager, nonTxManager service.TransactionManager, s
 }
 
 func (u *SynthesizerUsecase) Synthesize(ctx context.Context, lang5 *libdomain.Lang5, voice, text string) (*domain.AudioModel, error) {
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppUsecaseLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	var audioModel *domain.AudioModel
 
 	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {

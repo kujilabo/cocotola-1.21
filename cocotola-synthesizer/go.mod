@@ -5,8 +5,8 @@ go 1.21.4
 require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240128043145-ec650553dc24
-	github.com/kujilabo/redstart v0.0.11
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240128153617-66e14a9f9ede
+	github.com/kujilabo/redstart v0.0.12
 	github.com/samber/slog-gin v1.10.1
 	github.com/stretchr/testify v1.8.4
 	github.com/tcolgate/mp3 v0.0.0-20170426193717-e79c5a46d300
@@ -116,7 +116,7 @@ require (
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/driver/sqlserver v1.5.2 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
-	modernc.org/libc v1.40.7 // indirect
+	modernc.org/libc v1.40.8 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
