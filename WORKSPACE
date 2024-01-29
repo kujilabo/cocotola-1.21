@@ -1949,8 +1949,8 @@ go_repository(
 go_repository(
     name = "org_modernc_libc",
     importpath = "modernc.org/libc",
-    sum = "h1:oeLS0G067ZqUu+v143Dqad0btMfKmNS7SuOsnkq0Ysg=",
-    version = "v1.40.7",
+    sum = "h1:ZHN83BZzEytp4ctJMC2lxGTU3l8jo+2kGW7AUatIDZw=",
+    version = "v1.40.8",
 )
 
 go_repository(

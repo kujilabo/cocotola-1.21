@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240128043145-ec650553dc24
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240128153617-66e14a9f9ede
 	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240128153617-66e14a9f9ede
 	github.com/kujilabo/redstart v0.0.11
 	github.com/ohler55/ojg v1.21.0
@@ -119,7 +119,7 @@ require (
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/driver/sqlserver v1.5.2 // indirect
 	gorm.io/plugin/dbresolver v1.5.0 // indirect
-	modernc.org/libc v1.40.7 // indirect
+	modernc.org/libc v1.40.8 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
