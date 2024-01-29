@@ -7,7 +7,7 @@ require (
 	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240128153617-66e14a9f9ede
 	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240128153617-66e14a9f9ede
 	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240128153617-66e14a9f9ede
-	github.com/kujilabo/redstart v0.0.11
+	github.com/kujilabo/redstart v0.0.12
 	go.opentelemetry.io/otel v1.22.0
 	go.opentelemetry.io/otel/sdk v1.22.0
 	golang.org/x/sync v0.6.0

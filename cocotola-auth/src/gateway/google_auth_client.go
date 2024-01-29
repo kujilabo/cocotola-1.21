@@ -12,7 +12,6 @@ import (
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 type HTTPClient interface {
@@ -50,7 +49,8 @@ func NewGoogleAuthClient(httpClient HTTPClient, clientID, clientSecret, redirect
 func (c *GoogleAuthClient) RetrieveAccessToken(ctx context.Context, code string) (*domain.AuthTokenSet, error) {
 	ctx, span := tracer.Start(ctx, "googleAuthClient.RetrieveAccessToken")
 	defer span.End()
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	paramMap := map[string]string{
 		"client_id":     c.ClientID,

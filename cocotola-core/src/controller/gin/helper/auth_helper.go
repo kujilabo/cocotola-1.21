@@ -11,7 +11,6 @@ import (
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 type operator struct {
@@ -28,7 +27,8 @@ func (o *operator) OrganizationID() *rsuserdomain.OrganizationID {
 
 func HandleSecuredFunction(c *gin.Context, fn func(ctx context.Context, logger *slog.Logger, operator service.OperatorInterface) error, errorHandle func(ctx context.Context, logger *slog.Logger, c *gin.Context, err error) bool) {
 	ctx := c.Request.Context()
-	authLogger := rsliblog.GetLoggerFromContext(ctx, liblog.AppAuthLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	authLogger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	organizationIDInt := c.GetInt("OrganizationID")
 	if organizationIDInt == 0 {
@@ -60,7 +60,7 @@ func HandleSecuredFunction(c *gin.Context, fn func(ctx context.Context, logger *
 		appUserID:      operatorID,
 		organizationID: organizationID,
 	}
-	controllerLogger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	controllerLogger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 	if err := fn(ctx, controllerLogger, operator); err != nil {
 		if handled := errorHandle(ctx, controllerLogger, c, err); !handled {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": http.StatusText(http.StatusInternalServerError)})

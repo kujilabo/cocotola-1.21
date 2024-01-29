@@ -1,9 +1,9 @@
 package handler
 
 import (
-	rslibdomain "github.com/kujilabo/redstart/lib/domain"
+	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 )
 
 const (
-	HandlerContextKey rslibdomain.ContextKey = "handler"
+	loggerKey = liblog.SynthesizerControllerLoggerContextKey
 )

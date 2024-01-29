@@ -12,8 +12,6 @@ import (
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 	rsuserdomain "github.com/kujilabo/redstart/user/domain"
 
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
-
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/service"
 )
@@ -98,11 +96,13 @@ func (m *AuthTokenManager) CreateTokenSet(ctx context.Context, appUser service.A
 }
 
 func (m *AuthTokenManager) createJWT(ctx context.Context, appUser service.AppUserInterface, organization service.OrganizationInterface, duration time.Duration, tokenType string) (string, error) {
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	if len(m.SigningKey) == 0 {
 		return "", rsliberrors.Errorf("m.SigningKey is not set")
 	}
 
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
 	now := time.Now()
 	claims := AppUserClaims{
 		LoginID:          appUser.LoginID(),
@@ -144,7 +144,8 @@ func (m *AuthTokenManager) GetUserInfo(ctx context.Context, tokenString string) 
 }
 
 func (m *AuthTokenManager) parseToken(ctx context.Context, tokenString string) (*AppUserClaims, error) {
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AuthGatewayLoggerContextKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		return m.SigningKey, nil
 	}

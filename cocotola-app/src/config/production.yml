@@ -7,6 +7,7 @@ app:
   ownerPassword: $OWNER_PASSWORD
 db:
   driverName: postgres
+  migration: false
   postgres:
     username: $POSTGRES_USERNAME
     password: $POSTGRES_PASSWORD

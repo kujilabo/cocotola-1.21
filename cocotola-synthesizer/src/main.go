@@ -18,7 +18,6 @@ import (
 	"gorm.io/gorm"
 
 	rslibconfig "github.com/kujilabo/redstart/lib/config"
-	rslibdomain "github.com/kujilabo/redstart/lib/domain"
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
@@ -33,6 +32,10 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/initialize"
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/service"
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/sqls"
+)
+
+const (
+	loggerKey = liblog.SynthesizerMainLoggerContextKey
 )
 
 func getValue(values ...string) string {
@@ -58,7 +61,8 @@ func main() {
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
 	ctx = liblog.InitLogger(ctx)
-	logger := rsliblog.GetLoggerFromContext(ctx, rslibdomain.ContextKey(cfg.App.Name))
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
 		return gateway.NewRepositoryFactory(ctx, dialect, cfg.DB.DriverName, db, time.UTC) // nolint:wrapcheck
@@ -132,7 +136,7 @@ func run(ctx context.Context, cfg *config.Config, txManager, nonTxManager servic
 		if err := initialize.InitAppServer(ctx, router, *cfg.InternalAuth, cfg.CORS, cfg.Debug, cfg.TTS, cfg.App.Name, txManager, nonTxManager, rsrf); err != nil {
 			return err
 		}
-		return libcontroller.AppServerProcess(ctx, cfg.App.Name, router, cfg.App.HTTPPort, time.Duration(cfg.App.ReadHeaderTimeoutSec)*time.Second, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck
+		return libcontroller.AppServerProcess(ctx, loggerKey, router, cfg.App.HTTPPort, time.Duration(cfg.App.ReadHeaderTimeoutSec)*time.Second, time.Duration(cfg.Shutdown.TimeSec1)*time.Second) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		return rslibgateway.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck

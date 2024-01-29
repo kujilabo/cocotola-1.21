@@ -2,7 +2,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "initialize",
-    srcs = ["initialize.go"],
+    srcs = [
+        "init.go",
+        "initialize.go",
+    ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-core/src/initialize",
     visibility = ["//visibility:public"],
     deps = [
@@ -14,6 +17,7 @@ go_library(
         "//cocotola-core/src/service",
         "//cocotola-core/src/usecase/student",
         "//lib/config",
+        "//lib/log",
         "@com_github_gin_gonic_gin//:gin",
         "@com_github_kujilabo_redstart//lib/config",
         "@io_gorm_gorm//:gorm",

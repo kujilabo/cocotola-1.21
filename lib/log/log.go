@@ -9,40 +9,62 @@ import (
 )
 
 const (
-	LibGatewayLoggerContextKey     rslibdomain.ContextKey = "lib_gateway"
-	AppGORMLoggerContextKey        rslibdomain.ContextKey = "app_gorm"
-	AppServiceLoggerContextKey     rslibdomain.ContextKey = "app_service"
-	AppGatewayLoggerContextKey     rslibdomain.ContextKey = "app_gateway"
-	AppControllerLoggerContextKey  rslibdomain.ContextKey = "app_controller"
-	AppGinLoggerContextKey         rslibdomain.ContextKey = "app_gin"
-	AppTraceLoggerContextKey       rslibdomain.ContextKey = "app_trace"
-	AppAuthLoggerContextKey        rslibdomain.ContextKey = "app_auth"
-	AppUsecaseLoggerContextKey     rslibdomain.ContextKey = "app_usecase"
-	CoreMainLoggerContextKey       rslibdomain.ContextKey = "core_main"
-	AuthGatewayLoggerContextKey    rslibdomain.ContextKey = "auth_gateway"
-	AuthControllerLoggerContextKey rslibdomain.ContextKey = "auth_controller"
-	AuthUsecaseLoggerContextKey    rslibdomain.ContextKey = "auth_usecase"
-	AuthDomainLoggerContextKey     rslibdomain.ContextKey = "auth_domain"
-	AuthServiceLoggerContextKey    rslibdomain.ContextKey = "auth_service"
+	AppControllerLoggerContextKey         rslibdomain.ContextKey = "app_controller"
+	AppGatewayLoggerContextKey            rslibdomain.ContextKey = "app_gateway"
+	AppInitializeLoggerContextKey         rslibdomain.ContextKey = "app_initialize"
+	AppMainLoggerContextKey               rslibdomain.ContextKey = "app_main"
+	AppServiceLoggerContextKey            rslibdomain.ContextKey = "app_service"
+	AppUsecaseLoggerContextKey            rslibdomain.ContextKey = "app_usecase"
+	AuthControllerLoggerContextKey        rslibdomain.ContextKey = "auth_controller"
+	AuthGatewayLoggerContextKey           rslibdomain.ContextKey = "auth_gateway"
+	AuthInitializeLoggerContextKey        rslibdomain.ContextKey = "auth_initialize"
+	AuthMainLoggerContextKey              rslibdomain.ContextKey = "auth_main"
+	AuthServiceLoggerContextKey           rslibdomain.ContextKey = "auth_service"
+	AuthUsecaseLoggerContextKey           rslibdomain.ContextKey = "auth_usecase"
+	CoreControllerLoggerContextKey        rslibdomain.ContextKey = "core_controller"
+	CoreGatewayLoggerContextKey           rslibdomain.ContextKey = "core_gateway"
+	CoreInitializeLoggerContextKey        rslibdomain.ContextKey = "core_initialize"
+	CoreMainLoggerContextKey              rslibdomain.ContextKey = "core_main"
+	CoreServiceLoggerContextKey           rslibdomain.ContextKey = "core_service"
+	CoreUsecaseLoggerContextKey           rslibdomain.ContextKey = "core_usecase"
+	LibControllerLoggerContextKey         rslibdomain.ContextKey = "lib_controller"
+	LibGatewayLoggerContextKey            rslibdomain.ContextKey = "lib_gateway"
+	SynthesizerControllerLoggerContextKey rslibdomain.ContextKey = "synthesizer_controller"
+	SynthesizerGatewayLoggerContextKey    rslibdomain.ContextKey = "synthesizer_gateway"
+	SynthesizerInitializeLoggerContextKey rslibdomain.ContextKey = "synthesizer_initialize"
+	SynthesizerMainLoggerContextKey       rslibdomain.ContextKey = "synthesizer_main"
+	SynthesizerServiceLoggerContextKey    rslibdomain.ContextKey = "synthesizer_service"
+	SynthesizerUsecaseLoggerContextKey    rslibdomain.ContextKey = "synthesizer_usecase"
 )
 
 var (
 	LoggerKeys = []rslibdomain.ContextKey{
-		LibGatewayLoggerContextKey,
-		AppGORMLoggerContextKey,
-		AppServiceLoggerContextKey,
-		AppGatewayLoggerContextKey,
 		AppControllerLoggerContextKey,
-		AppGinLoggerContextKey,
-		AppTraceLoggerContextKey,
-		AppAuthLoggerContextKey,
+		AppGatewayLoggerContextKey,
+		AppInitializeLoggerContextKey,
+		AppMainLoggerContextKey,
+		AppServiceLoggerContextKey,
 		AppUsecaseLoggerContextKey,
-		CoreMainLoggerContextKey,
-		AuthGatewayLoggerContextKey,
 		AuthControllerLoggerContextKey,
-		AuthUsecaseLoggerContextKey,
-		AuthDomainLoggerContextKey,
+		AuthGatewayLoggerContextKey,
+		AuthInitializeLoggerContextKey,
+		AuthMainLoggerContextKey,
 		AuthServiceLoggerContextKey,
+		AuthUsecaseLoggerContextKey,
+		CoreControllerLoggerContextKey,
+		CoreGatewayLoggerContextKey,
+		CoreInitializeLoggerContextKey,
+		CoreMainLoggerContextKey,
+		CoreServiceLoggerContextKey,
+		CoreUsecaseLoggerContextKey,
+		LibControllerLoggerContextKey,
+		LibGatewayLoggerContextKey,
+		SynthesizerControllerLoggerContextKey,
+		SynthesizerGatewayLoggerContextKey,
+		SynthesizerInitializeLoggerContextKey,
+		SynthesizerMainLoggerContextKey,
+		SynthesizerServiceLoggerContextKey,
+		SynthesizerUsecaseLoggerContextKey,
 	}
 )
 
@@ -53,5 +75,6 @@ func InitLogger(ctx context.Context) context.Context {
 		}
 		ctx = context.WithValue(ctx, key, rsliblog.Loggers[key])
 	}
+
 	return ctx
 }

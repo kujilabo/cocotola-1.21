@@ -9,7 +9,6 @@ import (
 
 	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
 	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/domain"
@@ -38,7 +37,8 @@ func NewSynthesizerHandler(syntheziserUsecase SynthesizerInterface) *Synthesizer
 
 func (h *SynthesizerHandler) Synthesize(c *gin.Context) {
 	ctx := c.Request.Context()
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	synthesizeParameter := libapi.SynthesizeParameter{}
 	if err := c.ShouldBindJSON(&synthesizeParameter); err != nil {

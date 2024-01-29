@@ -4,6 +4,7 @@ go_library(
     name = "helper",
     srcs = [
         "auth_helper.go",
+        "init.go",
         "path_helper.go",
         "query_helper.go",
     ],

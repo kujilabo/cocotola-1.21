@@ -41,7 +41,7 @@ shutdown:
 log:
   level:
     default: debug
-    cocotola-core: debug
+    auth_main: debug
 swagger:
   enabled: true
   host: localhost:8010

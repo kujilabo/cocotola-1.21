@@ -12,7 +12,6 @@ import (
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
 	libdomain "github.com/kujilabo/cocotola-1.21/lib/domain"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-synthesizer/src/service"
@@ -98,7 +97,8 @@ func (r *audioRepository) FindByLangAndText(ctx context.Context, lang5 *libdomai
 	_, span := tracer.Start(ctx, "audioRepository.FindByLangAndText")
 	defer span.End()
 
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppUsecaseLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
 
 	entity := audioEntity{}
 	if result := r.db.Where("lang5 = ? and text = ?", lang5.String(), text).First(&entity); result.Error != nil {

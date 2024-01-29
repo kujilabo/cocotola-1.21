@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
-	liblog "github.com/kujilabo/cocotola-1.21/lib/log"
 
 	rsliblog "github.com/kujilabo/redstart/lib/log"
 
@@ -40,7 +39,9 @@ func NewGoogleAuthHandler(googleUserUsecase GoogleUserUsecaseInterface) *GoogleU
 
 func (h *GoogleUserHandler) GenerateState(c *gin.Context) {
 	ctx := c.Request.Context()
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	logger.Info("GenerateState")
 
 	state, err := h.googleUserUsecase.GenerateState(ctx)
@@ -54,7 +55,9 @@ func (h *GoogleUserHandler) GenerateState(c *gin.Context) {
 
 func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 	ctx := c.Request.Context()
-	logger := rsliblog.GetLoggerFromContext(ctx, liblog.AppControllerLoggerContextKey)
+	ctx = rsliblog.WithLoggerName(ctx, loggerKey)
+	logger := rsliblog.GetLoggerFromContext(ctx, loggerKey)
+
 	logger.Info("Authorize")
 
 	googleAuthParameter := googleAuthParameter{}
