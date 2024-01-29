@@ -13,6 +13,5 @@ go_library(
         "//cocotola-core/src/domain",
         "//cocotola-core/src/service",
         "//lib/api",
-        "//lib/log",
     ],
 )

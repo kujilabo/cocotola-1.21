@@ -15,7 +15,6 @@ go_library(
         "//cocotola-core/src/domain",
         "//cocotola-core/src/service",
         "//lib/api",
-        "//lib/log",
         "@com_github_kujilabo_redstart//lib/domain",
         "@com_github_kujilabo_redstart//lib/errors",
         "@com_github_kujilabo_redstart//lib/gateway",
