@@ -21,25 +21,6 @@ import (
 
 const defaultPageSize = 10
 
-// type WorkbookFindModel struct {
-// 	ID   int    `json:"id"`
-// 	Name string `json:"name"`
-// }
-
-// type WorkbookFindResult struct {
-// 	TotalCount int                  `json:"totalCount"`
-// 	Results    []*WorkbookFindModel `json:"results"`
-// }
-
-//	type Problem struct {
-//		Type       string            `json:"type"`
-//		Properties map[string]string `json:"properties"`
-//	}
-//
-//	type WorkbookWithProblem struct {
-//		ID       int        `json:"id"`
-//		Problems []*Problem `json:"problems"`
-//	}
 type WorkbookQueryUsecase interface {
 	FindWorkbooks(ctx context.Context, operator service.OperatorInterface, param *libapi.WorkbookFindParameter) (*libapi.WorkbookFindResult, error)
 

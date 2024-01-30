@@ -80,11 +80,11 @@ type EnglishConversationModel struct {
 type EnglishSentenceModel struct {
 	SrcLang2                  string `json:"srcLang2"`
 	SrcAudioContent           string `json:"srcAudioContent"`
-	SrcAudioLengthMillisecond int    `json:"SrcAudioLengthMillisecond"`
+	SrcAudioLengthMillisecond int    `json:"srcAudioLengthMillisecond"`
 	SrcText                   string `json:"srcText"`
 	DstLang2                  string `json:"dstLang2"`
 	DstAudioContent           string `json:"dstAudioContent"`
-	DstAudioLengthMillisecond int    `json:"DstAudioLengthMillisecond"`
+	DstAudioLengthMillisecond int    `json:"dstAudioLengthMillisecond"`
 	DstText                   string `json:"dstText"`
 }
 

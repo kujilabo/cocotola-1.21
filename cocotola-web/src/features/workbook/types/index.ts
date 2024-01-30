@@ -16,11 +16,11 @@ export type EnglishSentence = {
   srcLang2: string;
   srcText: string;
   srcAudioContent: string;
-  srcAudioLengthMillisecones: number;
+  srcAudioLengthMillisecond: number;
   dstLang2: string;
   dstText: string;
   dstcAudioContent: string;
-  dstAudioLengthMillisecones: number;
+  dstAudioLengthMillisecond: number;
 };
 export type EnglishSentences = {
   sentences: EnglishSentence[];

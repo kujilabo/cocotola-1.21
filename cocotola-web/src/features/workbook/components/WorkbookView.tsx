@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -52,11 +52,12 @@ const createSpriteForSourceOnly = (englishSentences: EnglishSentence[]): SoundSp
   const tmpSprite: SoundSpriteDefinitions = {};
   for (let i = 0; i < englishSentences.length; i++) {
     const englishSentence = englishSentences[i];
-    const audioLength = englishSentence.srcAudioLengthMillisecones;
+    const audioLength = englishSentence.srcAudioLengthMillisecond;
     const trackNo = makeTrackNo(i + 1);
     tmpSprite[trackNo] = [offset, audioLength];
     offset += audioLength;
   }
+  console.log('tmpSprite', tmpSprite);
   return tmpSprite;
 };
 const createSpriteForSourceAndDestination = (
@@ -68,7 +69,7 @@ const createSpriteForSourceAndDestination = (
 
   for (let i = 0; i < englishSentences.length; i++) {
     const englishSentence = englishSentences[i];
-    const audioLength = englishSentence.srcAudioLengthMillisecones;
+    const audioLength = englishSentence.srcAudioLengthMillisecond;
     const trackNo1 = makeTrackNo(i * 2 + 1);
     tmpSprite[trackNo1] = [offset, audioLength];
     offset += audioLength;
@@ -76,6 +77,7 @@ const createSpriteForSourceAndDestination = (
     const trackNo2 = makeTrackNo(i * 2 + 2);
     tmpSprite[trackNo2] = [totalAudioLength, 500];
   }
+  console.log('tmpSprite', tmpSprite);
   return tmpSprite;
 };
 
@@ -92,15 +94,20 @@ const createSprite = (
     return {};
   }
 };
-const createCard = (englishSentences: EnglishSentence[], activeIndex: number) => {
+const createCard = (
+  englishSentences: EnglishSentence[],
+  activeIndex: number,
+  scrollRef: React.RefObject<HTMLDivElement>
+) => {
   const activeColor = 'green.300';
   const inactiveColor = 'gray.100';
   return (
-    <Box>
+    <Box overflow="scroll" height="calc(100vh - 250px)">
       {englishSentences.map((englishSentence: EnglishSentence, i: number) => {
         const color = activeIndex == i ? activeColor : inactiveColor;
+        const ref = activeIndex == i || (i == 0 && activeIndex < 0) ? scrollRef : null;
         return (
-          <Box key={i}>
+          <Box key={i} ref={ref}>
             <Box p={1}>
               <HStack>
                 <Spacer />
@@ -138,6 +145,7 @@ const PLAYER_SOURCE_AND_DESTINATION = 1;
 export const WorkbookView = (): JSX.Element => {
   const { _workbookId } = useParams();
   const once = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const workbooks = useWorkbookRetrieveStore((state) => state.workbooks);
   const state = useWorkbookRetrieveStore((state) => state.state);
   const retrieveWorkbook = useWorkbookRetrieveStore((state) => state.retrieveWorkbook);
@@ -205,7 +213,7 @@ export const WorkbookView = (): JSX.Element => {
     for (let i = 0; i < workbook.englishSentences.sentences.length; i++) {
       const sentence = workbook.englishSentences.sentences[i];
       src += sentence.srcAudioContent;
-      totalAudioLength += +sentence.srcAudioLengthMillisecones;
+      totalAudioLength += +sentence.srcAudioLengthMillisecond;
     }
 
     const tmpSprite = createSprite(player, workbook.englishSentences.sentences, totalAudioLength);
@@ -226,6 +234,10 @@ export const WorkbookView = (): JSX.Element => {
       }
     }
   }, [workbookId, workbooks, state, retrieveWorkbook]);
+
+  useLayoutEffect(() => {
+    scrollRef.current?.scrollIntoView();
+  }, [scrollRef, trackIndex]);
 
   // play track
   useEffect(() => {
@@ -283,7 +295,8 @@ export const WorkbookView = (): JSX.Element => {
   }
   const workbook = workbooks[workbookId];
 
-  const card = createCard(workbook.englishSentences.sentences, trackIndex - 1);
+  console.log('trackIndex - 1', trackIndex - 1);
+  const card = createCard(workbook.englishSentences.sentences, trackIndex - 1, scrollRef);
 
   const footer = (
     // <ButtonGroup>

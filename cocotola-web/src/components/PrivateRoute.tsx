@@ -21,6 +21,7 @@ export const PrivateRoute = (props: PrivateRouteProps): ReactElement => {
   let isAccessTokenExpired = true;
   if (accessToken && accessToken != null && accessToken !== '') {
     const decoded = jwt_decode<JwtPayload>(accessToken) || null;
+    console.log('decoded', decoded);
     if (decoded.exp) {
       isAccessTokenExpired = decoded.exp < new Date().getTime() / 1000;
     }
@@ -29,10 +30,14 @@ export const PrivateRoute = (props: PrivateRouteProps): ReactElement => {
   let isRefreshTokenExpired = true;
   if (refreshToken && refreshToken != null && refreshToken !== '') {
     const decoded = jwt_decode<JwtPayload>(refreshToken) || null;
+    console.log('decoded', decoded);
     if (decoded.exp) {
       isRefreshTokenExpired = decoded.exp < new Date().getTime() / 1000;
     }
   }
+
+  console.log('isAccessTokenExpired', isAccessTokenExpired);
+  console.log('isRefreshTokenExpired', isRefreshTokenExpired);
 
   //   setError(authError);
 
