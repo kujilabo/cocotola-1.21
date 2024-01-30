@@ -1760,8 +1760,8 @@ go_repository(
 go_repository(
     name = "org_golang_google_api",
     importpath = "google.golang.org/api",
-    sum = "h1:fVTj+7HHiUYz4JEZCHHoRIeQX7h5FMzrA2RF/DzDdbs=",
-    version = "v0.159.0",
+    sum = "h1:SEspjXHVqE1m5a1fRy8JFB+5jSu+V0GEDKDghF3ttO4=",
+    version = "v0.160.0",
 )
 
 go_repository(
@@ -2987,8 +2987,8 @@ go_repository(
 go_repository(
     name = "com_github_grpc_ecosystem_grpc_gateway_v2",
     importpath = "github.com/grpc-ecosystem/grpc-gateway/v2",
-    sum = "h1:Wqo399gCIufwto+VfwCSvsnfGpF/w5E9CNxSwbpD6No=",
-    version = "v2.19.0",
+    sum = "h1:/c3QmbOGMGTOumP2iT/rCwB7b0QDGLKzqOmktBjT+Is=",
+    version = "v2.19.1",
 )
 
 go_repository(

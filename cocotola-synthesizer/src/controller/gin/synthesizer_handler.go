@@ -21,17 +21,17 @@ type AudioResponse struct {
 	Content string `json:"content"`
 }
 
-type SynthesizerInterface interface {
+type SynthesizerUsecase interface {
 	Synthesize(ctx context.Context, lang5 *libdomain.Lang5, void, text string) (*domain.AudioModel, error)
 }
 
 type SynthesizerHandler struct {
-	syntheziserUsecase SynthesizerInterface
+	synthesizerUsecase SynthesizerUsecase
 }
 
-func NewSynthesizerHandler(syntheziserUsecase SynthesizerInterface) *SynthesizerHandler {
+func NewSynthesizerHandler(synthesizerUsecase SynthesizerUsecase) *SynthesizerHandler {
 	return &SynthesizerHandler{
-		syntheziserUsecase: syntheziserUsecase,
+		synthesizerUsecase: synthesizerUsecase,
 	}
 }
 
@@ -52,9 +52,9 @@ func (h *SynthesizerHandler) Synthesize(c *gin.Context) {
 		return
 	}
 
-	audioModel, err := h.syntheziserUsecase.Synthesize(ctx, lang5, synthesizeParameter.Voice, synthesizeParameter.Text)
+	audioModel, err := h.synthesizerUsecase.Synthesize(ctx, lang5, synthesizeParameter.Voice, synthesizeParameter.Text)
 	if err != nil {
-		logger.ErrorContext(ctx, "syntheziserUsecase.Synthesize", slog.Any("err", err))
+		logger.ErrorContext(ctx, "synthesizerUsecase.Synthesize", slog.Any("err", err))
 		c.JSON(http.StatusInternalServerError, gin.H{"message": http.StatusText(http.StatusInternalServerError)})
 		return
 	}
@@ -79,10 +79,10 @@ func (h *SynthesizerHandler) FindAudioByID(c *gin.Context) {
 // 	return false
 // }
 
-func NewInitSynthesizerRouterFunc(syntheziserUsecase SynthesizerInterface) InitRouterGroupFunc {
+func NewInitSynthesizerRouterFunc(synthesizerUsecase SynthesizerUsecase) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 		workbook := parentRouterGroup.Group("synthesize")
-		SynthesizerHandler := NewSynthesizerHandler(syntheziserUsecase)
+		SynthesizerHandler := NewSynthesizerHandler(synthesizerUsecase)
 		for _, m := range middleware {
 			workbook.Use(m)
 		}

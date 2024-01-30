@@ -260,17 +260,6 @@ func containsWorkbook(ctx context.Context, bearerToken string, workbookID *domai
 	return nil, errors.New(string(respBytes))
 }
 
-// type EnglishSentencesOne struct {
-// 	SrcLang2                  string `json:"srcLang2"`
-// 	SrcAudioContent           string `json:"srcAudioContent"`
-// 	SrcAudioLengthMillisecond int    `json:"SrcAudioLengthMillisecond"`
-// 	SrcText                   string `json:"srcText"`
-// 	DstLang2                  string `json:"dstLang2"`
-// 	DstAudioContent           string `json:"dstAudioContent"`
-// 	DstAudioLengthMillisecond int    `json:"DstAudioLengthMillisecond"`
-// 	DstText                   string `json:"dstText"`
-// }
-
 type englishSentencesCSVReader struct {
 	reader1 *csv.Reader
 }

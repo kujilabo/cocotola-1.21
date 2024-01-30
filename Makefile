@@ -29,6 +29,9 @@ gen-code:
 	@pushd ./cocotola-auth/ && \
 		mockery	&& \
 	popd
+	@pushd ./cocotola-synthesizer/ && \
+		mockery	&& \
+	popd
 
 .PHONY: work-init
 work-init:

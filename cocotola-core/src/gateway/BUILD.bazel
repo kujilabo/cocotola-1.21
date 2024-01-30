@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "gateway",
@@ -20,14 +20,5 @@ go_library(
         "@com_github_kujilabo_redstart//lib/gateway",
         "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_otel//:otel",
-    ],
-)
-
-go_test(
-    name = "gateway_test",
-    srcs = ["workbook_repository_test.go"],
-    deps = [
-        ":gateway",
-        "@com_github_stretchr_testify//require",
     ],
 )

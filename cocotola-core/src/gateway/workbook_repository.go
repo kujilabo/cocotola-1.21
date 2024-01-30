@@ -11,32 +11,18 @@ import (
 	rsliberrors "github.com/kujilabo/redstart/lib/errors"
 	rslibgateway "github.com/kujilabo/redstart/lib/gateway"
 
+	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
+
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/service"
-	libapi "github.com/kujilabo/cocotola-1.21/lib/api"
 )
 
-type EnglishSentenceModel struct {
-	SrcLang2                  string `json:"srcLang2"`
-	SrcAudioContent           string `json:"srcAudioContent"`
-	SrcAudioLengthMillisecond int    `json:"SrcAudioLengthMillisecond"`
-	SrcText                   string `json:"srcText"`
-	DstLang2                  string `json:"dstLang2"`
-	DstAudioContent           string `json:"dstAudioContent"`
-	DstAudioLengthMillisecond int    `json:"DstAudioLengthMillisecond"`
-	DstText                   string `json:"dstText"`
-}
-
-type EnglishSentencesModel struct {
-	Sentences []*EnglishSentenceModel `json:"sentences"`
-}
-
-func FromEnglishSentenceModel(model *EnglishSentencesModel) ([]byte, error) {
+func FromEnglishSentenceModel(model *libapi.EnglishSentencesModel) ([]byte, error) {
 	return json.Marshal(model)
 }
 
-func ToEnglishSentenceModel(content []byte) (*EnglishSentencesModel, error) {
-	model := EnglishSentencesModel{}
+func ToEnglishSentenceModel(content []byte) (*libapi.EnglishSentencesModel, error) {
+	model := libapi.EnglishSentencesModel{}
 	if err := json.Unmarshal(content, &model); err != nil {
 		return nil, err
 	}
