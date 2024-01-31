@@ -91,3 +91,11 @@ type EnglishSentenceModel struct {
 type EnglishSentencesModel struct {
 	Sentences []*EnglishSentenceModel `json:"sentences"`
 }
+
+type AddPolicyToUserParameter struct {
+	OrganizationID int    `json:"organizationId"`
+	Subject        string `json:"subject"`
+	Action         string `json:"action"`
+	Object         string `json:"object"`
+	Effect         string `json:"effect"`
+}
