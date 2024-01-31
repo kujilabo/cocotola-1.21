@@ -26,6 +26,7 @@ type WorkbookQueryUsecase interface {
 
 	RetrieveWorkbookByID(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID) (*libapi.WorkbookRetrieveResult, error)
 }
+
 type WorkbookCommandUsecase interface {
 	AddWorkbook(ctx context.Context, operator service.OperatorInterface, param *service.WorkbookAddParameter) (*domain.WorkbookID, error)
 	UpdateWorkbook(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID, version int, param *service.WorkbookUpdateParameter) error
@@ -123,6 +124,7 @@ func (h *WorkbookHandler) AddWorkbook(c *gin.Context) {
 		return nil
 	}, h.errorHandle)
 }
+
 func (h *WorkbookHandler) UpdateWorkbook(c *gin.Context) {
 	helper.HandleSecuredFunction(c, func(ctx context.Context, logger *slog.Logger, operator service.OperatorInterface) error {
 		version, err := helper.GetIntFromQuery(c, "version")
@@ -130,16 +132,9 @@ func (h *WorkbookHandler) UpdateWorkbook(c *gin.Context) {
 			return rslibdomain.ErrInvalidArgument
 		}
 
-		workbookIDInt, err := helper.GetIntFromPath(c, "workbookID")
+		workbookID, err := helper.GetWorkbookIDFromPath(c, "workbookID")
 		if err != nil {
 			logger.WarnContext(ctx, fmt.Sprintf("GetIntFromPath. err: %+v", err))
-			c.Status(http.StatusBadRequest)
-			return nil
-		}
-
-		workbookID, err := domain.NewWorkbookID(workbookIDInt)
-		if err != nil {
-			logger.WarnContext(ctx, fmt.Sprintf("NewWorkbookID. err: %+v", err))
 			c.Status(http.StatusBadRequest)
 			return nil
 		}

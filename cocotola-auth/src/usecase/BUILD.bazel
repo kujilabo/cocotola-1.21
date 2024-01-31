@@ -7,6 +7,7 @@ go_library(
         "google_user_usecase.go",
         "init.go",
         "password_usecase.go",
+        "rbac_usecase.go",
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/usecase",
     visibility = ["//visibility:public"],

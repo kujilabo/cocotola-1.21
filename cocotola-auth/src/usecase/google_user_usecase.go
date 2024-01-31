@@ -72,7 +72,7 @@ type GoogleUserUsecase struct {
 	googleAuthClient GoogleAuthClient
 }
 
-func NewGoogleUserUsecase(txManager, nonTxManager service.TransactionManager, authTokenManager service.AuthTokenManager, googleAuthClient GoogleAuthClient) *GoogleUserUsecase {
+func NewGoogleUser(txManager, nonTxManager service.TransactionManager, authTokenManager service.AuthTokenManager, googleAuthClient GoogleAuthClient) *GoogleUserUsecase {
 	return &GoogleUserUsecase{
 		txManager:        txManager,
 		nonTxManager:     nonTxManager,

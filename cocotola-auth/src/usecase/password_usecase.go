@@ -17,7 +17,7 @@ type PasswordUsecae struct {
 	authTokenManager service.AuthTokenManager
 }
 
-func NewPasswordUsecae(txManager, nonTxManager service.TransactionManager, authTokenManager service.AuthTokenManager) *PasswordUsecae {
+func NewPassword(txManager, nonTxManager service.TransactionManager, authTokenManager service.AuthTokenManager) *PasswordUsecae {
 	return &PasswordUsecae{
 		txManager:        txManager,
 		nonTxManager:     nonTxManager,

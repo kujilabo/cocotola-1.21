@@ -19,7 +19,7 @@ import (
 	"github.com/kujilabo/cocotola-1.21/cocotola-auth/src/domain"
 )
 
-func initGoogleRouter(t *testing.T, ctx context.Context, googleUser handler.GoogleUserUsecaseInterface) *gin.Engine {
+func initGoogleRouter(t *testing.T, ctx context.Context, googleUser handler.GoogleUserUsecase) *gin.Engine {
 	t.Helper()
 	fn := handler.NewInitGoogleRouterFunc(googleUser)
 

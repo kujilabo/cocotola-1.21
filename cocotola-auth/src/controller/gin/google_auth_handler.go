@@ -22,16 +22,16 @@ type googleAuthParameter struct {
 	Code             string `json:"code"`
 }
 
-type GoogleUserUsecaseInterface interface {
+type GoogleUserUsecase interface {
 	GenerateState(context.Context) (string, error)
 	Authorize(ctx context.Context, state, code, organizationName string) (*domain.AuthTokenSet, error)
 }
 
 type GoogleUserHandler struct {
-	googleUserUsecase GoogleUserUsecaseInterface
+	googleUserUsecase GoogleUserUsecase
 }
 
-func NewGoogleAuthHandler(googleUserUsecase GoogleUserUsecaseInterface) *GoogleUserHandler {
+func NewGoogleAuthHandler(googleUserUsecase GoogleUserUsecase) *GoogleUserHandler {
 	return &GoogleUserHandler{
 		googleUserUsecase: googleUserUsecase,
 	}
@@ -136,14 +136,14 @@ func (h *GoogleUserHandler) Authorize(c *gin.Context) {
 	})
 }
 
-func NewInitGoogleRouterFunc(googleUser GoogleUserUsecaseInterface) InitRouterGroupFunc {
+func NewInitGoogleRouterFunc(googleUserUsecase GoogleUserUsecase) InitRouterGroupFunc {
 	return func(parentRouterGroup gin.IRouter, middleware ...gin.HandlerFunc) error {
 		auth := parentRouterGroup.Group("google")
 		for _, m := range middleware {
 			auth.Use(m)
 		}
 
-		googleAuthHandler := NewGoogleAuthHandler(googleUser)
+		googleAuthHandler := NewGoogleAuthHandler(googleUserUsecase)
 		auth.GET("state", googleAuthHandler.GenerateState)
 		auth.POST("authorize", googleAuthHandler.Authorize)
 		return nil

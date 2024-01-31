@@ -21,20 +21,18 @@ func NewWorkbookCommandUsecase(txManager, nonTxManager service.TransactionManage
 
 func (u *WorkbookCommandUsecase) AddWorkbook(ctx context.Context, operator service.OperatorInterface, param *service.WorkbookAddParameter) (*domain.WorkbookID, error) {
 	var workbookID *domain.WorkbookID
-	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
-		workbookRepo, err := rf.NewWorkbookRepository(ctx)
-		if err != nil {
-			return err
-		}
 
-		tmpWorkbookID, err := workbookRepo.AddWorkbook(ctx, operator, param)
+	fn := func(workbookRepository service.WorkbookRepository) error {
+		tmpWorkbookID, err := workbookRepository.AddWorkbook(ctx, operator, param)
 		if err != nil {
 			return err
 		}
 
 		workbookID = tmpWorkbookID
 		return nil
-	}); err != nil {
+	}
+
+	if err := u.workbookFunction(ctx, operator, fn); err != nil {
 		return nil, err
 	}
 
@@ -42,13 +40,28 @@ func (u *WorkbookCommandUsecase) AddWorkbook(ctx context.Context, operator servi
 }
 
 func (u *WorkbookCommandUsecase) UpdateWorkbook(ctx context.Context, operator service.OperatorInterface, workbookID *domain.WorkbookID, version int, param *service.WorkbookUpdateParameter) error {
+	fn := func(workbookRepository service.WorkbookRepository) error {
+		if err := workbookRepository.UpdateWorkbook(ctx, operator, workbookID, version, param); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	if err := u.workbookFunction(ctx, operator, fn); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *WorkbookCommandUsecase) workbookFunction(ctx context.Context, operator service.OperatorInterface, fn func(workbookRepository service.WorkbookRepository) error) error {
 	if err := u.txManager.Do(ctx, func(rf service.RepositoryFactory) error {
 		workbookRepo, err := rf.NewWorkbookRepository(ctx)
 		if err != nil {
 			return err
 		}
-
-		if err := workbookRepo.UpdateWorkbook(ctx, operator, workbookID, version, param); err != nil {
+		if err := fn(workbookRepo); err != nil {
 			return err
 		}
 
@@ -56,5 +69,6 @@ func (u *WorkbookCommandUsecase) UpdateWorkbook(ctx context.Context, operator se
 	}); err != nil {
 		return err
 	}
+
 	return nil
 }

@@ -56,7 +56,7 @@ func init() {
 	}
 }
 
-func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.AuthenticationUsecaseInterface) *gin.Engine {
+func initAuthRouter(t *testing.T, ctx context.Context, authentication handler.AuthenticationUsecase) *gin.Engine {
 	t.Helper()
 	fn := handler.NewInitAuthRouterFunc(authentication)
 
