@@ -1172,8 +1172,8 @@ go_repository(
 go_repository(
     name = "com_github_mattn_go_sqlite3",
     importpath = "github.com/mattn/go-sqlite3",
-    sum = "h1:BAZ50Ns0OFBNxdAqFhbZqdPcht1Xlb16pDCqkq1spr0=",
-    version = "v1.14.20",
+    sum = "h1:IXocQLOykluc3xPE0Lvy8FtggMz1G+U3mEjg+0zGizc=",
+    version = "v1.14.21",
 )
 
 go_repository(
@@ -1585,8 +1585,8 @@ go_repository(
 go_repository(
     name = "com_google_cloud_go_compute",
     importpath = "cloud.google.com/go/compute",
-    sum = "h1:6sVlXXBmbd7jNX0Ipq0trII3e4n1/MsADLK6a+aiVlk=",
-    version = "v1.23.3",
+    sum = "h1:EBT9Nw4q3zyE7G45Wvv3MzolIrCJEuHys5muLY0wvAw=",
+    version = "v1.23.4",
 )
 
 go_repository(
@@ -1760,8 +1760,8 @@ go_repository(
 go_repository(
     name = "org_golang_google_api",
     importpath = "google.golang.org/api",
-    sum = "h1:SEspjXHVqE1m5a1fRy8JFB+5jSu+V0GEDKDghF3ttO4=",
-    version = "v0.160.0",
+    sum = "h1:oYzk/bs26WN10AV7iU7MVJVXBH8oCPS2hHyBiEeFoSU=",
+    version = "v0.161.0",
 )
 
 go_repository(
@@ -1949,8 +1949,8 @@ go_repository(
 go_repository(
     name = "org_modernc_libc",
     importpath = "modernc.org/libc",
-    sum = "h1:ZHN83BZzEytp4ctJMC2lxGTU3l8jo+2kGW7AUatIDZw=",
-    version = "v1.40.8",
+    sum = "h1:oCWzNF5k6gedzmiqtOQACV07U4RxWy2qPBTyVWwObjw=",
+    version = "v1.40.10",
 )
 
 go_repository(
@@ -2791,8 +2791,8 @@ go_repository(
 go_repository(
     name = "com_google_cloud_go_trace",
     importpath = "cloud.google.com/go/trace",
-    sum = "h1:2qOAuAzNezwW3QN+t41BtkDJOG42HywL73q8x/f6fnM=",
-    version = "v1.10.4",
+    sum = "h1:0pr4lIKJ5XZFYD9GtxXEWr0KkVeigc3wlGpZco0X1oA=",
+    version = "v1.10.5",
 )
 
 go_repository(

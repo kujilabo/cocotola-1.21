@@ -18,6 +18,7 @@ import (
 type PasswordUsecaseInterface interface {
 	Authenticate(ctx context.Context, loginID, password, organizationName string) (*domain.AuthTokenSet, error)
 }
+
 type PasswordAuthHandler struct {
 	passwordUsecase PasswordUsecaseInterface
 }

@@ -68,11 +68,14 @@ func InitAppServer(ctx context.Context, parentRouterGroup gin.IRouter, corsConfi
 	signingMethod := jwt.SigningMethodHS256
 	authTokenManager := gateway.NewAuthTokenManager(signingKey, signingMethod, time.Duration(authConfig.AccessTokenTTLMin)*time.Minute, time.Duration(authConfig.RefreshTokenTTLHour)*time.Hour)
 
+	rbacUsecase := usecase.NewRBAC(txManager, nonTxManager)
 	authenticationUsecase := usecase.NewAuthentication(txManager, authTokenManager, &systemOwnerByOrganizationName{})
-	googleUserUsecase := usecase.NewGoogleUserUsecase(txManager, nonTxManager, authTokenManager, googleAuthClient)
-	passwordUsecase := usecase.NewPasswordUsecae(txManager, nonTxManager, authTokenManager)
+	googleUserUsecase := usecase.NewGoogleUser(txManager, nonTxManager, authTokenManager, googleAuthClient)
+	passwordUsecase := usecase.NewPassword(txManager, nonTxManager, authTokenManager)
 
-	privateRouterGroupFunc := []controller.InitRouterGroupFunc{}
+	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitRBACRouterFunc(rbacUsecase),
+	}
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitTestRouterFunc(),

@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kujilabo/cocotola-1.21/cocotola-core/src/domain"
 )
 
 func GetIntFromPath(c *gin.Context, param string) (int, error) {
@@ -18,4 +19,18 @@ func GetIntFromPath(c *gin.Context, param string) (int, error) {
 
 func GetStringFromPath(c *gin.Context, param string) string {
 	return c.Param(param)
+}
+
+func GetWorkbookIDFromPath(c *gin.Context, param string) (*domain.WorkbookID, error) {
+	value, err := GetIntFromPath(c, param)
+	if err != nil {
+		return nil, err
+	}
+
+	workbookID, err := domain.NewWorkbookID(value)
+	if err != nil {
+		return nil, err
+	}
+
+	return workbookID, nil
 }

@@ -9,6 +9,7 @@ go_library(
         "google_auth_handler.go",
         "init.go",
         "password_auth_handler.go",
+        "rback_handler.go",
         "user_handler.go",
     ],
     importpath = "github.com/kujilabo/cocotola-1.21/cocotola-auth/src/controller/gin",
