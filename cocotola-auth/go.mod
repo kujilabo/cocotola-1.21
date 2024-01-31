@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240130170721-ca8dd8c6af1f
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240131154816-bdd9292f2180
 	github.com/kujilabo/redstart v0.0.12
 	github.com/ohler55/ojg v1.21.0
 	github.com/samber/slog-gin v1.10.1

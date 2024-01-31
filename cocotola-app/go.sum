@@ -228,8 +228,8 @@ github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240131154816-bdd9292f21
 github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240131154816-bdd9292f2180/go.mod h1:zQNma84dnjczYRlo9/Nnmz7GKMd0P8Hw5BJS68gI33Q=
 github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240131154816-bdd9292f2180 h1:Canw5E4G7X9XT2UVFtpIBqfxc0BcfGAYqZlXjffMd58=
 github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240131154816-bdd9292f2180/go.mod h1:usy2PxhUHvVY6cEuWvwAql2Hmu3bCVW9GVBZX5lL7mo=
-github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240130170721-ca8dd8c6af1f h1:jfvZmcrorUw8DWISugYDtepQrVQcwIL4idI8Yp6Aha0=
-github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240130170721-ca8dd8c6af1f/go.mod h1:7G4fu+hZUWOMaZcJtH+vYjs4oNpBNfjixRsCMlxfQms=
+github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240131154816-bdd9292f2180 h1:wYY663+DqjOuLPOI+p0LKyraecaLE1dg/ZkfJTq3wKs=
+github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240131154816-bdd9292f2180/go.mod h1:7G4fu+hZUWOMaZcJtH+vYjs4oNpBNfjixRsCMlxfQms=
 github.com/kujilabo/redstart v0.0.12 h1:XyNPqeIfUlmKZjfhqVrXAhRA3h9m6MpU++I73Y9Gptw=
 github.com/kujilabo/redstart v0.0.12/go.mod h1:txieZR1M4mr9OEXqi1yMhQ2YlFGaBRYxopwzHdKCnDQ=
 github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=

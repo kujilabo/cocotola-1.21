@@ -6,7 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/kujilabo/cocotola-1.21/cocotola-auth v0.0.0-20240131154816-bdd9292f2180
 	github.com/kujilabo/cocotola-1.21/cocotola-core v0.0.0-20240131154816-bdd9292f2180
-	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240130170721-ca8dd8c6af1f
+	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240131154816-bdd9292f2180
 	github.com/kujilabo/redstart v0.0.12
 	go.opentelemetry.io/otel v1.22.0
 	go.opentelemetry.io/otel/sdk v1.22.0
