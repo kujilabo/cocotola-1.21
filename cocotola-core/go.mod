@@ -6,7 +6,7 @@ require (
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/kujilabo/cocotola-1.21/lib v0.0.0-20240130170721-ca8dd8c6af1f
-	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240130170721-ca8dd8c6af1f
+	github.com/kujilabo/cocotola-1.21/proto v0.0.0-20240131154816-bdd9292f2180
 	github.com/kujilabo/redstart v0.0.12
 	github.com/ohler55/ojg v1.21.0
 	github.com/samber/slog-gin v1.10.1
